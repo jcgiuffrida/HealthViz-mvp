@@ -12,7 +12,7 @@ var svg = d3.select("#chart").append("svg")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 /////////// Read in and format the data
-d3.csv("SDH.json", clean, function(data) {
+d3.csv("SDH.csv", clean, function(data) {
   var drawn = false;
   var cols = getColumns(data);
 
@@ -105,9 +105,9 @@ d3.csv("SDH.json", clean, function(data) {
       });
     redraw();
   }
-  selectAttribute({row:findAttr('fertility rate'),col:attrs[0]});
-  selectAttribute({row:findAttr('Life expectancy at birth male'),col:attrs[1]});
-  selectAttribute({row:findAttr('Income per person'),col:attrs[2]});
+  selectAttribute({row:findAttr('HARDSHIP INDEX 2010'),col:attrs[0]});
+  selectAttribute({row:findAttr('Life Expectancy at Birth 2010'),col:attrs[1]});
+  selectAttribute({row:findAttr('Unemployment Rate 2011'),col:attrs[2]});
   function findAttr(search) {
     var lower = search.toLowerCase();
     return cols.filter(function (attr) {
@@ -322,7 +322,7 @@ function getColumns(data) {
 // convert incoming strings to numbers
 function clean(item) {
   d3.keys(item).forEach(function (key) {
-    if (key === 'Country') {
+    if (key === 'COMMUNITY AREA NAME') {
       // do nothing
     } else if (item[key] === "") {
       item[key] = null;
