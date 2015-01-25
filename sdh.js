@@ -12,7 +12,7 @@ var svg = d3.select("#chart").append("svg")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 /////////// Read in and format the data
-d3.csv("SDH.json", clean, function(data) {
+d3.csv("SDH.csv", clean, function(data) {
   var drawn = false;
   var cols = getColumns(data);
 
@@ -91,7 +91,7 @@ d3.csv("SDH.json", clean, function(data) {
     {value: 'radius'}
   ];
   var attributes = {};
-  header('Attribute to Display Mapping');
+  header('Variables');
   var colsTable = table('', attrs);
   cols.forEach(function (col) {
     row(colsTable, attrs, col.name, col);
@@ -105,9 +105,9 @@ d3.csv("SDH.json", clean, function(data) {
       });
     redraw();
   }
-  selectAttribute({row:findAttr('HARDSHIP INDEX 2010'),col:attrs[0]});
-  selectAttribute({row:findAttr('Life Expectancy at Birth 2010'),col:attrs[1]});
-  selectAttribute({row:findAttr('Unemployment Rate 2011'),col:attrs[2]});
+  selectAttribute({row:findAttr('Unemployment Rate 2011'),col:attrs[0]});
+  selectAttribute({row:findAttr('Premature Mortality Rate'),col:attrs[1]});
+  selectAttribute({row:findAttr('Total Population'),col:attrs[2]});
   function findAttr(search) {
     var lower = search.toLowerCase();
     return cols.filter(function (attr) {
@@ -235,18 +235,18 @@ d3.csv("SDH.json", clean, function(data) {
           typeof d[attributes.x.key] === 'number' &&
           typeof d[attributes.y.key] === 'number';
       });
-      var countries = svg.selectAll('.country').data(filteredData, function (d) { return d.Country; });
-      countries.transition().duration(transitionDuration)
+      var areas = svg.selectAll('.ca').data(filteredData, function (d) { return d.CommunityArea; });
+      areas.transition().duration(transitionDuration)
         .ease(easingFunc)
         .call(place);
-      countries.enter().append('circle')
-          .attr('class', 'country')
-          .attr('fill', function (d) { return colorScale(d.Continent); })
+      areas.enter().append('circle')
+          .attr('class', 'ca')
+          .attr('fill', function (d) { return colorScale(d.Region); })
           .on("mouseleave", mouseout)
           .on("mouseout", mouseout)
           .on("mouseover", mouseover)
           .call(place);
-      countries.exit()
+      areas.exit()
         .transition()
         .duration(transitionDuration)
         .ease(easingFunc)
@@ -264,7 +264,7 @@ d3.csv("SDH.json", clean, function(data) {
     d.mouseover = true;
     var dx = Math.round(x(d[attributes.x.key]));
     var dy = Math.round(y(d[attributes.y.key]));
-    tip.selectAll('.country').text(d.Country);
+    tip.selectAll('.ca').text(d.CommunityArea);
     tip.selectAll('.x .name').text(attributes.x.name);
     tip.selectAll('.x .value').text(d[attributes.x.key]);
     tip.selectAll('.x .units').text(attributes.x.units ? "(" + attributes.x.units + ")" : "");
@@ -277,7 +277,7 @@ d3.csv("SDH.json", clean, function(data) {
   }
 
   function mouseout(d) {
-    d3.selectAll('circle.country').each(function (d) { d.mouseover = false; });
+    d3.selectAll('circle.ca').each(function (d) { d.mouseover = false; });
     tip.style("display", "none");
   }
 
@@ -288,6 +288,7 @@ d3.csv("SDH.json", clean, function(data) {
   d3.select("#chart svg")
     .attr('height', totalHeight);
   d3.select(self.frameElement).style("height", totalHeight + "px");
+  mouseout();
 });
 
 // Extract columns of interest from the dataset.  Columns of interest are the top N
@@ -312,17 +313,18 @@ function getColumns(data) {
       units: units && units[1]
     };
   }).filter(function (col) {
-    // only country, country ID and continent have full coverage - omit those
+    // omit Community Area and any variable with <90% coverage
     return items[col.key] !== data.length &&
       items[col.key] > 0.9 * data.length &&
-      col.name.length < 32;
+      col.name !== "CommunityArea" &&
+      col.name !== "Region";
   });
 }
 
 // convert incoming strings to numbers
 function clean(item) {
   d3.keys(item).forEach(function (key) {
-    if (key === 'COMMUNITY AREA NAME') {
+    if (key === 'CommunityArea') {
       // do nothing
     } else if (item[key] === "") {
       item[key] = null;

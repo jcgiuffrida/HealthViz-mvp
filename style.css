@@ -15,6 +15,11 @@ body {
   position: relative;
 }
 
+.pageheader {
+  font-size: 24px;
+  font-weight: bold;
+}
+
 svg {
   font: 10px sans-serif;
 }
@@ -63,6 +68,7 @@ tr {
 #controls {
   height: 530px;
   overflow: scroll;
+  margin-top: 10px;
 }
 
 a {
@@ -84,12 +90,12 @@ a {
 .label {
   font-size: 10px;
 }
-.country {
+.ca {
   fill-opacity: 0.5;
   stroke: #555;
   stroke-opacity: 0.5;
 }
-.country:hover {
+.ca:hover {
   fill-opacity: 1;
   stroke-opacity: 1;
 }
@@ -112,7 +118,7 @@ a {
   margin: 5px 0 0 5px;
 }
 
-.tip .country {
+.tip .ca {
   font-weight: bold;
   margin-bottom: 4px;
 }
