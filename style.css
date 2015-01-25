@@ -18,6 +18,7 @@ body {
 .pageheader {
   font-size: 24px;
   font-weight: bold;
+  margin: 20px 0;
 }
 
 svg {
@@ -66,7 +67,7 @@ tr {
 }
 
 #controls {
-  height: 530px;
+  height: 700px;
   overflow: scroll;
   margin-top: 10px;
 }

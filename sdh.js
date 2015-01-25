@@ -27,9 +27,9 @@ d3.csv("SDH.csv", clean, function(data) {
     {value: 'exp'}
   ];
   var func;
-  header('Interpolation Function');
+  // header('Interpolation Function');
   var funcTable = table(funcs);
-  row(funcTable, funcs, '', 'interp-func');
+  // row(funcTable, funcs, '', 'interp-func');
   funcTable.selectAll('a').on('click', selectFunc);
   function selectFunc(d) {
     func = d.col.value;
@@ -46,9 +46,9 @@ d3.csv("SDH.csv", clean, function(data) {
     {value: 'in-out'}
   ];
   var mode;
-  header('Interpolation Mode');
+  // header('Interpolation Mode');
   var modeTable = table(modes);
-  row(modeTable, modes, '', 'interp-mode');
+  // row(modeTable, modes, '', 'interp-mode');
   modeTable.selectAll('a').on('click', selectMode);
   function selectMode(d) {
     mode = d.col.value;
@@ -82,7 +82,7 @@ d3.csv("SDH.csv", clean, function(data) {
   }
   selectScale({col:scales[0],row:'x-scale'});
   selectScale({col:scales[0],row:'y-scale'});
-  selectScale({col:scales[2],row:'size-scale'});
+  selectScale({col:scales[0],row:'size-scale'});
 
   /////////// Draw the attribute mappings
   var attrs = [
