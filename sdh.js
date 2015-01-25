@@ -12,7 +12,7 @@ var svg = d3.select("#chart").append("svg")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 /////////// Read in and format the data
-d3.csv("SDH.csv", clean, function(data) {
+d3.csv("SDH.json", clean, function(data) {
   var drawn = false;
   var cols = getColumns(data);
 
