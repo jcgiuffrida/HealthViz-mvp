@@ -1,8 +1,10 @@
+// code adapted from http://bl.ocks.org/msbarry/raw/9911363/
+
 var margin = {top: 10, right: 10, bottom: 10, left: 60},
     width = Math.round(0.59 * 940) - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom,
     transitionDuration = 1000,
-    maxRadius = 7,
+    maxRadius = 9,
     minRadius = 1;
 
 var svg = d3.select("#chart").append("svg")
@@ -265,12 +267,15 @@ d3.csv("SDH.csv", clean, function(data) {
     var dx = Math.round(x(d[attributes.x.key]));
     var dy = Math.round(y(d[attributes.y.key]));
     tip.selectAll('.ca').text(d.CommunityArea);
+    tip.selectAll('.rd .name').text(attributes.radius.name);
+    tip.selectAll('.rd .value').text(d[attributes.radius.key]);
+    tip.selectAll('.rd .units').text(attributes.radius.units ? attributes.radius.units : "");
     tip.selectAll('.x .name').text(attributes.x.name);
     tip.selectAll('.x .value').text(d[attributes.x.key]);
-    tip.selectAll('.x .units').text(attributes.x.units ? "(" + attributes.x.units + ")" : "");
+    tip.selectAll('.x .units').text(attributes.x.units ? attributes.x.units : "");
     tip.selectAll('.y .name').text(attributes.y.name);
     tip.selectAll('.y .value').text(d[attributes.y.key]);
-    tip.selectAll('.y .units').text(attributes.y.units ? "(" + attributes.y.units + ")" : "");
+    tip.selectAll('.y .units').text(attributes.y.units ? attributes.y.units : "");
     tip.style("display", null)
         .style("top", (dy + margin.top + 10) + "px")
         .style("left", (dx + margin.left + 10) + "px");
