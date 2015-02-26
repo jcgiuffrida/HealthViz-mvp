@@ -30,7 +30,7 @@ d3.csv("SDH ii.csv", clean, function(data) {
   ];
   var func;
   // header('Interpolation Function');
-  var funcTable = table(funcs);
+  var funcTable = table(funcs, 'interpolations');
   // row(funcTable, funcs, '', 'interp-func');
   funcTable.selectAll('a').on('click', selectFunc);
   function selectFunc(d) {
@@ -49,7 +49,7 @@ d3.csv("SDH ii.csv", clean, function(data) {
   ];
   var mode;
   // header('Interpolation Mode');
-  var modeTable = table(modes);
+  var modeTable = table(modes, 'modes');
   // row(modeTable, modes, '', 'interp-mode');
   modeTable.selectAll('a').on('click', selectMode);
   function selectMode(d) {
@@ -60,6 +60,10 @@ d3.csv("SDH ii.csv", clean, function(data) {
   }
   selectMode({col:modes[2]});
 
+
+
+
+
   /////////// Draw the scales
   var scales = [
     {value: 'linear', scale: function () { return d3.scale.linear(); } },
@@ -69,7 +73,7 @@ d3.csv("SDH ii.csv", clean, function(data) {
   ];
   var scale = {};
   header('Axis Scale');
-  var scaleTable = table(scales);
+  var scaleTable = table(scales, 'scales');
   row(scaleTable, scales, 'X', 'x-scale');
   row(scaleTable, scales, 'Y', 'y-scale');
   row(scaleTable, scales, 'Size', 'size-scale');
@@ -94,10 +98,12 @@ d3.csv("SDH ii.csv", clean, function(data) {
   ];
   var attributes = {};
   header('Variables');
-  var colsTable = table('', attrs);
+  var colsTable = table(attrs, 'attributes');
   cols.forEach(function (col) {
     row(colsTable, attrs, col.name, col);
   });
+
+  // this is the magic
   colsTable.selectAll('a').on('click', selectAttribute);
   function selectAttribute(d) {
     attributes[d.col.value] = d.row;
@@ -107,6 +113,7 @@ d3.csv("SDH ii.csv", clean, function(data) {
       });
     redraw();
   }
+
   selectAttribute({row:findAttr('Hardship Index 2012'),col:attrs[0]});
   selectAttribute({row:findAttr('Infant Mortality'),col:attrs[1]});
   selectAttribute({row:findAttr('Population'),col:attrs[2]});
@@ -121,8 +128,8 @@ d3.csv("SDH ii.csv", clean, function(data) {
   function header(text) {
     form.append('div').text(text).attr('class', 'header');
   }
-  function table(data) {
-    var table = form.append('table')
+  function table(data, tableID) {
+    var table = form.append('table').attr('id', tableID);
     return table;
   }
   function row(table, data, display, name) {
@@ -132,7 +139,7 @@ d3.csv("SDH ii.csv", clean, function(data) {
     row.selectAll('td.option')
         .data(function (rowData) {
           return data.map(function (colData) {
-            return {
+            return {  
               row: name,
               col: colData
             };
@@ -197,7 +204,7 @@ d3.csv("SDH ii.csv", clean, function(data) {
       .attr('class', 'y label');
 
 
-  
+
 
   function place(selection) {
     selection
@@ -263,7 +270,9 @@ d3.csv("SDH ii.csv", clean, function(data) {
         .ease(easingFunc)
         .call(place);
       areas.enter().append('circle')
-          .attr('class', 'ca')
+          //.attr('class', 'ca')
+          .attr('class', function (d) {
+            return d.Region === 0 ? 'chicago ca' : 'ca'; })
           .attr('fill', function (d) { return colorScale(d.Region); })
           .on("mouseleave", mouseout)
           .on("mouseout", mouseout)
@@ -441,3 +450,11 @@ function leastSquares(xSeries, ySeries) {
   
   return [slope, intercept, rSquare];
 }
+
+
+// the following is a workaround to put the variables into collapsible panels
+// using jquery because of time constraints
+var attrsTable = $('table#attributes');
+
+
+

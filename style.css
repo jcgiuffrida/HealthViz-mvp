@@ -134,4 +134,9 @@ a.selected {
     stroke-width: 3;
   }
 
-  
+/* bootstrap corrections */
+.btn-group-sm>.btn, .btn-sm {
+  padding: 2px 7px;
+  line-height: 1.2;
+  border-radius: 5px;
+}
