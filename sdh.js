@@ -4,8 +4,8 @@ var margin = {top: 10, right: 10, bottom: 10, left: 60},
     width = Math.round(0.59 * 940) - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom,
     transitionDuration = 1000,
-    maxRadius = 9,
-    minRadius = 1;
+    maxRadius = 10,
+    minRadius = 2;
 
 var svg = d3.select("#chart").append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -14,7 +14,7 @@ var svg = d3.select("#chart").append("svg")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 /////////// Read in and format the data
-d3.csv("SDH.csv", clean, function(data) {
+d3.csv("SDH ii.csv", clean, function(data) {
   var drawn = false;
   var cols = getColumns(data);
 
@@ -25,7 +25,7 @@ d3.csv("SDH.csv", clean, function(data) {
   var funcs = [
     {value: 'linear'},
     {value: 'cubic'},
-    {value: 'sin'},
+    {value: 'sin'}, 
     {value: 'exp'}
   ];
   var func;
@@ -63,8 +63,8 @@ d3.csv("SDH.csv", clean, function(data) {
   /////////// Draw the scales
   var scales = [
     {value: 'linear', scale: function () { return d3.scale.linear(); } },
-    {value: 'pow(2)', scale: function () { return d3.scale.pow().exponent(2); } },
-    {value: 'sqrt', scale: function () { return d3.scale.sqrt(); } },
+    // {value: 'pow(2)', scale: function () { return d3.scale.pow().exponent(2); } },
+    // {value: 'sqrt', scale: function () { return d3.scale.sqrt(); } },
     {value: 'log', scale: function () { return d3.scale.log(); } },
   ];
   var scale = {};
@@ -107,9 +107,9 @@ d3.csv("SDH.csv", clean, function(data) {
       });
     redraw();
   }
-  selectAttribute({row:findAttr('Unemployment Rate 2011'),col:attrs[0]});
-  selectAttribute({row:findAttr('Premature Mortality Rate'),col:attrs[1]});
-  selectAttribute({row:findAttr('Total Population'),col:attrs[2]});
+  selectAttribute({row:findAttr('Hardship Index 2012'),col:attrs[0]});
+  selectAttribute({row:findAttr('Infant Mortality'),col:attrs[1]});
+  selectAttribute({row:findAttr('Population'),col:attrs[2]});
   function findAttr(search) {
     var lower = search.toLowerCase();
     return cols.filter(function (attr) {
@@ -159,11 +159,23 @@ d3.csv("SDH.csv", clean, function(data) {
   var colorScale = d3.scale.category10();
 
   var xAxis = d3.svg.axis()
-    .tickFormat(d3.format(',s'))
+    .tickFormat(function(d) {
+      if(d3.formatPrefix(d).symbol == "m" && d >= 0.1) {
+          return d;
+      } else {
+          return d3.format(",s")(d);
+      }
+    })
     .orient("bottom");
 
   var yAxis = d3.svg.axis()
-    .tickFormat(d3.format(',s'))
+    .tickFormat(function(d) {
+      if(d3.formatPrefix(d).symbol == "m" && d >= 0.1) {
+          return d;
+      } else {
+          return d3.format(",s")(d);
+      }
+    })
     .orient("left");
 
   svg.append('g')
@@ -184,10 +196,16 @@ d3.csv("SDH.csv", clean, function(data) {
       .style('text-anchor', 'end')
       .attr('class', 'y label');
 
+
+  
+
   function place(selection) {
     selection
       .attr('r', function (d) { return radius(d[attributes.radius.key]); })
-      .attr('cx', function (d) { return x(d[attributes.x.key]); })
+      .attr('cx', function (d) { 
+        console.log(x(d[attributes.x.key]));
+        return x(d[attributes.x.key]); 
+      })
       .attr('cy', function (d) { return y(d[attributes.y.key]); });
   }
 
@@ -206,15 +224,18 @@ d3.csv("SDH.csv", clean, function(data) {
       var yLogNotAllowed = Math.sign(yRange[0]) !== Math.sign(yRange[1]);
       var radiusLogNotAllowed = Math.sign(radiusRange[0]) !== Math.sign(radiusRange[1]);
       if (xLogNotAllowed && scale['x-scale'].value === 'log') {
-        errors.push("Can't use log scale with x-axis for '" + attributes.x.name + "' since it has positive and negative values.");
+        errors.push("Can't use log scale with x-axis for '" + attributes.x.name + 
+          "' since it has positive and negative values.");
         x = scales[0].scale();
       }
       if (yLogNotAllowed && scale['y-scale'].value === 'log') {
-        errors.push("Can't use log scale with y-axis for '" + attributes.y.name + "' since it has positive and negative values.");
+        errors.push("Can't use log scale with y-axis for '" + attributes.y.name + 
+          "' since it has positive and negative values.");
         y = scales[0].scale();
       }
       if (radiusLogNotAllowed && scale['size-scale'].value === 'log') {
-        errors.push("Can't use log scale with radius for '" + attributes.radius.name + "' since it has positive and negative values.");
+        errors.push("Can't use log scale with radius for '" + attributes.radius.name + 
+          "' since it has positive and negative values.");
         radius = scales[0].scale();
       }
       d3.select('#error').text(errors.join("<br>"));
@@ -253,6 +274,17 @@ d3.csv("SDH.csv", clean, function(data) {
         .duration(transitionDuration)
         .ease(easingFunc)
         .remove();
+
+      // trend line
+
+      // utilities for trend line
+      var xScale = d3.scale.ordinal()
+        .rangeRoundBands([margin.left, width], .1);
+        
+      var yScale = d3.scale.linear()
+        .range([height, 0]);
+
+      
     }
   }
 
@@ -286,6 +318,53 @@ d3.csv("SDH.csv", clean, function(data) {
     tip.style("display", "none");
   }
 
+
+  // // linear trend line
+  // // get the x and y values for least squares
+  // var xSeries = d3.range(1, xLabels.length + 1);
+  // var ySeries = data.map(function(d) { return parseFloat(d['rate']); });
+  
+  // var leastSquaresCoeff = leastSquares(xSeries, ySeries);
+  
+  // // apply the reults of the least squares regression
+  // var x1 = xLabels[0];
+  // var y1 = leastSquaresCoeff[0] + leastSquaresCoeff[1];
+  // var x2 = xLabels[xLabels.length - 1];
+  // var y2 = leastSquaresCoeff[0] * xSeries.length + leastSquaresCoeff[1];
+  // var trendData = [[x1,y1,x2,y2]];
+  
+  // var trendline = svg.selectAll(".trendline")
+  //   .data(trendData);
+    
+  // trendline.enter()
+  //   .append("line")
+  //   .attr("class", "trendline")
+  //   .attr("x1", function(d) { return xScale(d[0]); })
+  //   .attr("y1", function(d) { return yScale(d[1]); })
+  //   .attr("x2", function(d) { return xScale(d[2]); })
+  //   .attr("y2", function(d) { return yScale(d[3]); })
+  //   .attr("stroke", "black")
+  //   .attr("stroke-width", 1);
+  
+  // // display equation on the chart
+  // svg.append("text")
+  //   .text("eq: " + decimalFormat(leastSquaresCoeff[0]) + "x + " + 
+  //     decimalFormat(leastSquaresCoeff[1]))
+  //   .attr("class", "text-label")
+  //   .attr("x", function(d) {return xScale(x2) - 60;})
+  //   .attr("y", function(d) {return yScale(y2) - 30;});
+  
+  // // display r-square on the chart
+  // svg.append("text")
+  //   .text("r-sq: " + decimalFormat(leastSquaresCoeff[2]))
+  //   .attr("class", "text-label")
+  //   .attr("x", function(d) {return xScale(x2) - 60;})
+  //   .attr("y", function(d) {return yScale(y2) - 10;})
+  
+  
+
+
+
   redraw();
 
   // make it fit
@@ -307,6 +386,7 @@ function getColumns(data) {
   });
   return d3.keys(items).map(function (col) {
     // extract name and units from column name and normalize
+    // units are whatever is in parentheses
     var name = col
       .replace(/(_|\(.*?\))/g, " ")
       .replace(/\s+/g, " ")
@@ -318,9 +398,8 @@ function getColumns(data) {
       units: units && units[1]
     };
   }).filter(function (col) {
-    // omit Community Area and any variable with <90% coverage
-    return items[col.key] !== data.length &&
-      items[col.key] > 0.9 * data.length &&
+    // omit Community Area, Region, and any variable with <50% coverage
+    return items[col.key] > 0.5 * data.length &&
       col.name !== "CommunityArea" &&
       col.name !== "Region";
   });
@@ -338,4 +417,27 @@ function clean(item) {
     }
   });
   return item;
+}
+
+// returns slope, intercept and r-square of the line
+function leastSquares(xSeries, ySeries) {
+  var reduceSumFunc = function(prev, cur) { return prev + cur; };
+  
+  var xBar = xSeries.reduce(reduceSumFunc) * 1.0 / xSeries.length;
+  var yBar = ySeries.reduce(reduceSumFunc) * 1.0 / ySeries.length;
+
+  var ssXX = xSeries.map(function(d) { return Math.pow(d - xBar, 2); })
+    .reduce(reduceSumFunc);
+  
+  var ssYY = ySeries.map(function(d) { return Math.pow(d - yBar, 2); })
+    .reduce(reduceSumFunc);
+    
+  var ssXY = xSeries.map(function(d, i) { return (d - xBar) * (ySeries[i] - yBar); })
+    .reduce(reduceSumFunc);
+    
+  var slope = ssXY / ssXX;
+  var intercept = yBar - (xBar * slope);
+  var rSquare = Math.pow(ssXY, 2) / (ssXX * ssYY);
+  
+  return [slope, intercept, rSquare];
 }
