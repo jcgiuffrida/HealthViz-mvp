@@ -57,7 +57,7 @@ tr {
 }
 
 #controls {
-  height: 500px;
+  height: 550px;
   overflow: scroll;
   margin-top: 10px;
 }
@@ -139,4 +139,8 @@ a.selected {
   padding: 2px 7px;
   line-height: 1.2;
   border-radius: 5px;
+}
+
+.panel {
+  min-width:280px;
 }

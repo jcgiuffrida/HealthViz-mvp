@@ -72,7 +72,7 @@ d3.csv("SDH ii.csv", clean, function(data) {
     {value: 'log', scale: function () { return d3.scale.log(); } },
   ];
   var scale = {};
-  header('Axis Scale');
+  //header('Axis Scale');
   var scaleTable = table(scales, 'scales');
   row(scaleTable, scales, 'X', 'x-scale');
   row(scaleTable, scales, 'Y', 'y-scale');
@@ -97,7 +97,7 @@ d3.csv("SDH ii.csv", clean, function(data) {
     {value: 'radius'}
   ];
   var attributes = {};
-  header('Variables');
+  //header('Variables');
   var colsTable = table(attrs, 'attributes');
   cols.forEach(function (col) {
     row(colsTable, attrs, col.name, col);
@@ -210,7 +210,7 @@ d3.csv("SDH ii.csv", clean, function(data) {
     selection
       .attr('r', function (d) { return radius(d[attributes.radius.key]); })
       .attr('cx', function (d) { 
-        console.log(x(d[attributes.x.key]));
+        //console.log(x(d[attributes.x.key]));
         return x(d[attributes.x.key]); 
       })
       .attr('cy', function (d) { return y(d[attributes.y.key]); });
@@ -410,7 +410,8 @@ function getColumns(data) {
     // omit Community Area, Region, and any variable with <50% coverage
     return items[col.key] > 0.5 * data.length &&
       col.name !== "CommunityArea" &&
-      col.name !== "Region";
+      col.name !== "Region" && 
+      col.name !== "Community Area ID";
   });
 }
 
@@ -452,9 +453,80 @@ function leastSquares(xSeries, ySeries) {
 }
 
 
+
 // the following is a workaround to put the variables into collapsible panels
 // using jquery because of time constraints
-var attrsTable = $('table#attributes');
+$(document).ready(function(){
+  var organizeAttributes = setInterval(function(){
+    console.log($('table#attributes .panel').length);
+    if ($('table#attributes .panel').length){
+      clearInterval(organizeAttributes);
+      return;
+    } else if ($('table#attributes').children('tr').length < 100){
+      return;
+    }
+    var attrsTable = $('table#attributes');
+    var attributes = attrsTable.children('tr');
+    attributes.wrapAll('<div class="panel-group" id="accordion" role="tablist" ' + 
+      'aria-multiselectable="true">');
+    var sections = {
+      'Composite': 5,
+      'Health Insurance': 5,
+      'Economic':  7,
+      'Education': 5,
+      'Housing': 15,
+      'Transportation':  5,
+      'Crime': 6,
+      'Community': 2,
+      'Population':  6,
+      'Demographic': 12,
+      'Family':  6,
+      'Child Health':  9,
+      'Mortality': 24
+    }
+    var attributeGroups = {};
+    var attrsUsed = 0;
+    var attrs;
+    Object.keys(sections).forEach(function(key){ 
+      attrs = [];
+      if (attrsUsed == 0){
+        attrs = attributes.filter(':lt(' + (attrsUsed + sections[key]) + ')');  
+      } else {
+        attrs = attributes.filter(':gt(' + (attrsUsed - 1) + '):lt(' + 
+         (sections[key]) + ')');
+      }
+      attrsUsed += sections[key];
+      attributeGroups[key] = attrs;
+    });
+    var group, panel, panelHeader, panelBody;
+    var count = 1;
+    Object.keys(attributeGroups).forEach(function(key){
+      group = attributeGroups[key];
+      group.wrapAll('<div class="panel panel-default"></div>');
+      panel = group.closest('.panel');
+      panelHeader = '<div class="panel-heading" role="tab" id="' + key + '">' + 
+        '<h4 class="panel-title"><a data-toggle="collapse" ' + 
+        'href="#collapse' + count + '" aria-expanded="true" aria-controls="collapse' + count + 
+        '">' + key + '</a></h4></div>';
+      group.wrapAll('<div class="panel-body"></div>');
+      group.closest('.panel-body').wrap('<div id="collapse' + count + '" class="panel-collapse collapse" ' + 
+        'role="tabpanel" aria-labelledby="heading' + count + '"></div>');
+      panel.prepend(panelHeader);
+      count += 1;
+    });
+    
+    var options = $('table#scales').children('tr');
+    options.wrapAll('<div class="panel panel-default"></div>');
+    panel = options.closest('.panel');
+    panelHeader = '<div class="panel-heading" role="tab" id="Options">' + 
+      '<h4 class="panel-title"><a data-toggle="collapse" ' + 
+      'href="#collapseOptions" aria-expanded="true" aria-controls="collapseOptions">' + 
+      'Options</a></h4></div>';
+    options.wrapAll('<div class="panel-body"></div>');
+    options.closest('.panel-body').wrap('<div id="collapseOptions" class="panel-collapse collapse" ' + 
+      'role="tabpanel" aria-labelledby="headingOptions"></div>');
+    panel.prepend(panelHeader);
 
-
-
+    $('#collapse1').collapse('show');
+  }, 10);
+});
