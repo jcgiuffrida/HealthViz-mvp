@@ -15,9 +15,10 @@ body {
 }
 
 .pageheader {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: bold;
   margin: 20px 0;
+  color: #555;
 }
 
 svg {
@@ -57,7 +58,7 @@ tr {
 }
 
 #controls {
-  height: 550px;
+  height: 530px;
   overflow: scroll;
   margin-top: 10px;
 }
@@ -94,11 +95,13 @@ a.selected {
 .ca:hover {
   fill-opacity: 1;
   stroke-opacity: 1;
+  filter: url(#glow);
 }
 
 .ca.highlighted {
   fill-opacity: 1;
   stroke-opacity: 1;
+  filter:url(#glow);
 }
 
 .tip {
@@ -146,10 +149,68 @@ a.selected {
   border-radius: 5px;
 }
 
+
+#controls {
+  width: 342px;
+  border: 1px solid #337ab7;
+  border-radius: 10px;
+}
+
 .panel {
-  width:280px;
+  width: 320px;
+  margin: 10px;
+}
+
+.panel-title a {
+  display: block;
+  padding: 10px 15px;
+  margin: -10px -15px;
+  font-size: 15px;
+}
+
+.panel-title a:hover, .panel-title a:active,
+.panel-title a:focus {
+  color: #bbb;
 }
 
 td:first-child {
   padding-right: 10px;
+  padding-left: 1em;
+  text-indent: -1em;
 }
+
+td a {
+  padding: 2px;
+}
+
+#legend tr {
+  cursor: pointer;
+  border-bottom: 3px solid white;
+}
+
+#legend td {
+  padding: 0 9px 0 9px;
+}
+
+#legend td:first-child {
+  opacity: 0.6;
+}
+
+#legend tr:hover{
+  color:black;
+}
+
+#legend tr:hover td:first-child {
+  opacity: 1;
+}
+
+#legend tr.selected {
+  font-weight: bold;
+  color:black;
+}
+
+#legend tr.selected td:first-child {
+  opacity: 1;
+}
+
+

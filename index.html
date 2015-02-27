@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <title>Social Determinants of Health</title>
 <!--<link rel="stylesheet" href="bs/css/bootstrap.css" />-->
-<!--<link rel="stylesheet" href="bs/css/bootstrap-theme.css" />-->`
+<!--<link rel="stylesheet" href="bs/css/bootstrap-theme.css" />-->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+<link rel="stylesheet" href="http://bootswatch.com/journal/bootstrap.min.css">
 <link rel="stylesheet" href="style.css" />
 <body>
-
-<div class="pageheader">HealthyChi VIZ</div>
+<div class="row">
+  <div class="col-md-2 pull-left">
+    <img src="healthy-chicago-logo.png" >
+  </div>
+  <div class="pageheader col-md-8">HealthyChi VIZ</div>
+</div>
 <div id="container">
   <div class="row">
     <div id="chart" class="col-md-7 col-md-offset-1">
@@ -27,17 +31,83 @@
         </div>
       </div>
     </div>
-    <div id="error"></div>
+    <div class="col-md-4" id="error"></div>
     <div class="col-md-4">
       <form id="controls"></form>
     </div>
-
+  </div>
+  <div class="row" id="legend">
+    <div class="col-md-2 col-md-offset-1">
+      <table>
+        <tr data-region=1>
+          <td style="background-color: #1f77b4;">
+          </td>
+          <td>Far North Side</td>
+        </tr>
+        <tr data-region=2>
+          <td style="background-color: #ff7f0e;"></td>
+          <td>North Side</td>
+        </tr>
+        <tr data-region=3>
+          <td style="background-color: #2ca02c;"></td>
+          <td>Central</td>
+        </tr>
+      </table>
+    </div>
+    <div class="col-md-2">
+      <table>
+        <tr data-region=4>
+          <td style="background-color: #d62728;">
+          </td>
+          <td>Northwest Side</td>
+        </tr>
+        <tr data-region=5>
+          <td style="background-color: #bcbd22;"></td>
+          <td>Far Southwest Side</td>
+        </tr>
+        <tr data-region=6>
+          <td style="background-color: #7f7f7f;"></td>
+          <td>Southwest Side</td>
+        </tr>
+      </table>
+    </div>
+    <div class="col-md-2">
+      <table>
+        <tr data-region=7>
+          <td style="background-color: #8c564b;">
+          </td>
+          <td>South Side</td>
+        </tr>
+        <tr data-region=8>
+          <td style="background-color: #e377c2;"></td>
+          <td>Far Southeast Side</td>
+        </tr>
+        <tr data-region=9>
+          <td style="background-color: #9467bd;"></td>
+          <td>West Side</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="row">
     <div class="col-md-7 col-md-offset-1">
-      <p>Note: Demographic data are from the American Community Survey (ACS). All other data is from the Chicago Department of Public Health.</p>
+      <p>Note: Demographic data are from the American Community Survey (ACS). All other data is from the Chicago Department of Public Health. Visualization by <a href="https://github.com/lucaluca">Jonathan Giuffrida</a>.</p>
     </div>
 
   </div><!--row-->
 </div>
+
+<!--
+  <defs>
+    <filter id="f1" x="-40%" y="-40%" height="200%" width="200%">
+      <feOffset result="offOut" in="SourceAlpha" dx="4" dy="4" />
+      <feGaussianBlur result="blurOut" in="offOut" stdDeviation="8" />
+      <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+    </filter>
+  </defs>
+  <circle r="30" cx="50" cy="50" style="stroke:gray; fill:aliceblue; stroke-width:3px" filter="url(#f1)" />
+</svg>
+-->
 
 <script src="d3.js" charset="utf-8"></script>
 <script src="jquery-1.11.2.js"></script>

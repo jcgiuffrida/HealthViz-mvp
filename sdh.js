@@ -13,6 +13,26 @@ var svg = d3.select("#chart").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+// add filters
+var defs = svg.append("defs");
+var filter = defs.append("filter")
+    .attr("id", "glow")
+    .attr('x', '-40%')
+    .attr('y', '-40%')
+    .attr('height', '200%')
+    .attr('width', '200%');
+filter.append("feGaussianBlur")
+    .attr("stdDeviation", 2)
+    .attr("result", "coloredBlur");
+
+var feMerge = filter.append("feMerge");
+feMerge.append("feMergeNode")
+    .attr("in", "coloredBlur")
+feMerge.append("feMergeNode")
+    .attr("in", "SourceGraphic");
+
+
+
 /////////// Read in and format the data
 d3.csv("SDH ii.csv", clean, function(data) {
   var drawn = false;
@@ -74,9 +94,9 @@ d3.csv("SDH ii.csv", clean, function(data) {
   var scale = {};
   //header('Axis Scale');
   var scaleTable = table(scales, 'scales');
-  row(scaleTable, scales, 'X', 'x-scale');
-  row(scaleTable, scales, 'Y', 'y-scale');
-  row(scaleTable, scales, 'Size', 'size-scale');
+  row(scaleTable, scales, 'X Axis', 'x-scale');
+  row(scaleTable, scales, 'Y Axis', 'y-scale');
+  row(scaleTable, scales, 'Radius', 'size-scale');
   scaleTable.selectAll('a').on('click', selectScale);
   function selectScale(d) {
     scale[d.row] = d.col;
@@ -179,8 +199,8 @@ d3.csv("SDH ii.csv", clean, function(data) {
 
   var yAxis = d3.svg.axis()
     .tickFormat(function(d) {
-      if(d3.formatPrefix(d).symbol == "m") {
-          return d;
+      if(d3.formatPrefix(d).symbol == "m" | (Math.abs(d) < 2)) {
+          return d3.format(",.3g")(d);
       } else {
           return d3.format(",s")(d);
       }
@@ -276,6 +296,7 @@ d3.csv("SDH ii.csv", clean, function(data) {
           .attr('class', function (d) {
             return d.Region === 0 ? 'chicago ca' : 'ca'; })
           .attr('fill', function (d) { return colorScale(d.Region); })
+          .attr('region', function(d) { return d.Region; })
           .on("mouseleave", mouseout)
           .on("mouseout", mouseout)
           .on("mouseover", mouseover)
@@ -311,13 +332,19 @@ d3.csv("SDH ii.csv", clean, function(data) {
     var dy = Math.round(y(d[attributes.y.key]));
     tip.selectAll('.ca').text(d.CommunityArea);
     tip.selectAll('.rd .name').text(attributes.radius.name);
-    tip.selectAll('.rd .value').text(d[attributes.radius.key]);
+    tip.selectAll('.rd .value').text(
+      d[attributes.radius.key] > 999 ? d3.format(',g')(d[attributes.radius.key]) :
+      d[attributes.radius.key]);
     tip.selectAll('.rd .units').text(attributes.radius.units ? attributes.radius.units : "");
     tip.selectAll('.x .name').text(attributes.x.name);
-    tip.selectAll('.x .value').text(d[attributes.x.key]);
+    tip.selectAll('.x .value').text( 
+      d[attributes.x.key] > 999 ? d3.format(',g')(d[attributes.x.key]) : 
+      d[attributes.x.key]);
     tip.selectAll('.x .units').text(attributes.x.units ? attributes.x.units : "");
     tip.selectAll('.y .name').text(attributes.y.name);
-    tip.selectAll('.y .value').text(d[attributes.y.key]);
+    tip.selectAll('.y .value').text( 
+      d[attributes.y.key] > 999 ? d3.format(',g')(d[attributes.y.key]) : 
+      d[attributes.y.key]);
     tip.selectAll('.y .units').text(attributes.y.units ? attributes.y.units : "");
     tip.style("display", null)
         .style("top", (dy + margin.top + 10) + "px")
@@ -504,7 +531,7 @@ $(document).ready(function(){
     var count = 1;
     Object.keys(attributeGroups).forEach(function(key){
       group = attributeGroups[key];
-      group.wrapAll('<div class="panel panel-default"></div>');
+      group.wrapAll('<div class="panel panel-info"></div>');
       panel = group.closest('.panel');
       panelHeader = '<div class="panel-heading" role="tab" id="' + key + '">' + 
         '<h4 class="panel-title"><a data-toggle="collapse" ' + 
@@ -529,7 +556,58 @@ $(document).ready(function(){
       'role="tabpanel" aria-labelledby="headingOptions"></div>');
     panel.prepend(panelHeader);
 
+
     $('#collapse1').collapse('show');
+
+    $('table').on('click', '.panel-title a', function(){
+      this.blur();
+    });
+
+    $('#legend').on('mouseover', 'tr', function(){
+      var region = $(this).data('region');
+      d3.selectAll('circle').each( function(d, i){
+        if(d.Region == region){
+          d3.select(this).classed("highlighted", true);
+        } else if (d.Region != highlighted) {
+          d3.select(this).classed("highlighted", false);
+        }
+      });
+    });
+
+    var highlighted = 0;
+    
+    $('#legend').on('mouseleave', 'tr', function(){
+      var region = $(this).data('region');
+      d3.selectAll('circle').each( function(d, i){
+        if(d.Region == region & highlighted != region){
+          d3.select(this).classed("highlighted", false);
+        }
+      });
+    });
+
+    $('#legend').on('click', 'tr', function(){
+      var region = $(this).data('region');
+      if (highlighted !== region){
+        $(this).closest('#legend').find('tr').removeClass('selected');
+        $(this).addClass('selected');
+        highlighted = region;
+        d3.selectAll('circle').each( function(d, i){
+          if(d.Region == region){
+            d3.select(this).classed("highlighted", true);
+          } else {
+            d3.select(this).classed("highlighted", false);
+          }
+        });
+      } else {
+        $(this).removeClass('selected');
+        highlighted = 0;
+        d3.selectAll('circle').each( function(d, i){
+          if(d.Region == region){
+            d3.select(this).classed("highlighted", false);
+          }
+        });
+      }
+    });
 
   }, 10);
 });
