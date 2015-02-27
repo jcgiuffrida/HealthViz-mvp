@@ -96,6 +96,11 @@ a.selected {
   stroke-opacity: 1;
 }
 
+.ca.highlighted {
+  fill-opacity: 1;
+  stroke-opacity: 1;
+}
+
 .tip {
   position: absolute;
   pointer-events: none;
@@ -142,5 +147,9 @@ a.selected {
 }
 
 .panel {
-  min-width:280px;
+  width:280px;
+}
+
+td:first-child {
+  padding-right: 10px;
 }
