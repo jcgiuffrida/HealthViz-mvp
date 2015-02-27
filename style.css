@@ -95,11 +95,13 @@ a.selected {
 .ca:hover {
   fill-opacity: 1;
   stroke-opacity: 1;
+  filter: url(#glow);
 }
 
 .ca.highlighted {
   fill-opacity: 1;
   stroke-opacity: 1;
+  filter:url(#glow);
 }
 
 .tip {
@@ -163,6 +165,7 @@ a.selected {
   display: block;
   padding: 10px 15px;
   margin: -10px -15px;
+  font-size: 15px;
 }
 
 .panel-title a:hover, .panel-title a:active,
@@ -179,3 +182,35 @@ td:first-child {
 td a {
   padding: 2px;
 }
+
+#legend tr {
+  cursor: pointer;
+  border-bottom: 3px solid white;
+}
+
+#legend td {
+  padding: 0 9px 0 9px;
+}
+
+#legend td:first-child {
+  opacity: 0.6;
+}
+
+#legend tr:hover{
+  color:black;
+}
+
+#legend tr:hover td:first-child {
+  opacity: 1;
+}
+
+#legend tr.selected {
+  font-weight: bold;
+  color:black;
+}
+
+#legend tr.selected td:first-child {
+  opacity: 1;
+}
+
+

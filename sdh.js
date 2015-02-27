@@ -13,6 +13,26 @@ var svg = d3.select("#chart").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+// add filters
+var defs = svg.append("defs");
+var filter = defs.append("filter")
+    .attr("id", "glow")
+    .attr('x', '-40%')
+    .attr('y', '-40%')
+    .attr('height', '200%')
+    .attr('width', '200%');
+filter.append("feGaussianBlur")
+    .attr("stdDeviation", 2)
+    .attr("result", "coloredBlur");
+
+var feMerge = filter.append("feMerge");
+feMerge.append("feMergeNode")
+    .attr("in", "coloredBlur")
+feMerge.append("feMergeNode")
+    .attr("in", "SourceGraphic");
+
+
+
 /////////// Read in and format the data
 d3.csv("SDH ii.csv", clean, function(data) {
   var drawn = false;
@@ -179,8 +199,8 @@ d3.csv("SDH ii.csv", clean, function(data) {
 
   var yAxis = d3.svg.axis()
     .tickFormat(function(d) {
-      if(d3.formatPrefix(d).symbol == "m") {
-          return d;
+      if(d3.formatPrefix(d).symbol == "m" | (Math.abs(d) < 2)) {
+          return d3.format(",.3g")(d);
       } else {
           return d3.format(",s")(d);
       }
@@ -536,10 +556,57 @@ $(document).ready(function(){
       'role="tabpanel" aria-labelledby="headingOptions"></div>');
     panel.prepend(panelHeader);
 
+
     $('#collapse1').collapse('show');
 
     $('table').on('click', '.panel-title a', function(){
       this.blur();
+    });
+
+    $('#legend').on('mouseover', 'tr', function(){
+      var region = $(this).data('region');
+      d3.selectAll('circle').each( function(d, i){
+        if(d.Region == region){
+          d3.select(this).classed("highlighted", true);
+        } else if (d.Region != highlighted) {
+          d3.select(this).classed("highlighted", false);
+        }
+      });
+    });
+
+    var highlighted = 0;
+    
+    $('#legend').on('mouseleave', 'tr', function(){
+      var region = $(this).data('region');
+      d3.selectAll('circle').each( function(d, i){
+        if(d.Region == region & highlighted != region){
+          d3.select(this).classed("highlighted", false);
+        }
+      });
+    });
+
+    $('#legend').on('click', 'tr', function(){
+      var region = $(this).data('region');
+      if (highlighted !== region){
+        $(this).closest('#legend').find('tr').removeClass('selected');
+        $(this).addClass('selected');
+        highlighted = region;
+        d3.selectAll('circle').each( function(d, i){
+          if(d.Region == region){
+            d3.select(this).classed("highlighted", true);
+          } else {
+            d3.select(this).classed("highlighted", false);
+          }
+        });
+      } else {
+        $(this).removeClass('selected');
+        highlighted = 0;
+        d3.selectAll('circle').each( function(d, i){
+          if(d.Region == region){
+            d3.select(this).classed("highlighted", false);
+          }
+        });
+      }
     });
 
   }, 10);
