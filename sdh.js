@@ -190,7 +190,7 @@ d3.csv("SDH ii.csv", clean, function(data) {
       if (Math.abs(d) < 0.00000001){
         return '0';
       } else if(d3.formatPrefix(d).symbol == "m" | (Math.abs(d) < 2)) {
-          return d3.format(",.3g")(d);
+          return d3.format(",.1g")(d);
       } else {
           return d3.format(",s")(d);
       }
@@ -202,7 +202,7 @@ d3.csv("SDH ii.csv", clean, function(data) {
       if (Math.abs(d) < 0.00000001){
         return '0';
       } else if(d3.formatPrefix(d).symbol == "m" | (Math.abs(d) < 2)) {
-          return d3.format(",.3g")(d);
+          return d3.format(",.1g")(d);
       } else {
           return d3.format(",s")(d);
       }
