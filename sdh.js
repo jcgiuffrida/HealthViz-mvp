@@ -199,7 +199,9 @@ d3.csv("SDH ii.csv", clean, function(data) {
 
   var yAxis = d3.svg.axis()
     .tickFormat(function(d) {
-      if(d3.formatPrefix(d).symbol == "m" | (Math.abs(d) < 2)) {
+      if (Math.abs(d) < 0.00000001){
+        return '0';
+      } else if(d3.formatPrefix(d).symbol == "m" | (Math.abs(d) < 2)) {
           return d3.format(",.3g")(d);
       } else {
           return d3.format(",s")(d);
@@ -249,9 +251,9 @@ d3.csv("SDH ii.csv", clean, function(data) {
       var xRange = d3.extent(data, function (d) { return d[attributes.x.key]; });
       var yRange = d3.extent(data, function (d) { return d[attributes.y.key]; });
       var radiusRange = d3.extent(data, function (d) { return d[attributes.radius.key]; });
-      var xLogNotAllowed = Math.sign(xRange[0]) !== Math.sign(xRange[1]);
-      var yLogNotAllowed = Math.sign(yRange[0]) !== Math.sign(yRange[1]);
-      var radiusLogNotAllowed = Math.sign(radiusRange[0]) !== Math.sign(radiusRange[1]);
+      var xLogNotAllowed = sign(xRange[0]) !== sign(xRange[1]);
+      var yLogNotAllowed = sign(yRange[0]) !== sign(yRange[1]);
+      var radiusLogNotAllowed = sign(radiusRange[0]) !== sign(radiusRange[1]);
       if (xLogNotAllowed && scale['x-scale'].value === 'log') {
         errors.push("Can't use log scale with x-axis for '" + attributes.x.name + 
           "' since it has positive and negative values.");
@@ -479,6 +481,13 @@ function leastSquares(xSeries, ySeries) {
   var rSquare = Math.pow(ssXY, 2) / (ssXX * ssYY);
   
   return [slope, intercept, rSquare];
+}
+
+function sign(x){
+    if( +x === x ) { // check if a number was given
+        return (x === 0) ? x : (x > 0) ? 1 : -1;
+    }
+    return NaN;
 }
 
 
