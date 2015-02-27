@@ -136,7 +136,7 @@ d3.csv("SDH ii.csv", clean, function(data) {
     var row = table.append('tr');
     row.append('td').text(display);
 
-    row.selectAll('td.option')
+    row.selectAll('button.option')
         .data(function (rowData) {
           return data.map(function (colData) {
             return {  
@@ -167,8 +167,10 @@ d3.csv("SDH ii.csv", clean, function(data) {
 
   var xAxis = d3.svg.axis()
     .tickFormat(function(d) {
-      if(d3.formatPrefix(d).symbol == "m" && d >= 0.1) {
-          return d;
+      if (Math.abs(d) < 0.00000001){
+        return '0';
+      } else if(d3.formatPrefix(d).symbol == "m" | (Math.abs(d) < 2)) {
+          return d3.format(",.3g")(d);
       } else {
           return d3.format(",s")(d);
       }
@@ -177,7 +179,7 @@ d3.csv("SDH ii.csv", clean, function(data) {
 
   var yAxis = d3.svg.axis()
     .tickFormat(function(d) {
-      if(d3.formatPrefix(d).symbol == "m" && d >= 0.1) {
+      if(d3.formatPrefix(d).symbol == "m") {
           return d;
       } else {
           return d3.format(",s")(d);
@@ -458,7 +460,7 @@ function leastSquares(xSeries, ySeries) {
 // using jquery because of time constraints
 $(document).ready(function(){
   var organizeAttributes = setInterval(function(){
-    console.log($('table#attributes .panel').length);
+    //console.log($('table#attributes .panel').length);
     if ($('table#attributes .panel').length){
       clearInterval(organizeAttributes);
       return;
@@ -528,5 +530,6 @@ $(document).ready(function(){
     panel.prepend(panelHeader);
 
     $('#collapse1').collapse('show');
+
   }, 10);
 });
