@@ -74,9 +74,9 @@ d3.csv("SDH ii.csv", clean, function(data) {
   var scale = {};
   //header('Axis Scale');
   var scaleTable = table(scales, 'scales');
-  row(scaleTable, scales, 'X', 'x-scale');
-  row(scaleTable, scales, 'Y', 'y-scale');
-  row(scaleTable, scales, 'Size', 'size-scale');
+  row(scaleTable, scales, 'X Axis', 'x-scale');
+  row(scaleTable, scales, 'Y Axis', 'y-scale');
+  row(scaleTable, scales, 'Radius', 'size-scale');
   scaleTable.selectAll('a').on('click', selectScale);
   function selectScale(d) {
     scale[d.row] = d.col;
@@ -276,6 +276,7 @@ d3.csv("SDH ii.csv", clean, function(data) {
           .attr('class', function (d) {
             return d.Region === 0 ? 'chicago ca' : 'ca'; })
           .attr('fill', function (d) { return colorScale(d.Region); })
+          .attr('region', function(d) { return d.Region; })
           .on("mouseleave", mouseout)
           .on("mouseout", mouseout)
           .on("mouseover", mouseover)
@@ -311,13 +312,19 @@ d3.csv("SDH ii.csv", clean, function(data) {
     var dy = Math.round(y(d[attributes.y.key]));
     tip.selectAll('.ca').text(d.CommunityArea);
     tip.selectAll('.rd .name').text(attributes.radius.name);
-    tip.selectAll('.rd .value').text(d[attributes.radius.key]);
+    tip.selectAll('.rd .value').text(
+      d[attributes.radius.key] > 999 ? d3.format(',g')(d[attributes.radius.key]) :
+      d[attributes.radius.key]);
     tip.selectAll('.rd .units').text(attributes.radius.units ? attributes.radius.units : "");
     tip.selectAll('.x .name').text(attributes.x.name);
-    tip.selectAll('.x .value').text(d[attributes.x.key]);
+    tip.selectAll('.x .value').text( 
+      d[attributes.x.key] > 999 ? d3.format(',g')(d[attributes.x.key]) : 
+      d[attributes.x.key]);
     tip.selectAll('.x .units').text(attributes.x.units ? attributes.x.units : "");
     tip.selectAll('.y .name').text(attributes.y.name);
-    tip.selectAll('.y .value').text(d[attributes.y.key]);
+    tip.selectAll('.y .value').text( 
+      d[attributes.y.key] > 999 ? d3.format(',g')(d[attributes.y.key]) : 
+      d[attributes.y.key]);
     tip.selectAll('.y .units').text(attributes.y.units ? attributes.y.units : "");
     tip.style("display", null)
         .style("top", (dy + margin.top + 10) + "px")
@@ -504,7 +511,7 @@ $(document).ready(function(){
     var count = 1;
     Object.keys(attributeGroups).forEach(function(key){
       group = attributeGroups[key];
-      group.wrapAll('<div class="panel panel-default"></div>');
+      group.wrapAll('<div class="panel panel-info"></div>');
       panel = group.closest('.panel');
       panelHeader = '<div class="panel-heading" role="tab" id="' + key + '">' + 
         '<h4 class="panel-title"><a data-toggle="collapse" ' + 
@@ -530,6 +537,10 @@ $(document).ready(function(){
     panel.prepend(panelHeader);
 
     $('#collapse1').collapse('show');
+
+    $('table').on('click', '.panel-title a', function(){
+      this.blur();
+    });
 
   }, 10);
 });

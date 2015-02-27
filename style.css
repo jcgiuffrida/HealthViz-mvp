@@ -15,9 +15,10 @@ body {
 }
 
 .pageheader {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: bold;
   margin: 20px 0;
+  color: #555;
 }
 
 svg {
@@ -57,7 +58,7 @@ tr {
 }
 
 #controls {
-  height: 550px;
+  height: 530px;
   overflow: scroll;
   margin-top: 10px;
 }
@@ -146,10 +147,35 @@ a.selected {
   border-radius: 5px;
 }
 
+
+#controls {
+  width: 342px;
+  border: 1px solid #337ab7;
+  border-radius: 10px;
+}
+
 .panel {
-  width:280px;
+  width: 320px;
+  margin: 10px;
+}
+
+.panel-title a {
+  display: block;
+  padding: 10px 15px;
+  margin: -10px -15px;
+}
+
+.panel-title a:hover, .panel-title a:active,
+.panel-title a:focus {
+  color: #bbb;
 }
 
 td:first-child {
   padding-right: 10px;
+  padding-left: 1em;
+  text-indent: -1em;
+}
+
+td a {
+  padding: 2px;
 }
