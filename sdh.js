@@ -190,7 +190,7 @@ d3.csv("SDH ii.csv", clean, function(data) {
       if (Math.abs(d) < 0.00000001){
         return '0';
       } else if(d3.formatPrefix(d).symbol == "m" | (Math.abs(d) < 2)) {
-          return d3.format(",.3g")(d);
+          return d3.format(",.1g")(d);
       } else {
           return d3.format(",s")(d);
       }
@@ -202,7 +202,7 @@ d3.csv("SDH ii.csv", clean, function(data) {
       if (Math.abs(d) < 0.00000001){
         return '0';
       } else if(d3.formatPrefix(d).symbol == "m" | (Math.abs(d) < 2)) {
-          return d3.format(",.3g")(d);
+          return d3.format(",.1g")(d);
       } else {
           return d3.format(",s")(d);
       }
@@ -332,7 +332,7 @@ d3.csv("SDH ii.csv", clean, function(data) {
     d.mouseover = true;
     var dx = Math.round(x(d[attributes.x.key]));
     var dy = Math.round(y(d[attributes.y.key]));
-    tip.selectAll('.ca').text(d.CommunityArea);
+    tip.selectAll('.ca').text((d.CommunityArea + ' (' + d['ID'] + ')'));
     tip.selectAll('.rd .name').text(attributes.radius.name);
     tip.selectAll('.rd .value').text(
       d[attributes.radius.key] > 999 ? d3.format(',g')(d[attributes.radius.key]) :
@@ -442,7 +442,8 @@ function getColumns(data) {
     return items[col.key] > 0.5 * data.length &&
       col.name !== "CommunityArea" &&
       col.name !== "Region" && 
-      col.name !== "Community Area ID";
+      col.name !== "Community Area ID" && 
+      col.name !== "ID";
   });
 }
 
@@ -520,7 +521,7 @@ $(document).ready(function(){
       'Demographic': 12,
       'Family':  6,
       'Child Health':  9,
-      'Mortality': 24
+      'Mortality': 23
     }
     var attributeGroups = {};
     var attrsUsed = 0;
@@ -564,7 +565,7 @@ $(document).ready(function(){
     options.closest('.panel-body').wrap('<div id="collapseOptions" class="panel-collapse collapse" ' + 
       'role="tabpanel" aria-labelledby="headingOptions"></div>');
     panel.prepend(panelHeader);
-
+    panel.hide(); // for now
 
     $('#collapse1').collapse('show');
 
@@ -572,6 +573,8 @@ $(document).ready(function(){
       this.blur();
     });
 
+
+    // legend
     $('#legend').on('mouseover', 'tr', function(){
       var region = $(this).data('region');
       d3.selectAll('circle').each( function(d, i){

@@ -1,16 +1,28 @@
 <!DOCTYPE html>
-<title>Social Determinants of Health</title>
-<!--<link rel="stylesheet" href="bs/css/bootstrap.css" />-->
-<!--<link rel="stylesheet" href="bs/css/bootstrap-theme.css" />-->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-<link rel="stylesheet" href="http://bootswatch.com/journal/bootstrap.min.css">
-<link rel="stylesheet" href="style.css" />
+<head>
+  <title>HealthyChi VIZ: Chicago Social Determinants of Health</title>
+  <!--<link rel="stylesheet" href="bs/css/bootstrap.css" />-->
+  <!--<link rel="stylesheet" href="bs/css/bootstrap-theme.css" />-->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="http://bootswatch.com/journal/bootstrap.min.css">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-60569315-1', 'auto');
+  ga('send', 'pageview');
+  </script>
+</head>
 <body>
 <div class="row">
-  <div class="col-md-2 pull-left">
-    <img src="healthy-chicago-logo.png" >
+  <div class="col-md-2 pull-left hc-logo">
+    <a href="http://www.cityofchicago.org/city/en/depts/cdph/provdrs/healthychicago/svcs/healthy-chicago-2-0--community-health-assessment-and-improvement.html"><img src="healthy-chicago-logo.png" ></a>
   </div>
-  <div class="pageheader col-md-8">HealthyChi VIZ</div>
+  <div class="col-md-8">
+    <h2>HealthyChi VIZ</h2>
+  </div>
 </div>
 <div id="container">
   <div class="row">
@@ -33,7 +45,31 @@
     </div>
     <div class="col-md-4" id="error"></div>
     <div class="col-md-4">
-      <form id="controls"></form>
+      <form id="controls">
+        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+          <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="Composite">
+              <h4 class="panel-title">
+                <a data-toggle="collapse" href="#collapse0" aria-expanded="true" aria-controls="collapse0" class="">Instructions</a>
+              </h4>
+            </div>
+            <div id="collapse0" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading0" aria-expanded="true">
+              <div class="panel-body">
+                <b>This is an interactive scatterplot</b> to look at social determinants of health alongside various health outcomes in Chicago's 77 community areas. You can put any variables on the X and Y axes to look at their relationship by clicking <code>x</code> or <code>y</code> next to the variables you want in the list below. The size of the bubbles indicates a third variable, which you can change by clicking <code>radius</code>. Mouse over the bubbles for more information and to identify which community area a bubble represents. By default, this scatterplot shows how Infant Mortality increases in community areas that score highly on the Hardship Index, and the size of a bubble is proportional to the population of that community area. 
+                <br/>
+                <br/>
+                <b>It's important to remember</b> that this scatterplot shows relationships but not causal effects. Just because two variables show a clear trend does not mean that one causes the other: both could be caused by a third, hidden factor. We also recognize that it is difficult to draw broad conclusions about the health of Chicago's citizens by looking only at its 77 community areas, which represent vastly different populations and demographics. No community can be fully represented by a bubble on a graph. Even so, this tool can point us toward the right questions to investigate further. 
+                <br/>
+                <br/>
+                <b>All data is provided</b> by the Epidemiology and Public Health Informatics Unit at the Chicago Department of Public Health. As a disclaimer, this tool is still in development and is only intended for internal planning purposes. It is not an official City of Chicago application. 
+                <br/>
+                <br/><small>Version 1.0: March 2015</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+
     </div>
   </div>
   <div class="row" id="legend">
