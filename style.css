@@ -14,13 +14,14 @@ body {
   position: relative;
 }
 
+/*
 .pageheader {
   font-size: 28px;
   font-weight: bold;
   margin: 20px 0;
   color: #555;
 }
-
+*/
 svg {
   font: 10px sans-serif;
 }
@@ -212,5 +213,3 @@ td a {
 #legend tr.selected td:first-child {
   opacity: 1;
 }
-
-
