@@ -37,6 +37,14 @@ feMerge.append("feMergeNode")
 d3.csv("SDH ii.csv", clean, function(data) {
   var drawn = false;
   var cols = getColumns(data);
+  var statistics = false;
+  setTimeout(function(){
+    statistics = getStatistics(data, cols);
+    selectAttribute({row:findAttr('Hardship Index 2012'),col:attrs[0]});
+    selectAttribute({row:findAttr('Infant Mortality'),col:attrs[1]});
+    selectAttribute({row:findAttr('Population'),col:attrs[2]});
+  }, 100);
+  
 
 
   var form = d3.select('#controls');
@@ -131,6 +139,21 @@ d3.csv("SDH ii.csv", clean, function(data) {
       .classed('selected', function (other) {
         return other.row.name === d.row.name;
       });
+    if (statistics) {
+      var stats = ['mean', 'median', 'min', '25', '75', 'max'];
+      var table = $('.statistics table');
+      table.find('thead .' + d.col.value).html('<h5>' + d.row.name + '<br/>' + 
+        '<small>' + (d.row.units ? d.row.units : '') + '</small></h5>');
+      stats.forEach(function (s) {
+        table.find('.' + s + ' .' + d.col.value).text(
+          statistics[d.row.name][s] > 999 ? d3.format(',g')(statistics[d.row.name][s]) : 
+          statistics[d.row.name][s]);
+      });
+      console.log(statistics['Infant Mortality']);
+    }
+
+// have it calculate statistics after page load and then load the stats table
+
     redraw();
   }
 
@@ -431,7 +454,7 @@ function getColumns(data) {
       .replace(/(_|\(.*?\))/g, " ")
       .replace(/\s+/g, " ")
       .replace(/(^\s*|\s*$)/g, "");
-    var units = /\((.*?)\)/.exec(col)
+    var units = /\((.*?)\)/.exec(col);
     return {
       key: col,
       name: name,
@@ -447,6 +470,32 @@ function getColumns(data) {
   });
 }
 
+function getStatistics(data, cols) {
+  var statistics = {};
+  cols.forEach(function (c) {
+    statistics[c.name] = {'data': []};
+  });
+  data.forEach(function (d) {
+    cols.forEach(function (c) {
+      if (d[c.key] !== null){
+        statistics[c.name]['data'].push(d[c.key]);
+      }
+    })
+  });
+  d3.keys(statistics).forEach(function (s) {
+    statistics[s]['data'] = statistics[s]['data'].sort(function(a, b) {
+      return a - b;
+    });
+    statistics[s]['mean'] = myround(d3.mean(statistics[s]['data']));
+    statistics[s]['median'] = myround(d3.median(statistics[s]['data']));
+    statistics[s]['max'] = myround(d3.max(statistics[s]['data']));
+    statistics[s]['min'] = myround(d3.min(statistics[s]['data']));
+    statistics[s]['25'] = myround(d3.quantile(statistics[s]['data'], 0.25));
+    statistics[s]['75'] = myround(d3.quantile(statistics[s]['data'], 0.75));
+  });
+  return statistics;
+}
+
 // convert incoming strings to numbers
 function clean(item) {
   d3.keys(item).forEach(function (key) {
@@ -459,6 +508,15 @@ function clean(item) {
     }
   });
   return item;
+}
+
+// remove digits if .00 or a large number
+function myround(i) {
+  if (Math.floor(parseFloat(i.toFixed(3))) == i || i >= 10000){
+    return Math.round(i);
+  } else {
+    return i.toFixed(1);
+  }
 }
 
 // returns slope, intercept and r-square of the line
@@ -548,7 +606,8 @@ $(document).ready(function(){
         'href="#collapse' + count + '" aria-expanded="true" aria-controls="collapse' + count + 
         '">' + key + '</a></h4></div>';
       group.wrapAll('<div class="panel-body"></div>');
-      group.closest('.panel-body').wrap('<div id="collapse' + count + '" class="panel-collapse collapse" ' + 
+      group.closest('.panel-body').wrap('<div id="collapse' + count + 
+        '" class="panel-collapse collapse" ' + 
         'role="tabpanel" aria-labelledby="heading' + count + '"></div>');
       panel.prepend(panelHeader);
       count += 1;
@@ -575,7 +634,7 @@ $(document).ready(function(){
 
 
     // legend
-    $('#legend').on('mouseover', 'tr', function(){
+    $('.legend').on('mouseover', 'tr', function(){
       var region = $(this).data('region');
       d3.selectAll('circle').each( function(d, i){
         if(d.Region == region){
@@ -588,7 +647,7 @@ $(document).ready(function(){
 
     var highlighted = 0;
     
-    $('#legend').on('mouseleave', 'tr', function(){
+    $('.legend').on('mouseleave', 'tr', function(){
       var region = $(this).data('region');
       d3.selectAll('circle').each( function(d, i){
         if(d.Region == region & highlighted != region){
@@ -597,10 +656,10 @@ $(document).ready(function(){
       });
     });
 
-    $('#legend').on('click', 'tr', function(){
+    $('.legend').on('click', 'tr', function(){
       var region = $(this).data('region');
       if (highlighted !== region){
-        $(this).closest('#legend').find('tr').removeClass('selected');
+        $(this).closest('.legend').find('tr').removeClass('selected');
         $(this).addClass('selected');
         highlighted = region;
         d3.selectAll('circle').each( function(d, i){

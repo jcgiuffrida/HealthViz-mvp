@@ -53,7 +53,7 @@
                 <a data-toggle="collapse" href="#collapse0" aria-expanded="true" aria-controls="collapse0" class="">Instructions</a>
               </h4>
             </div>
-            <div id="collapse0" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading0" aria-expanded="true">
+            <div id="collapse0" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading0" aria-expanded="true">
               <div class="panel-body">
                 <b>This is an interactive scatterplot</b> to look at social determinants of health alongside various health outcomes in Chicago's 77 community areas. You can put any variables on the X and Y axes to look at their relationship by clicking <code>x</code> or <code>y</code> next to the variables you want in the list below. The size of the bubbles indicates a third variable, which you can change by clicking <code>radius</code>. Mouse over the bubbles for more information and to identify which community area a bubble represents. By default, this scatterplot shows how Infant Mortality increases in community areas that score highly on the Hardship Index, and the size of a bubble is proportional to the population of that community area. 
                 <br/>
@@ -72,8 +72,8 @@
 
     </div>
   </div>
-  <div class="row" id="legend">
-    <div class="col-md-2 col-md-offset-1">
+  <div class="row">
+    <div class="col-md-2 col-md-offset-1 legend">
       <table>
         <tr data-region=1>
           <td style="background-color: #1f77b4;">
@@ -90,7 +90,7 @@
         </tr>
       </table>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-2 legend">
       <table>
         <tr data-region=4>
           <td style="background-color: #d62728;">
@@ -107,7 +107,7 @@
         </tr>
       </table>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-2 legend">
       <table>
         <tr data-region=7>
           <td style="background-color: #8c564b;">
@@ -124,13 +124,40 @@
         </tr>
       </table>
     </div>
-  </div>
-  <div class="row">
-    <div class="col-md-7 col-md-offset-1">
+    <div class="col-md-5 statistics pull-right">
+      <table>
+        <thead>
+          <tr>
+            <td></td><td class="x"></td><td class="y"></td><td class="radius"></td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="mean">
+            <td>Mean</td><td class="x"></td><td class="y"></td><td class="radius"></td>
+          </tr>
+          <tr class="min">
+            <td>Minimum</td><td class="x"></td><td class="y"></td><td class="radius"></td>
+          </tr>
+          <tr class="25">
+            <td>25%</td><td class="x"></td><td class="y"></td><td class="radius"></td>
+          </tr>
+          <tr class="median">
+            <td>Median</td><td class="x"></td><td class="y"></td><td class="radius"></td>
+          </tr>
+          <tr class="75">
+            <td>75%</td><td class="x"></td><td class="y"></td><td class="radius"></td>
+          </tr>
+          <tr class="max">
+            <td>Maximum</td><td class="x"></td><td class="y"></td><td class="radius"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col-md-6 col-md-offset-1">
+      <br/>
       <p>Note: Demographic data are from the American Community Survey (ACS). All other data is from the Chicago Department of Public Health. Visualization by <a href="https://github.com/lucaluca">Jonathan Giuffrida</a>.</p>
     </div>
-
-  </div><!--row-->
+  </div>
 </div>
 
 <!--
