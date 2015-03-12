@@ -5,6 +5,11 @@ body {
   text-align: center;
 }
 
+.row {
+  margin-right: 0;
+  margin-left: 0;
+}
+
 #container {
   margin: 0 auto;
   text-align: left;
@@ -48,6 +53,7 @@ td {
   margin: 0;
   padding: 0;
 }
+
 tr {
   margin: 0;
   padding: 0;
@@ -89,9 +95,9 @@ a.selected {
   font-size: 10px;
 }
 .ca {
-  fill-opacity: 0.6;
+  fill-opacity: 0.7;
   stroke: #555;
-  stroke-opacity: 0.6;
+  stroke-opacity: 0.7;
 }
 .ca:hover {
   fill-opacity: 1;
@@ -153,8 +159,12 @@ a.selected {
 
 #controls {
   width: 342px;
-  border: 1px solid #337ab7;
+  border: 1px solid #3a87ad;
   border-radius: 10px;
+}
+
+#controls .small-instructions {
+  padding: 20px 15px 0 15px;
 }
 
 .panel {
@@ -162,11 +172,28 @@ a.selected {
   margin: 10px;
 }
 
+.instructions .panel {
+  width: auto;
+  font-size: 14px;
+}
+
+.instructions img {
+  padding-left: 10px;
+}
+
+.panel-info {
+  border-color: #3a87ad;
+}
+
+.panel-info>.panel-heading {
+  background-color: #3a87ad;
+  border-color: #3a87ad;
+}
+
 .panel-title a {
   display: block;
   padding: 10px 15px;
   margin: -10px -15px;
-  font-size: 15px;
 }
 
 .panel-title a:hover, .panel-title a:active,
@@ -174,42 +201,69 @@ a.selected {
   color: #bbb;
 }
 
-td:first-child {
+#controls td:first-child {
   padding-right: 10px;
   padding-left: 1em;
   text-indent: -1em;
 }
 
-td a {
+#controls td a {
   padding: 2px;
 }
 
-#legend tr {
+.legend tr {
   cursor: pointer;
   border-bottom: 3px solid white;
 }
 
-#legend td {
+.legend td {
   padding: 0 9px 0 9px;
 }
 
-#legend td:first-child {
-  opacity: 0.6;
-}
-
-#legend tr:hover{
+.legend tr:hover{
   color:black;
 }
 
-#legend tr:hover td:first-child {
+/* hover over legend makes squares darker */
+.legend td:first-child {
+  opacity: 0.7;
+}
+
+.legend tr:hover td:first-child {
   opacity: 1;
 }
 
-#legend tr.selected {
+.legend tr.selected td:first-child {
+  opacity: 1;
+}
+
+
+.legend tr.selected {
   font-weight: bold;
   color:black;
 }
 
-#legend tr.selected td:first-child {
-  opacity: 1;
+.statistics td {
+  padding: 2px 0;
+  width: 120px;
+  text-align: center;
+}
+
+.statistics td:first-child {
+  width: 75px;
+  text-align: left;
+  font-weight: bold;
+}
+
+.statistics tr {
+  margin: 0;
+  padding: 0;
+}
+
+.statistics {
+  margin-bottom: 30px;
+}
+
+#collapseExamples .list-group-item-text {
+  font-weight: normal;
 }
