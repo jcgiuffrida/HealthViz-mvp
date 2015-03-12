@@ -122,7 +122,7 @@ d3.csv("SDH ii.csv", clean, function(data) {
   var attrs = [
     {value: 'x'},
     {value: 'y'},
-    {value: 'radius'}
+    {value: 'size'}
   ];
   var attributes = {};
   //header('Variables');
@@ -149,7 +149,7 @@ d3.csv("SDH ii.csv", clean, function(data) {
           statistics[d.row.name][s] > 999 ? d3.format(',g')(statistics[d.row.name][s]) : 
           statistics[d.row.name][s]);
       });
-      console.log(statistics['Infant Mortality']);
+
     }
 
 // have it calculate statistics after page load and then load the stats table
@@ -166,6 +166,42 @@ d3.csv("SDH ii.csv", clean, function(data) {
       return attr.name.toLowerCase().indexOf(lower) > -1;
     })[0];
   }
+
+  // some examples
+  $('#collapseExamples').on('click', 'a', function(e){
+    e.preventDefault();
+    var btn = $(this);
+    var example = $(this).find('h4').text();
+    $('#collapseExamples').find('a').removeClass('active');
+    btn.addClass('active');
+    if (example == 'Divergence in Outcomes'){
+      selectAttribute({row:findAttr('Hardship Index 2012'),col:attrs[0]});
+      selectAttribute({row:findAttr('Years of Potential Life Lost'),col:attrs[1]});
+      selectAttribute({row:findAttr('Population'),col:attrs[2]});
+    } else if (example == 'A Hispanic Paradox') {
+      selectAttribute({row:findAttr('Hardship Index 2012'),col:attrs[0]});
+      selectAttribute({row:findAttr('Years of Potential Life Lost'),col:attrs[1]});
+      selectAttribute({row:findAttr('Latino'),col:attrs[2]});
+    } else if (example == 'Obesity Among the Uninsured'){
+      selectAttribute({row:findAttr('Uninsured'),col:attrs[0]});
+      selectAttribute({row:findAttr('Obesity Prevalence Estimate'),col:attrs[1]});
+      selectAttribute({row:findAttr('Population'),col:attrs[2]});
+    } else if (example == 'What Makes Armour Square Different?') {
+      selectAttribute({row:findAttr('Uninsured'),col:attrs[0]});
+      selectAttribute({row:findAttr('Obesity Prevalence Estimate'),col:attrs[1]});
+      selectAttribute({row:findAttr('Asian, Non-Hispanic'),col:attrs[2]});
+    } else if (example == 'A Determinant of Infant Mortality') {
+      selectAttribute({row:findAttr('Foreclosure Rate, 2013'),col:attrs[0]});
+      selectAttribute({row:findAttr('Infant Mortality'),col:attrs[1]});
+      selectAttribute({row:findAttr('Population'),col:attrs[2]});
+    } else if (example == 'Reset') {
+      selectAttribute({row:findAttr('Hardship Index 2012'),col:attrs[0]});
+      selectAttribute({row:findAttr('Infant Mortality'),col:attrs[1]});
+      selectAttribute({row:findAttr('Population'),col:attrs[2]});
+      btn.removeClass('active');
+      btn.closest('#collapseExamples').collapse('hide');
+    }
+  });
 
   /////////// Utilities
   function header(text) {
@@ -207,6 +243,8 @@ d3.csv("SDH ii.csv", clean, function(data) {
   /////////// Render the scatterplot
   drawn = true;
   var colorScale = d3.scale.category10();
+  var colorConversion = ['#7f7f7f', '#d62728', '#2ca02c', '#9467bd', 
+    '#5091C8', '#A57D55', '#17becf', '#DBDB4A', '#e377c2', '#ff7f0e'];
 
   var xAxis = d3.svg.axis()
     .tickFormat(function(d) {
@@ -255,7 +293,7 @@ d3.csv("SDH ii.csv", clean, function(data) {
 
   function place(selection) {
     selection
-      .attr('r', function (d) { return radius(d[attributes.radius.key]); })
+      .attr('r', function (d) { return radius(d[attributes.size.key]); })
       .attr('cx', function (d) { 
         //console.log(x(d[attributes.x.key]));
         return x(d[attributes.x.key]); 
@@ -273,7 +311,7 @@ d3.csv("SDH ii.csv", clean, function(data) {
       var errors = [];
       var xRange = d3.extent(data, function (d) { return d[attributes.x.key]; });
       var yRange = d3.extent(data, function (d) { return d[attributes.y.key]; });
-      var radiusRange = d3.extent(data, function (d) { return d[attributes.radius.key]; });
+      var radiusRange = d3.extent(data, function (d) { return d[attributes.size.key]; });
       var xLogNotAllowed = sign(xRange[0]) !== sign(xRange[1]);
       var yLogNotAllowed = sign(yRange[0]) !== sign(yRange[1]);
       var radiusLogNotAllowed = sign(radiusRange[0]) !== sign(radiusRange[1]);
@@ -288,7 +326,7 @@ d3.csv("SDH ii.csv", clean, function(data) {
         y = scales[0].scale();
       }
       if (radiusLogNotAllowed && scale['size-scale'].value === 'log') {
-        errors.push("Can't use log scale with radius for '" + attributes.radius.name + 
+        errors.push("Can't use log scale with size for '" + attributes.size.name + 
           "' since it has positive and negative values.");
         radius = scales[0].scale();
       }
@@ -307,8 +345,8 @@ d3.csv("SDH ii.csv", clean, function(data) {
       d3.select('.x.axis').transition().duration(transitionDuration).ease(easingFunc).call(xAxis);
       d3.select('.y.axis').transition().duration(transitionDuration).ease(easingFunc).call(yAxis);
       var filteredData = data.filter(function (d) {
-        return typeof d[attributes.radius.key] === 'number' &&
-          d[attributes.radius.key] !== 0 &&
+        return typeof d[attributes.size.key] === 'number' &&
+          d[attributes.size.key] !== 0 &&
           typeof d[attributes.x.key] === 'number' &&
           typeof d[attributes.y.key] === 'number';
       });
@@ -320,7 +358,7 @@ d3.csv("SDH ii.csv", clean, function(data) {
           //.attr('class', 'ca')
           .attr('class', function (d) {
             return d.Region === 0 ? 'chicago ca' : 'ca'; })
-          .attr('fill', function (d) { return colorScale(d.Region); })
+          .attr('fill', function (d) { return colorConversion[d.Region]; })
           .attr('region', function(d) { return d.Region; })
           .on("mouseleave", mouseout)
           .on("mouseout", mouseout)
@@ -356,11 +394,11 @@ d3.csv("SDH ii.csv", clean, function(data) {
     var dx = Math.round(x(d[attributes.x.key]));
     var dy = Math.round(y(d[attributes.y.key]));
     tip.selectAll('.ca').text((d.CommunityArea + ' (' + d['ID'] + ')'));
-    tip.selectAll('.rd .name').text(attributes.radius.name);
+    tip.selectAll('.rd .name').text(attributes.size.name);
     tip.selectAll('.rd .value').text(
-      d[attributes.radius.key] > 999 ? d3.format(',g')(d[attributes.radius.key]) :
-      d[attributes.radius.key]);
-    tip.selectAll('.rd .units').text(attributes.radius.units ? attributes.radius.units : "");
+      d[attributes.size.key] > 999 ? d3.format(',g')(d[attributes.size.key]) :
+      d[attributes.size.key]);
+    tip.selectAll('.rd .units').text(attributes.size.units ? attributes.size.units : "");
     tip.selectAll('.x .name').text(attributes.x.name);
     tip.selectAll('.x .value').text( 
       d[attributes.x.key] > 999 ? d3.format(',g')(d[attributes.x.key]) : 
@@ -486,14 +524,20 @@ function getStatistics(data, cols) {
     statistics[s]['data'] = statistics[s]['data'].sort(function(a, b) {
       return a - b;
     });
-    statistics[s]['mean'] = myround(d3.mean(statistics[s]['data']));
-    statistics[s]['median'] = myround(d3.median(statistics[s]['data']));
-    statistics[s]['max'] = myround(d3.max(statistics[s]['data']));
-    statistics[s]['min'] = myround(d3.min(statistics[s]['data']));
-    statistics[s]['25'] = myround(d3.quantile(statistics[s]['data'], 0.25));
-    statistics[s]['75'] = myround(d3.quantile(statistics[s]['data'], 0.75));
+    // if range is small, show more decimals
+    var smallRange = (d3.max(statistics[s]['data']) - d3.min(statistics[s]['data']) < 3);
+    statistics[s]['max'] = myround(d3.max(statistics[s]['data']), smallRange);
+    statistics[s]['min'] = myround(d3.min(statistics[s]['data']), smallRange);
+    statistics[s]['mean'] = myround(d3.mean(statistics[s]['data']), smallRange);
+    statistics[s]['median'] = myround(d3.median(statistics[s]['data']), smallRange);
+    statistics[s]['25'] = myround(d3.quantile(statistics[s]['data'], 0.25), smallRange);
+    statistics[s]['75'] = myround(d3.quantile(statistics[s]['data'], 0.75), smallRange);
   });
   return statistics;
+}
+
+function getCorrelation(c1, c2) {
+
 }
 
 // convert incoming strings to numbers
@@ -511,8 +555,10 @@ function clean(item) {
 }
 
 // remove digits if .00 or a large number
-function myround(i) {
-  if (Math.floor(parseFloat(i.toFixed(3))) == i || i >= 10000){
+function myround(i, smallRange) {
+  if (smallRange) {
+    return i.toFixed(3);
+  } else if (Math.floor(parseFloat(i.toFixed(3))) == i || i >= 10000){
     return Math.round(i);
   } else {
     return i.toFixed(1);
@@ -678,6 +724,10 @@ $(document).ready(function(){
           }
         });
       }
+    });
+
+    $('#controls').on('click', '#show-instructions', function(e){
+      $('#collapse0').collapse('show');
     });
 
   }, 10);
