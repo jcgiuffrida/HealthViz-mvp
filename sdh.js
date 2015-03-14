@@ -613,19 +613,20 @@ $(document).ready(function(){
     attributes.wrapAll('<div class="panel-group" id="accordion" role="tablist" ' + 
       'aria-multiselectable="true">');
     var sections = {
-      'Composite': 5,
-      'Health Insurance': 5,
-      'Economic':  7,
+      
+      'Child Health': 9,
+      'Mortality': 24,
+      'Social Indices': 6,
+      'Population': 5,
+      'Demographic': 11,
+      'Family': 6,
+      'Economic': 7,
       'Education': 5,
       'Housing': 15,
-      'Transportation':  5,
+      'Transportation': 5,
+      'Social Cohesion': 2,
       'Crime': 6,
-      'Community': 2,
-      'Population':  6,
-      'Demographic': 12,
-      'Family':  6,
-      'Child Health':  9,
-      'Mortality': 23
+      'Health Insurance': 4
     }
     var attributeGroups = {};
     var attrsUsed = 0;
@@ -705,7 +706,7 @@ $(document).ready(function(){
     $('.legend').on('click', 'tr', function(){
       var region = $(this).data('region');
       if (highlighted !== region){
-        $(this).closest('.legend').find('tr').removeClass('selected');
+        $(this).closest('.row').find('.legend tr').removeClass('selected');
         $(this).addClass('selected');
         highlighted = region;
         d3.selectAll('circle').each( function(d, i){
