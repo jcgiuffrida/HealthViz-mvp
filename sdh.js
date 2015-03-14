@@ -615,8 +615,8 @@ $(document).ready(function(){
     var sections = {
       
       'Child Health': 9,
-      'Mortality': 24,
-      'Social Indices': 6,
+      'Mortality': 25,
+      'Social Indices': 5,
       'Population': 5,
       'Demographic': 11,
       'Family': 6,
