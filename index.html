@@ -1,5 +1,10 @@
 <!DOCTYPE html>
 <head>
+  <script>
+  var host = "lucaluca.github.io/SDH";
+  if ((host == window.location.host) && (window.location.protocol != "https:"))
+      window.location.protocol = "https";
+  </script>
   <title>HealthyChi VIZ: Chicago Social Determinants of Health</title>
   <link rel="stylesheet" href="bs/css/bootstrap-journal.min.css" />
   <link rel="stylesheet" href="style.css" />
@@ -11,6 +16,7 @@
   ga('create', 'UA-60569315-1', 'auto');
   ga('send', 'pageview');
   </script>
+  <link rel="canonical" href="{{ site.url }}{{ page.url }}" />
 </head>
 <body>
 <div class="row">
@@ -190,15 +196,15 @@
               <b>This is an interactive scatterplot</b> to look at social determinants of health alongside various health outcomes in Chicago's 77 community areas. You can put any variables on the X and Y axes to look at their relationship by clicking <code>x</code> or <code>y</code> next to the variables you want in the list below. The size of the bubbles indicates a third variable, which you can change by clicking <code>size</code>. Mouse over the bubbles for more information and to identify which community area a bubble represents. By default, this scatterplot shows how <code>Infant Mortality</code> increases in community areas that score highly on the <code>Hardship Index</code>, and the size of a bubble is proportional to the <code>Population</code> of that community area. You can also see summary statistics of these variables to the right.
               <br/>
               <br/>
-              <b>It's important to remember</b> that this scatterplot shows relationships but not causal effects. Just because two variables show a clear trend does not mean that one causes the other: both could be caused by a third, hidden factor. We also recognize that it is difficult to draw broad conclusions about the health of Chicago's citizens by looking only at its 77 community areas, which represent vastly different populations and demographics. No community can be fully represented by a bubble on a graph. Even so, this tool can point us toward the right questions to investigate further. 
+              <b>It's important to remember</b> that this scatterplot shows relationships but not causal effects. Just because two variables show a clear trend does not mean that one causes the other: both could be caused by a third, hidden factor. We also recognize that it is difficult to draw broad conclusions about the health of Chicago's citizens by looking only at its 77 community areas, which represent vastly different populations and demographics. No community can be fully represented by a bubble on a graph. Even so, this tool can point us toward the right questions to investigate further.
               <br/>
               <br/>
-              <a href="map.png"><img src="map.png" width="50%" class="pull-right"></a><b>The color of the bubbles</b> represent the nine "Sides" of Chicago, as seen in the map to the right. You can click a Side in the legend to highlight those community areas.
+              <a href="map.png"><img src="map.png" width="50%" class="pull-right"></a><b>The color of the bubbles</b> represent the nine "Sides" of Chicago, as seen in the map to the right. You can click a Side in the legend to highlight community areas.
               <br/>
               <br/>
-              <b>All data is provided</b> by the Epidemiology and Public Health Informatics Unit at the Chicago Department of Public Health. The map of the community areas is by Alissapump and licensed under CC BY-SA 3.0 via <a href="http://commons.wikimedia.org/wiki/File:Map_of_the_Community_Areas_and_%27Sides%27_of_the_City_of_Chicago.svg#mediaviewer/File:Map_of_the_Community_Areas_and_%27Sides%27_of_the_City_of_Chicago.svg">Wikimedia Commons</a>. As a disclaimer, this tool is still in development and is only intended for internal planning purposes. It is not an official City of Chicago application. All code is open-source and the visualization is by <a href="http://lucaluca.github.io">Jonathan Giuffrida</a>.
+              <b>All data is provided</b> by the Epidemiology and Public Health Informatics Unit at the Chicago Department of Public Health. The map of the community areas is by Alissapump and licensed under CC BY-SA 3.0 via <a href="http://commons.wikimedia.org/wiki/File:Map_of_the_Community_Areas_and_%27Sides%27_of_the_City_of_Chicago.svg#mediaviewer/File:Map_of_the_Community_Areas_and_%27Sides%27_of_the_City_of_Chicago.svg">Wikimedia Commons</a>. As a disclaimer, this tool is still in development and is only intended for internal planning purposes. It is not an official City of Chicago application. All code is open-source and the visualization is by <a href="http://lucaluca.github.io">Jonathan Giuffrida</a>, based on <a href="http://bl.ocks.org/msbarry/9911363">this scatterplot</a> by Michael Barry.
               <br/>
-              <br/><small>Version 1.0: March 2015</small>
+              <br/><small>Version 1.1: November 2015</small>
               <br/>
             </div>
           </div>

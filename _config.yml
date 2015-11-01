@@ -1,0 +1,12 @@
+# Setup
+enforce_ssl:      lucaluca.github.io/SDH
+title:            'HealthyChi VIZ: Chicago Social Determinants of Health'
+url:              https://lucaluca.github.io/SDH
+author:
+  name:           'Jonathan Giuffrida'
+
+# Custom vars
+version:          1.1
+
+github:
+  repo:           https://github.com/lucaluca/SDH
