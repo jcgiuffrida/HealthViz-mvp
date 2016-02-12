@@ -5,7 +5,7 @@
   if ((host == window.location.host) && (window.location.protocol != "https:"))
       window.location.protocol = "https";
   </script>
-  <title>HealthyChi VIZ: Chicago Social Determinants of Health</title>
+  <title>HealthyChi Viz: Social Determinants of Health in Chicago</title>
   <link rel="stylesheet" href="bs/css/bootstrap-journal.min.css" />
   <link rel="stylesheet" href="style.css" />
   <script>
@@ -24,18 +24,18 @@
     <a href="http://www.cityofchicago.org/city/en/depts/cdph/provdrs/healthychicago/svcs/healthy-chicago-2-0--community-health-assessment-and-improvement.html"><img src="healthy-chicago-logo.png" ></a>
   </div>
   <div class="col-md-8">
-    <h2>HealthyChi VIZ
+    <h2>HealthyChi Viz
       <br/>
       <small>Social Determinants of Health in Chicago's Community Areas</small>
     </h2>
   </div>
   <div class="col-md-2 pull-right">
-    <h6>A project by <a href="https://lucaluca.github.io">Jonathan Giuffrida</a></h6>
+    <h5>A project by <a href="https://lucaluca.github.io">Jonathan Giuffrida</a></h5>
   </div>
 </div>
 <div id="container">
   <div class="row">
-    <div id="chart" class="col-md-7 col-md-offset-1">
+    <div id="chart" class="col-md-8 col-xs-12">
       <div class="tip" style="display: none;">
         <div class="ca row">Community Area</div>
         <div class="rd row">
@@ -59,7 +59,7 @@
   		 instructions for enabling JavaScript in your web browser</a>.</p>
   		</noscript>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-4 col-xs-12">
       <form id="controls">
         <div class="small-instructions">
           Choose variables from below to put in the interactive scatterplot, and mouse over each bubble to see which community area it represents. You can start by clicking on "Examples" below. <a href="#instructions" id="show-instructions">Full instructions</a>
@@ -73,39 +73,19 @@
             </div>
             <div id="collapseExamples" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingExamples" aria-expanded="true">
               <div class="list-group">
-                <a href="#" class="list-group-item list-group-item-default">
-                  <h4 class="list-group-item-heading">Divergence in Outcomes</h4>
-                  <p class="list-group-item-text">The Hardship Index tends to predict poor health outcomes (shown as Years of Potential Life Lost, or YPLL) fairly well, but there is a clear divergence among community areas. Some score highly on the Hardship Index without suffering higher YPLL.</p>
-                </a>
-                <a href="#" class="list-group-item list-group-item-default">
-                  <h4 class="list-group-item-heading">A Hispanic Paradox</h4>
-                  <p class="list-group-item-text">By making the size of each bubble represent that community area's Latino population, we see that community areas that are majority Latino tend not to suffer worse health outcomes even when life is hard. Change the Y axis to different variables under Mortality, below, to see what diseases are causing this divergence in health outcomes. </p>
-                </a>
-                <a href="#" class="list-group-item list-group-item-default">
-                  <h4 class="list-group-item-heading">Obesity Among the Uninsured</h4>
-                  <p class="list-group-item-text">We've long known that lack of health insurance is correlated with many adverse health indicators. Here we see that community areas with higher uninsurance rates also tend to have higher rates of obesity. (The sizes of bubbles are proportional to population.)</p>
-                </a>
-                <a href="#" class="list-group-item list-group-item-default">
-                  <h4 class="list-group-item-heading">What Makes Armour Square Different?</h4>
-                  <p class="list-group-item-text">The clear outlier in the preceding graph is Armour Square, which has a high uninsured population but little obesity. By setting the size of bubbles proportional to their Asian, Non-Hispanic population, we find a possible explanation.</p>
-                </a>
-                <a href="#" class="list-group-item list-group-item-default">
-                  <h4 class="list-group-item-heading">A Determinant of Infant Mortality</h4>
-                  <p class="list-group-item-text">Community areas with higher foreclosure rates are more likely to also have worse child health outcomes, especially infant mortality rates, which can increase by a factor of 10 in neighborhoods hard-hit by the foreclosure crisis.</p>
-                </a>
-                <a href="#" class="list-group-item list-group-item-default">
-                  <h4 class="list-group-item-heading" style="font-size: 15px; color: #777;">Reset</h4>
-                </a>
               </div>
             </div>
           </div>
         </div>
-        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-        </div>
+        <table id="attributes">
+
+        </table>
 
       </form>
 
     </div>
+
+
   </div>
   <div class="row">
     <div class="col-md-2 col-md-offset-1 legend">
@@ -159,7 +139,7 @@
         </tr>
       </table>
     </div>
-    <div class="col-md-5 statistics pull-right">
+    <div class="col-md-4 statistics pull-right">
       <table>
         <thead>
           <tr>
@@ -194,10 +174,10 @@
         <div class="panel panel-default">
           <div class="panel-heading" role="tab" id="Instructions">
             <h4 class="panel-title">
-              <a data-toggle="collapse" href="#collapse0" aria-expanded="true" aria-controls="collapse0" class="">Instructions</a>
+              <a data-toggle="collapse" href="#collapseInstructions" aria-expanded="true" aria-controls="collapseInstructions" class="">Instructions</a>
             </h4>
           </div>
-          <div id="collapse0" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading0" aria-expanded="true">
+          <div id="collapseInstructions" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingInstructions" aria-expanded="true">
             <div class="panel-body">
               <b>This is an interactive scatterplot</b> to look at social determinants of health alongside various health outcomes in Chicago's 77 community areas. You can put any variables on the X and Y axes to look at their relationship by clicking <code>x</code> or <code>y</code> next to the variables you want in the list below. The size of the bubbles indicates a third variable, which you can change by clicking <code>size</code>. Mouse over the bubbles for more information and to identify which community area a bubble represents. At first, this scatterplot shows how <code>Infant Mortality</code> increases in community areas that score highly on the <code>Hardship Index</code>, and the size of a bubble is proportional to the <code>Population</code> of that community area. You can also see summary statistics of the variables selected to the right.
               <br/>
@@ -236,4 +216,5 @@
 <script src="d3.min.js" charset="utf-8"></script>
 <script src="jquery-1.11.2.min.js"></script>
 <script src="bs/js/bootstrap.min.js"></script>
+<script src="js/papaparse.min.js"></script>
 <script src="sdh.js"></script>

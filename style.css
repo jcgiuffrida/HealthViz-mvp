@@ -1,3 +1,5 @@
+
+/****  PAGE  **/
 body {
   font-size: 12px;
   font-family: Arial;
@@ -15,25 +17,32 @@ body {
   text-align: left;
 }
 
+div, form {
+  margin: 0;
+  padding: 0;
+}
+
+text {
+  font: 12px sans-serif;  /* axis ticks */
+}
+
+/* bootstrap corrections */
+.btn-group-sm>.btn, .btn-sm {
+  padding: 2px 7px;
+  line-height: 1.2;
+  border-radius: 5px;
+}
+
+
+
+/************************  SVG */
+
 #chart {
   position: relative;
 }
 
-/*
-.pageheader {
-  font-size: 28px;
-  font-weight: bold;
-  margin: 20px 0;
-  color: #555;
-}
-*/
 svg {
-  font: 10px sans-serif;
-}
-
-div, form {
-  margin: 0;
-  padding: 0;
+  font: 12px sans-serif;
 }
 
 .axis path,
@@ -43,57 +52,9 @@ div, form {
   shape-rendering: crispEdges;
 }
 
-text {
-  font: 10px sans-serif;
-}
 
-td {
-  border-top: none;
-  border-bottom: none;
-  margin: 0;
-  padding: 0;
-}
-
-tr {
-  margin: 0;
-  padding: 0;
-}
-
-.header {
-  font-weight: bold;
-  margin-top: 5px;
-}
-
-#controls {
-  height: 530px;
-  overflow: scroll;
-  margin-top: 10px;
-}
-
-a {
-  text-decoration: none;
-  padding-right: 3px;
-  color: #ccc;
-  font-weight: bold;
-}
-
-a:hover, a:focus {
-  text-decoration: none;
-  color: black;
-}
-
-a.selected {
-  color: black;
-}
-
-#error {
-  font-size: 10px;
-  color: darkRed;
-}
-
-.label {
-  font-size: 10px;
-}
+/************************ CHART ELEMENTS */
+/* bubbles */
 .ca {
   fill-opacity: 0.7;
   stroke: #555;
@@ -111,6 +72,14 @@ a.selected {
   filter:url(#glow);
 }
 
+/* trendline */
+.line {
+    stroke: blue;
+    fill:none;
+    stroke-width: 3;
+  }
+
+/** tooltips */
 .tip {
   position: absolute;
   pointer-events: none;
@@ -142,43 +111,113 @@ a.selected {
   color: #888;
 }
 
-/* trendline */
-.line {
-    stroke: blue;
-    fill:none;
-    stroke-width: 3;
-  }
+.label {
+  font-size: 10px;
+}
 
-/* bootstrap corrections */
-.btn-group-sm>.btn, .btn-sm {
-  padding: 2px 7px;
-  line-height: 1.2;
-  border-radius: 5px;
+/* legend */
+.legend tr {
+  cursor: pointer;
+  border-bottom: 3px solid white;
+}
+
+.legend td {
+  padding: 0 9px 0 9px;
+}
+
+.legend tr:hover{
+  color:black;
+}
+
+/* hover over legend makes squares darker */
+.legend td:first-child {
+  opacity: 0.7;
+}
+
+.legend tr.selected {
+  font-weight: bold;
+  color:black;
+}
+
+.legend tr:hover td:first-child,
+.legend tr.selected td:first-child {
+  opacity: 1;
 }
 
 
+/******************************* CONTROLS */
 #controls {
-  width: 342px;
+  height: 620px;
+  overflow-y: scroll;
+  margin-top: 10px;
   border: 1px solid #3a87ad;
   border-radius: 10px;
 }
 
-#controls .small-instructions {
+#attributes {
+  width: 100%;
+}
+
+.header {
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+td {
+  border-top: none;
+  border-bottom: none;
+  margin: 0;
+  padding: 0;
+}
+
+td:first-child:hover {
+  color: #444;
+}
+
+tr {
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  padding-right: 3px;
+  text-decoration: none;
+  color: #aaa;
+  font-weight: bold;
+}
+
+a:hover, a:focus {
+  text-decoration: none;
+  color: black;
+}
+
+a.selected {
+  color: black;
+}
+
+#error {  /* e.g. no javascript */
+  font-size: 12px;
+  color: darkRed;
+}
+
+#controls .small-instructions {  /* instructions at top */
   padding: 20px 15px 0 15px;
 }
 
+#controls td:first-child {
+  padding-right: 10px;
+  padding-left: 1em;
+  text-indent: -1em;
+}
+
+#controls td a {
+  display: block;
+  padding: 0 3px;
+}
+
 .panel {
-  width: 320px;
   margin: 10px;
-}
-
-.instructions .panel {
-  width: auto;
-  font-size: 14px;
-}
-
-.instructions img {
-  padding-left: 10px;
+  width: 95%;
 }
 
 .panel-info {
@@ -198,49 +237,32 @@ a.selected {
 
 .panel-title a:hover, .panel-title a:active,
 .panel-title a:focus {
-  color: #bbb;
+  color: #aaa;
 }
 
-#controls td:first-child {
-  padding-right: 10px;
-  padding-left: 1em;
-  text-indent: -1em;
+#collapseExamples .list-group-item-text {
+  font-weight: normal;
 }
 
-#controls td a {
-  padding: 2px;
+/* instructions panel */
+.instructions .panel {
+  width: auto;
+  font-size: 14px;
 }
 
-.legend tr {
-  cursor: pointer;
-  border-bottom: 3px solid white;
-}
-
-.legend td {
-  padding: 0 9px 0 9px;
-}
-
-.legend tr:hover{
-  color:black;
-}
-
-/* hover over legend makes squares darker */
-.legend td:first-child {
-  opacity: 0.7;
-}
-
-.legend tr:hover td:first-child {
-  opacity: 1;
-}
-
-.legend tr.selected td:first-child {
-  opacity: 1;
+.instructions img {
+  padding-left: 10px;
 }
 
 
-.legend tr.selected {
-  font-weight: bold;
-  color:black;
+/******************************* STATISTICS */
+.statistics {
+  margin-bottom: 30px;
+}
+
+.statistics tr {
+  margin: 0;
+  padding: 0;
 }
 
 .statistics td {
@@ -255,15 +277,3 @@ a.selected {
   font-weight: bold;
 }
 
-.statistics tr {
-  margin: 0;
-  padding: 0;
-}
-
-.statistics {
-  margin-bottom: 30px;
-}
-
-#collapseExamples .list-group-item-text {
-  font-weight: normal;
-}
