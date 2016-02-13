@@ -26,29 +26,41 @@
   <div class="col-md-8">
     <h2>HealthyChi Viz
       <br/>
-      <small>Social Determinants of Health in Chicago's Community Areas</small>
+      <small>Social Determinants of Health in Chicago and Illinois</small>
     </h2>
   </div>
   <div class="col-md-2 pull-right">
     <h5>A project by <a href="https://lucaluca.github.io">Jonathan Giuffrida</a></h5>
   </div>
 </div>
+<div class="row">
+  <div class="col-md-12">
+    <ul class="tabs">
+      <li><a href="#" class="active">Community Area</a></li>
+      <li><a href="#">Census Tract</a></li>
+    </ul>
+  </div>
+</div>
 <div id="container">
   <div class="row">
     <div id="chart" class="col-md-8 col-xs-12">
+      <div id="chartHeader">
+        <div class="correlation col-md-2 col-md-offset-4 text-right" data-original-title="">Correlation: 0.54</div>
+        <div class="rSquared col-md-2" data-original-title="">R-squared: 0.293</div>
+      </div>
       <div class="tip" style="display: none;">
         <div class="ca row">Community Area</div>
-        <div class="rd row">
+        <div class="size row">
           <span class="name">label</span><br>
-          <span class="value">value</span> <span class="units">units</span>
+          <span class="value">value</span><span class="units">units</span>
         </div>
         <div class="x row">
           <span class="name">label</span><br>
-          <span class="value">value</span> <span class="units">units</span>
+          <span class="value">value</span><span class="units">units</span>
         </div>
         <div class="y row">
           <span class="name">label</span><br>
-          <span class="value">value</span> <span class="units">units</span>
+          <span class="value">value</span><span class="units">units</span>
         </div>
       </div>
     </div>
@@ -62,7 +74,7 @@
     <div class="col-md-4 col-xs-12">
       <form id="controls">
         <div class="small-instructions">
-          Choose variables from below to put in the interactive scatterplot, and mouse over each bubble to see which community area it represents. You can start by clicking on "Examples" below. <a href="#instructions" id="show-instructions">Full instructions</a>
+          Choose variables from below to put in the interactive scatterplot, and mouse over each bubble to see which <span class="geography-text">community area</span> it represents. You can start by clicking on "Examples" below. <a href="#instructions" id="show-instructions">Full instructions</a>
         </div>
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
           <div class="panel panel-default">
@@ -88,56 +100,21 @@
 
   </div>
   <div class="row">
-    <div class="col-md-2 col-md-offset-1 legend">
-      <table>
-        <tr data-region=1>
-          <td style="background-color: #d62728;">
-          </td>
-          <td>Far North Side</td>
-        </tr>
-        <tr data-region=2>
-          <td style="background-color: #2ca02c;"></td>
-          <td>North Side</td>
-        </tr>
-        <tr data-region=3>
-          <td style="background-color: #9467bd;"></td>
-          <td>Central</td>
-        </tr>
-      </table>
+    <div class="col-md-1">
+      <!-- <select id="regionSelect">
+        <option value="0" selected>All</option>
+        <option value="1">Far North Side</option>
+        <option value="2">North Side</option>
+        <option value="3">Central Side</option>
+        <option value="4">Northwest Side</option>
+        <option value="5">Far Southwest Side</option>
+        <option value="6">Southwest Side</option>
+        <option value="7">South Side</option>
+        <option value="8">Far Southeast Side</option>
+        <option value="9">West Side</option>
+      </select> -->
     </div>
-    <div class="col-md-2 legend">
-      <table>
-        <tr data-region=4>
-          <td style="background-color: #5091C8;">
-          </td>
-          <td>Northwest Side</td>
-        </tr>
-        <tr data-region=5>
-          <td style="background-color: #A57D55;"></td>
-          <td>Far Southwest Side</td>
-        </tr>
-        <tr data-region=6>
-          <td style="background-color: #17becf;"></td>
-          <td>Southwest Side</td>
-        </tr>
-      </table>
-    </div>
-    <div class="col-md-2 legend">
-      <table>
-        <tr data-region=7>
-          <td style="background-color: #DBDB4A;">
-          </td>
-          <td>South Side</td>
-        </tr>
-        <tr data-region=8>
-          <td style="background-color: #e377c2;"></td>
-          <td>Far Southeast Side</td>
-        </tr>
-        <tr data-region=9>
-          <td style="background-color: #ff7f0e;"></td>
-          <td>West Side</td>
-        </tr>
-      </table>
+    <div id="legend" class="col-md-6">
     </div>
     <div class="col-md-4 statistics pull-right">
       <table>

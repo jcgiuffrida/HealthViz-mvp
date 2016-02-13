@@ -1,5 +1,5 @@
 
-/****  PAGE  **/
+/********************************  PAGE  **/
 body {
   font-size: 12px;
   font-family: Arial;
@@ -33,6 +33,74 @@ text {
   border-radius: 5px;
 }
 
+/* geography tabs */
+ul.tabs {
+  list-style: none;
+  padding: 0;
+  overflow: hidden;
+  margin-left: 50px;
+}
+ul.tabs li {
+  float: left;
+  margin: 0 4px 0 0;
+  font-size: 14px;
+}
+
+ul.tabs li:first-child {
+  margin-left: 8px;
+}
+ul.tabs a {
+  display: block;
+  float: left;
+  padding: 10px 15px;
+  text-decoration: none;
+  color: #fff;
+  background: #bbb;
+  -webkit-border-top-left-radius: 6px;
+  -webkit-border-top-right-radius: 6px;
+  -moz-border-radius-topleft: 6px;
+  -moz-border-radius-topright: 6px;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+ul.tabs a:hover,
+ul.tabs a:focus {
+  background: #999;
+}
+ul.tabs a:active {
+  background: #888;
+}
+
+ul.tabs a.active {
+  position: relative;
+  border: none;
+  border-bottom: none;
+}
+
+ul.tabs a.active::before,
+ul.tabs a.active::after {
+  display: block;
+  content: '';
+  position: absolute;
+  bottom: 0;
+  height: 0px;
+  width: 999em;
+  border-bottom: 2px solid #999;
+}
+
+ul.tabs a.active::before {
+  right: 100%;
+}
+
+ul.tabs a.active::after {
+  left: 100%;
+}
+ul.tabs a.active {
+  color: #fff;
+  background: #eb6864;
+  cursor: default;
+}
+
 
 
 /************************  SVG */
@@ -53,6 +121,18 @@ svg {
 }
 
 
+/************************ CHART HEADER */
+#chartHeader .correlation,
+#chartHeader .rSquared {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+#chartHeader .correlation:hover,
+#chartHeader .rSquared:hover {
+  color: #444;
+}
+
 /************************ CHART ELEMENTS */
 /* bubbles */
 .ca {
@@ -60,10 +140,16 @@ svg {
   stroke: #555;
   stroke-opacity: 0.7;
 }
+
 .ca:hover {
   fill-opacity: 1;
   stroke-opacity: 1;
   filter: url(#glow);
+}
+
+.ca.not-highlighted {
+  fill-opacity: 0.4;
+  stroke-opacity: 0.4;
 }
 
 .ca.highlighted {
@@ -105,6 +191,7 @@ svg {
 
 .tip .value {
   font-weight: bold;
+  padding-right: 5px;
 }
 
 .tip .units {
@@ -116,31 +203,31 @@ svg {
 }
 
 /* legend */
-.legend tr {
+#legend tr {
   cursor: pointer;
   border-bottom: 3px solid white;
 }
 
-.legend td {
+#legend td {
   padding: 0 9px 0 9px;
 }
 
-.legend tr:hover{
+#legend tr:hover{
   color:black;
 }
 
 /* hover over legend makes squares darker */
-.legend td:first-child {
+#legend td:first-child {
   opacity: 0.7;
 }
 
-.legend tr.selected {
+#legend tr.selected {
   font-weight: bold;
   color:black;
 }
 
-.legend tr:hover td:first-child,
-.legend tr.selected td:first-child {
+#legend tr:hover td:first-child,
+#legend tr.selected td:first-child {
   opacity: 1;
 }
 

@@ -5,10 +5,8 @@ var margin = {top: 10, right: 30, bottom: 10, left: 80},
     width = $('#chart').width() - margin.left - margin.right,
     height = 600 - margin.top - margin.bottom,
     transitionDuration = 1000,
-    maxRadius = 12,
-    minRadius = 2,
     minCoverage = 0.5,  // minimum coverage a variable needs in the data to be included
-    geography = "Community Area";
+    geography = "Community Area";  // starting geography
 
 // create svg using global vars
 var svg = d3.select("#chart").append("svg")
@@ -35,55 +33,108 @@ feMerge.append("feMergeNode")
 feMerge.append("feMergeNode")
     .attr("in", "SourceGraphic");
 
+// axes
+var xAxis = d3.svg.axis()
+  .tickFormat(function(d) {
+    // format the tick numbers
+    if (Math.abs(d) < 0.00000001){
+      return '0';
+    } else if(d3.formatPrefix(d).symbol == "m" | (Math.abs(d) < 2)) {
+        return d3.format(",.1g")(d);
+    } else {
+        return d3.format(",s")(d);
+    }
+  })
+  .orient("bottom");
+
+var yAxis = d3.svg.axis()
+  .tickFormat(function(d) {
+    // format the tick numbers
+    if (Math.abs(d) < 0.00000001){
+      return '0';
+    } else if(d3.formatPrefix(d).symbol == "m" | (Math.abs(d) < 2)) {
+        return d3.format(",.1g")(d);
+    } else {
+        return d3.format(",s")(d);
+    }
+  })
+  .orient("left");
+
+// x axis
+svg.append('g')
+    .attr('class', 'x axis')
+    .attr("transform", "translate(0," + (height+25) + ")")
+  .append('text') 
+    .attr('x', width)
+    .attr('dy', -3)
+    .style('text-anchor', 'end')
+    .attr('class', 'x label');
+
+// y axis
+svg.append('g')
+    .attr('class', 'y axis')
+    .attr("transform", "translate(-25,0)")
+  .append('text')
+    .attr('transform', 'rotate(-90)')
+    .attr('dy', 10)
+    .style('text-anchor', 'end')
+    .attr('class', 'y label');
+
 
 // examples
-var examples = [
-  { 
-    name: 'Divergence in Outcomes',
-    x: 'Hardship Index',
-    y: 'Years of Potential Life Lost',
-    r: 'Population',
-    geography: "Community Area",
-    description: "The Hardship Index tends to predict poor health outcomes (shown as Years of Potential Life Lost, or YPLL) fairly well, but there is a clear divergence among community areas. Some score highly on the Hardship Index without suffering higher YPLL."
-  }, {
-    name: 'A Hispanic Paradox', 
-    x: 'Hardship Index',
-    y: 'Years of Potential Life Lost',
-    r: 'Latino',
-    geography: "Community Area",
-    description: "By making the size of each bubble represent that community area's Latino population, we see that community areas that are majority Latino tend not to suffer worse health outcomes even when life is hard. Change the Y axis to different variables under Mortality, below, to see what diseases are causing this divergence in health outcomes."
-  }, {
-    name: 'Obesity Among the Uninsured', 
-    x: 'Uninsured',
-    y: 'Obesity Prevalence Estimate',
-    r: 'Population',
-    geography: "Community Area",
-    description: "We've long known that lack of health insurance is correlated with many adverse health indicators. Here we see that community areas with higher uninsurance rates also tend to have higher rates of obesity. (The sizes of bubbles are proportional to population.)"
-  }, {
-    name: 'What Makes Armour Square Different?',
-    x: 'Uninsured',
-    y: 'Obesity Prevalence Estimate',
-    r: 'Asian, Non-Hispanic',
-    geography: "Community Area",
-    description: "The clear outlier in the preceding graph is Armour Square, which has a high uninsured population but little obesity. By setting the size of bubbles proportional to their Asian, Non-Hispanic population, we find a possible explanation."
-  }, {
-    name: 'A Determinant of Infant Mortality', 
-    x: 'Foreclosure Rate',
-    y: 'Infant Mortality',
-    r: 'Population',
-    geography: "Community Area",
-    description: "Community areas with higher foreclosure rates are more likely to also have worse child health outcomes, especially infant mortality rates, which can increase by a factor of 10 in neighborhoods hard-hit by the foreclosure crisis."
-  }, {
-    name: 'Reset',
-    x: 'Hardship Index',
-    y: 'Infant Mortality',
-    r: 'Population',
-    geography: "Community Area",
-    description: ""
-  }
-];
+var examples = {
+  'Community Area': [
+    {
+      name: 'Divergence in Outcomes',
+      x: 'Hardship Index',
+      y: 'Years of Potential Life Lost',
+      r: 'Population',
+      geography: "Community Area",
+      description: "The Hardship Index tends to predict poor health outcomes (shown as Years of Potential Life Lost, or YPLL) fairly well, but there is a clear divergence among community areas. Some score highly on the Hardship Index without suffering higher YPLL."
+    }, {
+      name: 'A Hispanic Paradox', 
+      x: 'Hardship Index',
+      y: 'Years of Potential Life Lost',
+      r: 'Latino',
+      geography: "Community Area",
+      description: "By making the size of each bubble represent that community area's Latino population, we see that community areas that are majority Latino tend not to suffer worse health outcomes even when life is hard. Change the Y axis to different variables under Mortality, below, to see what diseases are causing this divergence in health outcomes."
+    }, {
+      name: 'Obesity Among the Uninsured', 
+      x: 'Uninsured',
+      y: 'Obesity Prevalence Estimate',
+      r: 'Population',
+      geography: "Community Area",
+      description: "We've long known that lack of health insurance is correlated with many adverse health indicators. Here we see that community areas with higher uninsurance rates also tend to have higher rates of obesity. (The sizes of bubbles are proportional to population.)"
+    }, {
+      name: 'What Makes Armour Square Different?',
+      x: 'Uninsured',
+      y: 'Obesity Prevalence Estimate',
+      r: 'Asian, Non-Hispanic',
+      geography: "Community Area",
+      description: "The clear outlier in the preceding graph is Armour Square, which has a high uninsured population but little obesity. By setting the size of bubbles proportional to their Asian, Non-Hispanic population, we find a possible explanation."
+    }, {
+      name: 'A Determinant of Infant Mortality', 
+      x: 'Foreclosure Rate',
+      y: 'Infant Mortality',
+      r: 'Population',
+      geography: "Community Area",
+      description: "Community areas with higher foreclosure rates are more likely to also have worse child health outcomes, especially infant mortality rates, which can increase by a factor of 10 in neighborhoods hard-hit by the foreclosure crisis."
+    }, {
+      name: 'Reset',
+      x: 'Hardship Index',
+      y: 'Infant Mortality',
+      r: 'Population',
+      geography: "Community Area",
+      description: ""
+    }
+  ],
+  'Census Tract': [
+    {
 
-loadExamples(examples.filter(function(e){ return e.geography == geography; }));
+    }
+  ]
+};
+
 
 function loadExamples(arr){
   var item;
@@ -100,28 +151,73 @@ function loadExamples(arr){
   });
 
 }
+
+// metadata about the options
+var options = {
+  'Community Area': {
+    data: 'SDH ii.csv',       // name of local file
+    ID: 'ID',                 // name of numeric ID field
+    name: 'Community Area',   // name of display name field
+    default: {                // default attributes for scatterplot
+                              // important: these attributes must have roughly 100% coverage across ALL areas
+      x: 'Hardship Index',
+      y: 'Infant Mortality',
+      r: 'Population',
+      geofilter: 'Region'     // name of default geofilter / color coding field
+    },
+    tooltipText: function(d){ // function to create the name/description in the tooltip
+      return d['Community Area'] + ' (' + d.ID + ')';
+    },
+    sizeRange: [2, 12],       // [ minimum radius, maximum radius ] for bubbles
+    cols: [],                 // holds data from the master table
+    idCols: [],               // just the identification (non-data) fields
+    regions: {}               // auto-generated list of regions with counts and id numbers
+  },
+  'Census Tract': {
+    data: 'census tract.csv',
+    ID: 'Tract',
+    name: 'Tract',
+    default: {
+      x: 'Median income',
+      y: 'HS grad or higher',
+      r: 'Population',
+      geofilter: 'County'
+    },
+    tooltipText: function(d){ // function to create the name/description in the tooltip
+      return 'Tract ' + String(d['Tract']).substring(5) + 
+        '<br>' + d.County + ' County';
+    },
+    sizeRange: [1, 10],
+    cols: [],
+    idCols: [],
+    regions: {}
+  }
+}
+
 // load the master table
 // NOTE: the master table needs to conform to these requirements:
 //   - non-data variables have the category "Identification" or "Geofilter"
-//   - the master table is sorted by Geography (all similar geographies are listed together)
+//   - the master table is sorted by geography (all similar geographies are listed together)
 //   - the non-data variables come first within each geography
 
-var master;
-var cols = [];
-var nonNumeric = [];
 Papa.parse("master.csv",{
     download: true,
     header: true,
     complete: function(results) {
-      master = results.data;
-      for (row in master){
-        if (master[row].geography == geography){
+      for (r in results.data){
+        var row = results.data[r];
+        if (row.geography in options){
           // distinguish between the data columns and the ID columns
-          if (master[row].category == "Identification" || master[row].category == "Geofilter"){
-            nonNumeric.push(master[row].key);
-          } else { // right geography, but actual data
-            cols.push(master[row]);
+          if (row.category == "Identification" || row.category == "Geofilter"){
+            options[row.geography].idCols.push(row);
+          } else {
+            options[row.geography].cols.push(row);
           }
+        } else if (row.key !== ""){
+          // error
+          console.log("the following is not a recognized geography: ");
+          console.log(row);
+          continue;
         }
       }
   }
@@ -131,450 +227,526 @@ Papa.parse("master.csv",{
 ***** CREATE THE CHART ****
 *************************/
 
-var coverage = {};
-var attributesPlaced = false;
 
-// Read in, clean, and format the data
-d3.csv("SDH ii.csv", clean, function(data) {
-  var drawn = false; // has it been drawn?
+// Main function
+function Scatter(geo){
+  // remove any existing scatterplots
+  svg.selectAll("#circles").remove();
+  svg.selectAll("#lines").remove();
 
-  // drop columns without full coverage
-  cols = cols.filter(function(c){
-    return coverage[c.key] * 1.0 / data.length >= minCoverage;
-  });
-  
-  var statistics = false;
+  var coverage = {};
+  var attributesPlaced = false;
+
+  geography = geo;
+  options[geo].regions = {};
+  $('#collapseExamples .list-group').empty();
+  loadExamples(examples[geography]);
+
+  $('#legend').empty();
 
 
-  // create attributes table
-  var colsTable = d3.select('#controls #attributes');
-  $('#controls #attributes').append('<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">');
-  var attrs = [
-    {value: 'x'},
-    {value: 'y'},
-    {value: 'size'}
-  ];
-  var attributes = {};
-
-  // create panels
-  var currentCategory = "";
-  var panel = undefined;
-  for (c in cols){
-    var thisCategory = cols[c].category;
-    if (thisCategory !== currentCategory){
-      // create and append panel
-      panel = $(
-        '<div class="panel panel-info">' + 
-          '<div class="panel-heading" role="tab" id="' + thisCategory + '">' + 
-            '<h4 class="panel-title">' + 
-              '<a data-toggle="collapse" href="#collapse' + c + 
-              '" aria-expanded="true" aria-controls="collapse' + c + '" class="">' + 
-              thisCategory + '</a>' + 
-            '</h4>' + 
-          '</div>' + 
-          '<div id="collapse' + c + '" class="panel-collapse collapse" role="tabpanel" ' + 
-          'aria-labelledby="heading' + c + '" aria-expanded="true">' + 
-            '<div class="panel-body category-' + thisCategory.replace(/\s/g, "-") + '"></div>' + 
-          '</div>' + 
-        '</div>');
-      $('#controls #attributes .panel-group').append(panel);
-      currentCategory = thisCategory;
-    }
+  // Read in, clean, and format the data
+  d3.csv(options[geo].data, clean, function(data) {
+    var drawn = false; // has it been drawn?
     
-    row(d3.select('#attributes .category-' + thisCategory.replace(/\s/g, "-")), 
-      attrs, cols[c].key, cols[c]);
-  }
+    var statistics = false;
 
-  attributesPlaced = true;
+    // create attributes table
+    var colsTable = d3.select('#controls #attributes');
+    colsTable.selectAll("*").remove();
 
-  // open the first panel, whatever it is
-  $('#attributes .panel').first().find('.panel-collapse').collapse('show');
+    $('#controls #attributes').append('<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">');
+    var attrs = [
+      {value: 'x'},
+      {value: 'y'},
+      {value: 'size'}
+    ];
+    var attributes = {};
 
-
-  // this is the magic
-  colsTable.selectAll('td a').on('click', selectAttribute);
-  function selectAttribute(d) {
-    attributes[d.col.value] = d.row;
-    colsTable.selectAll('td a.' + d.col.value)
-      .classed('selected', function (other) {
-        return other.row.key === d.row.key;
+    // drop columns without full coverage
+    options[geo].cols = options[geo].cols.filter(function(c){
+      return coverage[c.key] * 1.0 / data.length >= minCoverage;
     });
 
-    // refresh the chart (if all three dimensions have been selected)
-    if (Object.keys(attributes).length == 3) { 
-      redraw();
-    
-      // refresh statistics
-      if (statistics) {
-        var stats = ['mean', 'median', 'min', '25', '75', 'max'];
-        var table = $('.statistics table');
-        table.find('thead .' + d.col.value).html('<h5>' + d.row.key + '<br/>' + 
-          '<small>' + (d.row.units ? d.row.units : '') + '</small></h5>');
-        // prettier stats number formats
-        stats.forEach(function (s) {
-          table.find('.' + s + ' .' + d.col.value).text(
-            statistics[d.row.key][s] > 999 ? d3.format(',g')(statistics[d.row.key][s]) : 
-            statistics[d.row.key][s]);
-        });
+    var cols = options[geo].cols;
+
+    // create panels
+    var currentCategory = "";
+    var panel = undefined;
+    for (c in cols){
+      var thisCategory = cols[c].category;
+      if (thisCategory !== currentCategory){
+        // create and append panel
+        panel = $(
+          '<div class="panel panel-info">' + 
+            '<div class="panel-heading" role="tab" id="' + thisCategory + '">' + 
+              '<h4 class="panel-title">' + 
+                '<a data-toggle="collapse" href="#collapse' + c + 
+                '" aria-expanded="true" aria-controls="collapse' + c + '" class="">' + 
+                thisCategory + '</a>' + 
+              '</h4>' + 
+            '</div>' + 
+            '<div id="collapse' + c + '" class="panel-collapse collapse" role="tabpanel" ' + 
+            'aria-labelledby="heading' + c + '" aria-expanded="true">' + 
+              '<div class="panel-body category-' + thisCategory.replace(/\s/g, "-") + '"></div>' + 
+            '</div>' + 
+          '</div>');
+        $('#controls #attributes .panel-group').append(panel);
+        currentCategory = thisCategory;
+      }
+      
+      row(d3.select('#attributes .category-' + thisCategory.replace(/\s/g, "-")), 
+        attrs, cols[c].key, cols[c]);
+    }
+
+    attributesPlaced = true;
+
+    // open the first panel, whatever it is
+    $('#attributes .panel').first().find('.panel-collapse').collapse('show');
+
+
+    // this is the magic
+    colsTable.selectAll('td a').on('click', selectAttribute);
+    function selectAttribute(d) {
+      attributes[d.col.value] = d.row;
+      colsTable.selectAll('td a.' + d.col.value)
+        .classed('selected', function (other) {
+          return other.row.key === d.row.key;
+      });
+
+      // refresh the chart (if all three dimensions have been selected)
+      if (Object.keys(attributes).length == 3) { 
+        redraw();
+      
+        // refresh statistics
+        if (statistics) {
+          var stats = ['mean', 'median', 'min', '25', '75', 'max'];
+          var table = $('.statistics table');
+          table.find('thead .' + d.col.value).html('<h5>' + d.row.key + '<br/>' + 
+            '<small>' + (d.row.units ? d.row.units : '') + '</small></h5>');
+          // prettier stats number formats
+          stats.forEach(function (s) {
+            table.find('.' + s + ' .' + d.col.value).text(
+              statistics[d.row.key][s] > 999 ? d3.format(',g')(statistics[d.row.key][s]) : 
+              statistics[d.row.key][s]);
+          });
+        }
+      }
+      
+    }
+
+    // get statistics after everything is drawn, and then "redraw" to show statistics
+    setTimeout(function(){
+      statistics = getStatistics(data, cols);
+      selectAttribute({row:findAttr(options[geo].default.x),col:attrs[0]});
+      selectAttribute({row:findAttr(options[geo].default.y),col:attrs[1]});
+      selectAttribute({row:findAttr(options[geo].default.r),col:attrs[2]});
+    }, 100);
+
+
+
+
+    selectAttribute({row:findAttr(options[geo].default.x),col:attrs[0]});
+    selectAttribute({row:findAttr(options[geo].default.y),col:attrs[1]});
+    selectAttribute({row:findAttr(options[geo].default.r),col:attrs[2]});
+
+
+    // this helps us programmatically select attributes
+    function findAttr(search) {
+      var lower = search.toLowerCase();
+      var v = cols.filter(function (attr) {
+        return attr.key.toLowerCase().indexOf(lower) > -1;
+      })[0];
+      if (v){ 
+        return v;
+      } else {
+        // variable not found
+        console.log('error: variable ' + search + ' doesn\'t exist');
+        d3.select('#error').text('error: variable ' + search + ' doesn\'t exist');
       }
     }
+
+    // some examples
+    $('#collapseExamples').on('click', 'a', function(e){
+      e.preventDefault();
+      var btn = $(this);
+      $('#collapseExamples').find('a').removeClass('active');
+      btn.addClass('active');
+      var example = examples[geography].filter(function(o){ return o.name == btn.find('h4').text(); });
+      if (example){
+        selectAttribute({row:findAttr(example[0].x),col:attrs[0]});
+        selectAttribute({row:findAttr(example[0].y),col:attrs[1]});
+        selectAttribute({row:findAttr(example[0].r),col:attrs[2]});
+      }
+      if (example[0].name == 'Reset'){
+        btn.removeClass('active');
+        btn.closest('#collapseExamples').collapse('hide');
+      }
+
+    });
+
+    // Utilities for drawing the attribute table
+    function row(ele, data, display, name) {
+      var row = ele.append('tr');
+      row.append('td').text(display)
+        .attr('data-toggle', 'tooltip')
+        .attr('title', function(){
+          var title = [name.units, name.period].filter(function(a){ return a; }).join(', ');
+          if (name.source){
+            return [title, name.description, ("Source: " + name.source)]
+              .filter(function(a){ return a; }).join('<br>');
+          } else {
+          return [title, name.description]
+              .filter(function(a){ return a; }).join('<br>');
+          }
+        });
+
+      row.selectAll('button.option')
+          .data(function (rowData) {
+            return data.map(function (colData) {
+              return {  
+                row: name,
+                col: colData
+              };
+            });
+          })
+          .enter()
+        .append('td')
+          .attr('class', 'option')
+        .append('a')
+          .attr('href', '#')
+          .attr('class', function (d) {
+            return [
+              name,
+              d.row,
+              d.col.value
+            ].filter(function (d) { return typeof d === 'string'; }).join(" ");
+          })
+          .text(function (d) { return d.col.value })
+          .on('click.preventDefault', function () { d3.event.preventDefault(); });
+    }
+
+    // Render the scatterplot
+    drawn = true;
+    var colorScale = d3.scale.category20();
+    var colorConversion = ['#2f2f2f', '#d62728', '#2ca02c', '#9467bd', 
+      '#5091C8', '#A57D55', '#17becf', '#DBDB4A', '#e377c2', '#ff7f0e'];
+
     
-  }
-
-  // get statistics after everything is drawn, and then "redraw" to show statistics
-  setTimeout(function(){
-    statistics = getStatistics(data, cols);
-    selectAttribute({row:findAttr('Hardship Index'),col:attrs[0]});
-    selectAttribute({row:findAttr('Infant Mortality'),col:attrs[1]});
-    selectAttribute({row:findAttr('Population'),col:attrs[2]});
-  }, 100);
 
 
 
 
-  selectAttribute({row:findAttr('Hardship Index'),col:attrs[0]});
-  selectAttribute({row:findAttr('Infant Mortality'),col:attrs[1]});
-  selectAttribute({row:findAttr('Population'),col:attrs[2]});
+    var x, y, radius;
+    function redraw() {
+      if (drawn) {
+        var easingFunc = 'cubic-in-out';
+        x = d3.scale.linear();
+        y = d3.scale.linear();
+        radius = d3.scale.linear();
+        var errors = [];
+        var xRange = d3.extent(data, function (d) { return d[attributes.x.key]; });
+        var yRange = d3.extent(data, function (d) { return d[attributes.y.key]; });
+        var radiusRange = d3.extent(data, function (d) { return d[attributes.size.key]; });
+        
+        // if there are errors, add them to [ errors ] here
 
+        d3.select('#error').text(errors.join("<br>"));
 
-  // this helps us programmatically select attributes
-  function findAttr(search) {
-    var lower = search.toLowerCase();
-    var v = cols.filter(function (attr) {
-      return attr.key.toLowerCase().indexOf(lower) > -1;
-    })[0];
-    if (v){ 
-      return v;
-    } else {
-      // variable not found
-      console.log('error: variable ' + search + ' doesn\'t exist');
-      d3.select('#error').text('error: variable ' + search + ' doesn\'t exist');
+        // label axes
+        d3.select('.x.label').text(attributes.x.key + (attributes.x.units ? (" (" + attributes.x.units + ")") : ""));
+        d3.select('.y.label').text(attributes.y.key + (attributes.y.units ? (" (" + attributes.y.units + ")") : ""));
+
+        // set axes
+        x.domain(xRange)
+          .range([0, width]);
+        y.domain(yRange)
+          .range([height, 0]);
+        radius.range(options[geo].sizeRange)
+          .domain(radiusRange);
+        xAxis.scale(x);
+        yAxis.scale(y);
+        d3.select('.x.axis').transition().duration(transitionDuration).ease(easingFunc).call(xAxis);
+        d3.select('.y.axis').transition().duration(transitionDuration).ease(easingFunc).call(yAxis);
+
+        // handle nulls by filtering
+        var filteredData = data.filter(function (d) {
+          return typeof d[attributes.size.key] === 'number' &&
+            d[attributes.size.key] !== 0 &&
+            typeof d[attributes.x.key] === 'number' &&
+            typeof d[attributes.y.key] === 'number';
+        });
+
+        // always show circles above the trendline
+        svg.append("g").attr("id", "lines");
+        svg.append("g").attr("id", "circles");
+
+        var areas = svg.select('#circles').selectAll('.ca').data(filteredData, function (d) { return d[options[geo].name]; });
+
+        areas.enter().append('circle')
+          .attr('class', 'ca')
+          .attr('region', function(d){
+            return options[geo].regions[d[options[geo].default.geofilter]].ID; })
+          .attr('fill', function (d) { 
+            return colorScale(options[geo].regions[d[options[geo].default.geofilter]].ID); })
+          .attr('r', 0)
+          .on("mouseleave", mouseout)
+          .on("mouseout", mouseout)
+          .on("mouseover", mouseover);
+        areas.transition().duration(transitionDuration)
+          .ease(easingFunc)
+          .attr('r', function (d) { 
+            if (isNaN(radius(d[attributes.size.key]))){
+              console.log("error: this point has no " + attributes.size.key);
+              console.log(d[attributes.size.key]);
+            }
+            return radius(d[attributes.size.key]); })
+          .attr('cx', function (d) { 
+            if (isNaN(x(d[attributes.x.key]))){
+              console.log("error: this point has no " + attributes.x.key);
+              console.log(d[attributes.x.key]);
+            }
+            return x(d[attributes.x.key]); })
+          .attr('cy', function (d) { 
+            if (isNaN(y(d[attributes.y.key]))){
+              console.log("error: this point has no " + attributes.y.key);
+              console.log(d[attributes.y.key]);
+            }
+            return y(d[attributes.y.key]); });
+        areas.exit()
+          .transition()
+          .duration(transitionDuration)
+          .ease(easingFunc)
+          .remove();
+
+        // trend line
+        // calculate trend line and correlation coefficient
+        trendCalc = leastSquares(
+          filteredData.map(function(d){return +d[attributes.x.key]; }), 
+          filteredData.map(function(d){return +d[attributes.y.key]; })
+        );
+        // console.log("calculations: " + trendCalc.map(function(d) { return " " + Math.floor(d * 100) / 100; }));
+
+        var xSeries = filteredData.map(function(d){return +d[attributes.x.key]; });
+        var ySeries = filteredData.map(function(d){return +d[attributes.y.key]; });
+
+        // wish we could use array destructuring
+        var slope = trendCalc[0];
+        var intercept = trendCalc[1];
+        var rSquared = trendCalc[2];
+        var rXY = trendCalc[3];
+
+        // apply the results of the least squares regression
+        var x1 = d3.min(xSeries);
+        var y1 = intercept + x1 * slope;
+        var x2 = d3.max(xSeries);
+        var y2 = y1 + slope * (x2 - x1);
+        
+        // truncate line if it extends above or below the chart area
+        if (y1 > d3.max(ySeries)){        // left above
+          y1 = d3.max(ySeries);
+          x1 = (y1 - intercept) / slope;
+        } else if (y2 > d3.max(ySeries)){ // right above
+          y2 = d3.max(ySeries);
+          x2 = (y2 - intercept) / slope;
+        }
+        if (y1 < d3.min(ySeries)){        // left below
+          y1 = d3.min(ySeries);
+          x1 = (y1 - intercept) / slope;
+        } else if (y2 < d3.min(ySeries)){ // right below
+          y2 = d3.min(ySeries);
+          x2 = (y2 - intercept) / slope;
+        }
+
+        var trendData = [[x1,y1,x2,y2]];
+        // console.log("points: " + trendData[0].map(function(d) { return " " + Math.floor(d * 100) / 100; }));
+
+        var trendline = svg.select('#lines').selectAll(".trendline")
+          .data(trendData);
+          
+        trendline.enter()
+          .append("line")
+          .attr("class", "trendline")
+          .attr("stroke", "black")
+          .attr("stroke-width", 0);
+
+        trendline.transition()
+          .duration(transitionDuration).ease(easingFunc)
+          .attr("x1", function(d) { return x(d[0]); })
+          .attr("y1", function(d) { return y(d[1]); })
+          .attr("x2", function(d) { return x(d[2]); })
+          .attr("y2", function(d) { return y(d[3]); })
+          .attr("stroke-width", Math.abs(rXY) * 2);  // vary strength with correlation coefficient
+        
+        
+        // display correlation coefficient and other statistics
+        $('#chartHeader .correlation').text("Correlation: " + Math.floor(rXY * 100) / 100)
+          .attr("data-original-title", function(){
+          var title = '';
+          if (rXY == 1){
+            title += 'A correlation of 1 is only seen when the same variable is on the X and Y axes.';
+          } else if (rXY >= 0.5){
+            title += 'A high correlation means that ' + attributes.x.key + ' and ' + 
+              attributes.y.key + ' tend to move strongly in the same direction, and may be linked.';
+          } else if (rXY > 0.2){
+            title += 'A positive correlation means that ' + attributes.x.key + ' and ' + 
+              attributes.y.key + ' tend to move in the same direction, but does not necessarily indicate ' + 
+              'that they are linked.';
+          } else if (rXY > 0){
+            title += 'A very weakly positive correlation means that ' + attributes.x.key + ' and ' + 
+              attributes.y.key + ' probably have no link at all.';
+          } else if (rXY == 0){
+            title += 'A correlation of 0 means that ' + attributes.y.key + ' does not seem to change at all ' + 
+              'as ' + attributes.x.key + ' changes. ';
+          } else if (rXY >= -0.2){
+            title += 'A very weakly negative correlation means that ' + attributes.x.key + ' and ' + 
+              attributes.y.key + ' probably have no link at all.';
+          } else if (rXY > -0.5){
+            title += 'A negative correlation means that ' + attributes.x.key + ' and ' + 
+              attributes.y.key + ' tend to move in opposite directions, but does not necessarily indicate ' + 
+              'that they are linked.';
+          } else if (rXY <= -0.5){
+            title += 'A highly negative correlation means that ' + attributes.x.key + ' and ' + 
+              attributes.y.key + ' tend to move strongly in opposite directions, and may be linked.';
+          }
+          return title;
+        }).tooltip('fixTitle');
+
+        $('#chartHeader .rSquared').text("R-squared: " + myRound(rSquared, true))
+          .attr("data-original-title", function(){
+            return 'The R-squared measures the percentage of variation in ' + attributes.y.key + 
+              ' that is explained by ' + attributes.x.key + 
+              '. It ranges from 0 to 1, where 1 means that the relationship is perfect. ';
+          }).tooltip('fixTitle');
+        
+      }
     }
-  }
 
-  // some examples
-  $('#collapseExamples').on('click', 'a', function(e){
-    e.preventDefault();
-    var btn = $(this);
-    $('#collapseExamples').find('a').removeClass('active');
-    btn.addClass('active');
-    var example = examples.filter(function(o){ return o.name == btn.find('h4').text(); });
-    if (example){
-      selectAttribute({row:findAttr(example[0].x),col:attrs[0]});
-      selectAttribute({row:findAttr(example[0].y),col:attrs[1]});
-      selectAttribute({row:findAttr(example[0].r),col:attrs[2]});
+    // handle interaction/tooltip
+    var tip = d3.select('.tip');
+    tip.on("mouseover", mouseout);
+
+    // create text for tooltip
+    function mouseover(d) {
+      if (d.mouseover) { return; }
+      mouseout();
+      d.mouseover = true;
+      var dx = Math.round(x(d[attributes.x.key]));
+      var dy = Math.round(y(d[attributes.y.key]));
+      tip.selectAll('.ca').html(options[geo].tooltipText(d));
+      ['size', 'x', 'y'].forEach(function(attr){
+        tip.selectAll('.' + attr + ' .name').text(attributes[attr].key);
+        tip.selectAll('.' + attr + ' .value').text(myRound(d[attributes[attr].key]));
+        tip.selectAll('.' + attr + ' .units').text(attributes[attr].units ? attributes[attr].units : "");
+        if (attributes[attr].units == '$'){
+          $('.tip .' + attr + ' .units').after($('.' + attr + ' .value'))
+            .css("font-weight", "bold");
+        } else if (attributes[attr].units[0] == '%'){
+          $('.tip .' + attr + ' .units').before($('.' + attr + ' .value')
+            .css("padding-right", "2px"))
+            .css("font-weight", "normal");
+        } else {
+          $('.tip .' + attr + ' .units').before($('.' + attr + ' .value')
+            .css("padding-right", "5px"))
+            .css("font-weight", "normal");
+        }
+      });
+      tip.style("display", null)
+          .style("top", (dy + margin.top + 35) + "px")
+          .style("left", (dx + margin.left + 10) + "px");
     }
-    if (example[0].name == 'Reset'){
-      btn.removeClass('active');
-      btn.closest('#collapseExamples').collapse('hide');
+
+    function mouseout(d) {
+      d3.selectAll('circle.ca').each(function (d) { d.mouseover = false; });
+      tip.style("display", "none");
     }
+
+    redraw();
+
+    // make it fit, heightwise
+    var totalHeight = margin.top + margin.bottom + height + 60;
+    d3.select("#chart svg")
+      .attr('height', totalHeight);
+    d3.select(self.frameElement).style("height", totalHeight + "px");
+    mouseout();
+
+    // add legend
+    var sortedRegions = [];
+    for (var r in options[geo].regions){
+      sortedRegions.push(options[geo].regions[r]);
+      sortedRegions.sort(function(a, b) {return b.count - a.count});
+    }
+    sortedRegions.forEach(function(r){
+      if (r.name !== "All"){
+        var entry = $('<div class="col-md-4">');
+        entry.append($('<table>')
+          .append($('<tr data-region="' + r.ID + '"><td style="background-color: ' + 
+            colorScale(r.ID) + 
+            ';"></td><td>' + r.name + '</td></tr>')));
+        $('#legend').append(entry);
+      }
+    });
 
   });
 
-  // Utilities for drawing the attribute table
-  function row(ele, data, display, name) {
-    var row = ele.append('tr');
-    row.append('td').text(display)
-      .attr('data-toggle', 'tooltip')
-      .attr('title', function(){
-        var title = [name.units, name.period].filter(function(a){ return a; }).join(', ');
-        if (name.source){
-          return [title, name.description, ("Source: " + name.source)]
-            .filter(function(a){ return a; }).join('<br>');
+  // convert incoming strings to numbers, convert blanks to null, and count variable coverage
+  function clean(item) {
+    d3.keys(item).forEach(function (key) {
+      if (options[geo].idCols.filter(function(c){ return c.key == key; }).length > 0) {
+        if (key == options[geo].default.geofilter) {  // geofilter field
+          // count the geofilters and assign ID numbers
+          if (item[key] in options[geo].regions){
+            // increment
+            options[geo].regions[item[key]].count += 1;
+          } else {
+            // create new key
+            options[geo].regions[item[key]] = {
+              ID: Object.keys(options[geo].regions).length,
+              count: 1,
+              name: item[key]
+            }
+          }
         } else {
-        return [title, name.description]
-            .filter(function(a){ return a; }).join('<br>');
+          // do nothing: not a data field  
         }
-      });
-
-    row.selectAll('button.option')
-        .data(function (rowData) {
-          return data.map(function (colData) {
-            return {  
-              row: name,
-              col: colData
-            };
-          });
-        })
-        .enter()
-      .append('td')
-        .attr('class', 'option')
-      .append('a')
-        .attr('href', '#')
-        .attr('class', function (d) {
-          return [
-            name,
-            d.row,
-            d.col.value
-          ].filter(function (d) { return typeof d === 'string'; }).join(" ");
-        })
-        .text(function (d) { return d.col.value })
-        .on('click.preventDefault', function () { d3.event.preventDefault(); });
+      } else {
+        if (item[key] === "" || isNaN(item[key])) {
+          item[key] = null;
+        } else {
+          item[key] = +item[key];
+          coverage[key] = (coverage[key] || 0) + 1;
+        }
+      }
+    });
+    return item;
   }
 
-  // Render the scatterplot
-  drawn = true;
-  var colorScale = d3.scale.category10();
-  var colorConversion = ['#2f2f2f', '#d62728', '#2ca02c', '#9467bd', 
-    '#5091C8', '#A57D55', '#17becf', '#DBDB4A', '#e377c2', '#ff7f0e'];
-
-  var xAxis = d3.svg.axis()
-    .tickFormat(function(d) {
-      // format the tick numbers
-      if (Math.abs(d) < 0.00000001){
-        return '0';
-      } else if(d3.formatPrefix(d).symbol == "m" | (Math.abs(d) < 2)) {
-          return d3.format(",.1g")(d);
-      } else {
-          return d3.format(",s")(d);
-      }
-    })
-    .orient("bottom");
-
-  var yAxis = d3.svg.axis()
-    .tickFormat(function(d) {
-      // format the tick numbers
-      if (Math.abs(d) < 0.00000001){
-        return '0';
-      } else if(d3.formatPrefix(d).symbol == "m" | (Math.abs(d) < 2)) {
-          return d3.format(",.1g")(d);
-      } else {
-          return d3.format(",s")(d);
-      }
-    })
-    .orient("left");
-
-  // x axis
-  svg.append('g')
-      .attr('class', 'x axis')
-      .attr("transform", "translate(0," + (height+25) + ")")
-    .append('text') 
-      .attr('x', width)
-      .attr('dy', -3)
-      .style('text-anchor', 'end')
-      .attr('class', 'x label');
-
-  // y axis
-  svg.append('g')
-      .attr('class', 'y axis')
-      .attr("transform", "translate(-25,0)")
-    .append('text')
-      .attr('transform', 'rotate(-90)')
-      .attr('dy', 10)
-      .style('text-anchor', 'end')
-      .attr('class', 'y label');
-
-
-
-
-  var x, y, radius;
-  function redraw() {
-    if (drawn) {
-      var easingFunc = 'cubic-in-out';
-      x = d3.scale.linear();
-      y = d3.scale.linear();
-      radius = d3.scale.linear();
-      var errors = [];
-      var xRange = d3.extent(data, function (d) { return d[attributes.x.key]; });
-      var yRange = d3.extent(data, function (d) { return d[attributes.y.key]; });
-      var radiusRange = d3.extent(data, function (d) { return d[attributes.size.key]; });
-      
-      // if there are errors, add them to [ errors ] here
-
-      d3.select('#error').text(errors.join("<br>"));
-
-      // label axes
-      d3.select('.x.label').text(attributes.x.key + (attributes.x.units ? (" (" + attributes.x.units + ")") : ""));
-      d3.select('.y.label').text(attributes.y.key + (attributes.y.units ? (" (" + attributes.y.units + ")") : ""));
-
-      // set axes
-      x.domain(xRange)
-        .range([0, width]);
-      y.domain(yRange)
-        .range([height, 0]);
-      radius.range([minRadius, maxRadius])
-        .domain(radiusRange);
-      xAxis.scale(x);
-      yAxis.scale(y);
-      d3.select('.x.axis').transition().duration(transitionDuration).ease(easingFunc).call(xAxis);
-      d3.select('.y.axis').transition().duration(transitionDuration).ease(easingFunc).call(yAxis);
-
-      // handle nulls by filtering
-      var filteredData = data.filter(function (d) {
-        return typeof d[attributes.size.key] === 'number' &&
-          d[attributes.size.key] !== 0 &&
-          typeof d[attributes.x.key] === 'number' &&
-          typeof d[attributes.y.key] === 'number';
+  // initialize variable tooltips once the attributes are loaded
+  var initializeTooltips = setInterval(function(){
+    if (attributesPlaced){
+      $('td[data-toggle="tooltip"]').tooltip({
+        container: 'body',
+        placement: 'left',
+        html: true
       });
-
-      // always show circles above the trendline
-      svg.append("g").attr("id", "lines");
-      svg.append("g").attr("id", "circles");
-
-      var areas = svg.select('#circles').selectAll('.ca').data(filteredData, function (d) { return d['Community Area']; });
-
-      areas.enter().append('circle')
-        .attr('class', function (d) {
-          return d.Region === 0 ? 'chicago ca' : 'ca'; })
-        .attr('fill', function (d) { return colorConversion[d.Region]; })
-        .attr('region', function(d) { return d.Region; })
-        .attr('r', 0)
-        .on("mouseleave", mouseout)
-        .on("mouseout", mouseout)
-        .on("mouseover", mouseover);
-      areas.transition().duration(transitionDuration)
-        .ease(easingFunc)
-        .attr('r', function (d) { return radius(d[attributes.size.key]); })
-        .attr('cx', function (d) { return x(d[attributes.x.key]); })
-        .attr('cy', function (d) { return y(d[attributes.y.key]); });
-      areas.exit()
-        .transition()
-        .duration(transitionDuration)
-        .ease(easingFunc)
-        .remove();
-
-      // trend line
-      // calculate trend line and correlation coefficient
-      trendCalc = leastSquares(
-        filteredData.map(function(d){return d[attributes.x.key]; }), 
-        filteredData.map(function(d){return d[attributes.y.key]; })
-      );
-      // console.log("calculations: " + trendCalc.map(function(d) { return " " + Math.floor(d * 100) / 100; }));
-
-      var xSeries = filteredData.map(function(d){return d[attributes.x.key]; });
-      var ySeries = filteredData.map(function(d){return d[attributes.y.key]; });
-
-      // wish we could use array destructuring
-      var slope = trendCalc[0];
-      var intercept = trendCalc[1];
-      var rSquared = trendCalc[2];
-      var rXY = trendCalc[3];
-
-      // apply the results of the least squares regression
-      var x1 = d3.min(xSeries);
-      var y1 = intercept + x1 * slope;
-      var x2 = d3.max(xSeries);
-      var y2 = y1 + slope * (x2 - x1);
-      
-      // truncate line if it extends above or below the chart area
-      if (y1 > d3.max(ySeries)){        // left above
-        y1 = d3.max(ySeries);
-        x1 = (y1 - intercept) / slope;
-      } else if (y2 > d3.max(ySeries)){ // right above
-        y2 = d3.max(ySeries);
-        x2 = (y2 - intercept) / slope;
-      }
-      if (y1 < d3.min(ySeries)){        // left below
-        y1 = d3.min(ySeries);
-        x1 = (y1 - intercept) / slope;
-      } else if (y2 < d3.min(ySeries)){ // right below
-        y2 = d3.min(ySeries);
-        x2 = (y2 - intercept) / slope;
-      }
-
-      var trendData = [[x1,y1,x2,y2]];
-      // console.log("points: " + trendData[0].map(function(d) { return " " + Math.floor(d * 100) / 100; }));
-
-      var trendline = svg.select('#lines').selectAll(".trendline")
-        .data(trendData);
-        
-      trendline.enter()
-        .append("line")
-        .attr("class", "trendline")
-        .attr("stroke", "black")
-        .attr("stroke-width", 0);
-
-      trendline.transition()
-        .duration(transitionDuration).ease(easingFunc)
-        .attr("x1", function(d) { return x(d[0]); })
-        .attr("y1", function(d) { return y(d[1]); })
-        .attr("x2", function(d) { return x(d[2]); })
-        .attr("y2", function(d) { return y(d[3]); })
-        .attr("stroke-width", Math.abs(rXY) * 2);  // vary strength with correlation coefficient
-      
-      
-      // display correlation coefficient on the chart
-      // svg.selectAll("text.text-label").remove();
-      // svg.append("text")
-      //   .transition()
-      //   .duration(transitionDuration).ease(easingFunc)
-      //   .text("Correlation: " + Math.floor(rXY * 100) / 100)
-      //   .attr("class", "text-label")
-      //   .attr("x", function(d) {return x(x2) - 80;})
-      //   .attr("y", function(d) {return y(y2) - 5;});
-      
-  
+      clearInterval(initializeTooltips);
+      return;
     }
-  }
+  }, 50);
 
-  // handle interaction/tooltip
-  var tip = d3.select('.tip');
-  tip.on("mouseover", mouseout);
+  // and the correlation tooltip
+  $('#chartHeader div').tooltip({
+    placement: 'bottom'
+  });
+};
 
-  function d3Round(d){
-    return d > 999 ? d3.format(',g')(d) : d;
-  }
-
-  // create text for tooltip
-  function mouseover(d) {
-    if (d.mouseover) { return; }
-    mouseout();
-    d.mouseover = true;
-    var dx = Math.round(x(d[attributes.x.key]));
-    var dy = Math.round(y(d[attributes.y.key]));
-    tip.selectAll('.ca').text((d['Community Area'] + ' (' + d['ID'] + ')'));
-    tip.selectAll('.rd .name').text(attributes.size.key);
-    tip.selectAll('.rd .value').text(d3Round(d[attributes.size.key]));
-    tip.selectAll('.rd .units').text(attributes.size.units ? attributes.size.units : "");
-    tip.selectAll('.x .name').text(attributes.x.key);
-    tip.selectAll('.x .value').text(d3Round(d[attributes.x.key]));
-    tip.selectAll('.x .units').text(attributes.x.units ? attributes.x.units : "");
-    tip.selectAll('.y .name').text(attributes.y.key);
-    tip.selectAll('.y .value').text(d3Round(d[attributes.y.key]));
-    tip.selectAll('.y .units').text(attributes.y.units ? attributes.y.units : "");
-    tip.style("display", null)
-        .style("top", (dy + margin.top + 10) + "px")
-        .style("left", (dx + margin.left + 10) + "px");
-  }
-
-  function mouseout(d) {
-    d3.selectAll('circle.ca').each(function (d) { d.mouseover = false; });
-    tip.style("display", "none");
-  }
-
-  redraw();
-
-  // make it fit, heightwise
-  var totalHeight = margin.top + margin.bottom + height + 60;
-  d3.select("#chart svg")
-    .attr('height', totalHeight);
-  d3.select(self.frameElement).style("height", totalHeight + "px");
-  mouseout();
-
-});
-
-
+Scatter("Community Area");
 
 /***************************
 ********** AUXILIARY FUNCTIONS
 ****************************/
 
-// convert incoming strings to numbers, convert blanks to null, and count variable coverage
-function clean(item) {
-  d3.keys(item).forEach(function (key) {
-    if (nonNumeric.indexOf(key) !== -1) {
-      // do nothing: not a data field
-    } else {
-      if (item[key] === "") {
-        item[key] = null;
-      } else {
-        item[key] = +item[key];
-        coverage[key] = (coverage[key] || 0) + 1;
-      }
-    }
-  });
-  return item;
-}
+
 
 
 // compile descriptive statistics about a variable
@@ -606,11 +778,14 @@ function getStatistics(data, cols) {
   return statistics;
 }
 
-// helper function to remove digits after the decimal if .00 or a large number
+// helper function for intelligent rounding:
+//   adds commas for large numbers
+//   removes digits after the decimal if .000 or a large number
+//   can include decimals if the range of values is small (smallRange = true)
 function myRound(i, smallRange) {
-  if (smallRange) {
-    return i.toFixed(3);
-  } else if (Math.floor(parseFloat(i.toFixed(3))) == i || i >= 10000){
+  if (smallRange) {  // give 3 digits after the decimal
+    return d3.format(',g')(i.toFixed(3));
+  } else if (Math.floor(parseFloat(i.toFixed(3))) == i || Math.abs(i) >= 1000){
     return d3.format(',g')(Math.round(i));
   } else {
     return i.toFixed(1);
@@ -621,17 +796,12 @@ function myRound(i, smallRange) {
 function leastSquares(xSeries, ySeries) {
   var reduceSumFunc = function(a, b) { return a + b; };
   
-  var xBar = xSeries.reduce(reduceSumFunc) * 1.0 / xSeries.length;
-  var yBar = ySeries.reduce(reduceSumFunc) * 1.0 / ySeries.length;
+  var xBar = d3.sum(xSeries) * 1.0 / xSeries.length;
+  var yBar = d3.sum(ySeries) * 1.0 / ySeries.length;
 
-  var ssXX = xSeries.map(function(d) { return Math.pow(d - xBar, 2); })
-    .reduce(reduceSumFunc);
-  
-  var ssYY = ySeries.map(function(d) { return Math.pow(d - yBar, 2); })
-    .reduce(reduceSumFunc);
-    
-  var ssXY = xSeries.map(function(d, i) { return (d - xBar) * (ySeries[i] - yBar); })
-    .reduce(reduceSumFunc);
+  var ssXX = d3.sum(xSeries.map(function(d) { return Math.pow(d - xBar, 2); }));
+  var ssYY = d3.sum(ySeries.map(function(d) { return Math.pow(d - yBar, 2); }));
+  var ssXY = d3.sum(xSeries.map(function(d, i) { return (d - xBar) * (ySeries[i] - yBar); }));
     
   var slope = ssXY / ssXX;
   var intercept = yBar - (xBar * slope);
@@ -645,6 +815,7 @@ function leastSquares(xSeries, ySeries) {
 // a little jQuery
 $(document).ready(function(){
 
+  // avoid ugly box around panel titles when clicked
   $('table#attributes').on('click', '.panel-title a', function(){
     this.blur();
   });
@@ -653,65 +824,71 @@ $(document).ready(function(){
     $('#collapseInstructions').collapse('show');
   });
 
+  // tabs
+  $('ul.tabs li').on('click', 'a', function(e){
+    e.preventDefault();
+    if ($(this).hasClass('active')){
+      // do nothing
+    } else {
+      $('ul.tabs a').removeClass('active');
+      $(this).addClass('active');
+      var geo = $(this).text();
+      $('span.geography-text').text(geo.toLowerCase());
+      Scatter(geo);
+    }
+  });
+
   // legend
-  $('.legend').on('mouseover', 'tr', function(){
+  $('#legend').on('mouseover', 'tr', function(){
     var region = $(this).data('region');
     d3.selectAll('circle').each( function(d, i){
-      if(d.Region == region){
+      if(d3.select(this).attr("region") == region){
         d3.select(this).classed("highlighted", true);
-      } else if (d.Region != highlighted) {
+      } else if (d3.select(this).attr("region") != highlighted) {
         d3.select(this).classed("highlighted", false);
       }
     });
   });
 
-  var highlighted = 0;
+  var highlighted = -1;
   
-  $('.legend').on('mouseleave', 'tr', function(){
+  $('#legend').on('mouseleave', 'tr', function(){
     var region = $(this).data('region');
     d3.selectAll('circle').each( function(d, i){
-      if(d.Region == region & highlighted != region){
+      if(d3.select(this).attr("region") == region && highlighted != region){
         d3.select(this).classed("highlighted", false);
       }
     });
   });
 
-  $('.legend').on('click', 'tr', function(){
+  $('#legend').on('click', 'tr', function(){
     var region = $(this).data('region');
-    if (highlighted !== region){
-      $(this).closest('.row').find('.legend tr').removeClass('selected');
+    if (highlighted != region){
+      $(this).closest('.row').find('#legend tr').removeClass('selected');
       $(this).addClass('selected');
       highlighted = region;
       d3.selectAll('circle').each( function(d, i){
-        if(d.Region == region){
+        if(d3.select(this).attr("region") == region){
           d3.select(this).classed("highlighted", true);
+          d3.select(this).classed("not-highlighted", false);
         } else {
           d3.select(this).classed("highlighted", false);
+          d3.select(this).classed("not-highlighted", true);
         }
       });
     } else {
       $(this).removeClass('selected');
-      highlighted = 0;
+      highlighted = -1;
       d3.selectAll('circle').each( function(d, i){
-        if(d.Region == region){
+        if(d3.select(this).attr("region") == region){
           d3.select(this).classed("highlighted", false);
+        } else {
+          // turn all highlighting off
+          d3.select(this).classed("not-highlighted", false);
         }
       });
     }
   });
-
-  // initialize variable tooltips once the attributes are loaded
-  var initializeTooltips = setInterval(function(){
-    if (attributesPlaced){
-      $('[data-toggle="tooltip"]').tooltip({
-        container: 'body',
-        placement: 'left',
-        html: true
-      });
-      clearInterval(initializeTooltips);
-      return;
-    }
-  }, 50);
 
 });
 
