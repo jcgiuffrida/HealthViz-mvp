@@ -5,8 +5,10 @@ var margin = {top: 10, right: 30, bottom: 10, left: 80},
     width = $('#chart').width() - margin.left - margin.right,
     height = 600 - margin.top - margin.bottom,
     transitionDuration = 1000,
-    minCoverage = 0.5,  // minimum coverage a variable needs in the data to be included
     geography = "Community Area";  // starting geography
+
+
+var attributes = {};
 
 // create svg using global vars
 var svg = d3.select("#chart").append("svg")
@@ -89,48 +91,95 @@ var examples = {
       x: 'Hardship Index',
       y: 'Years of Potential Life Lost',
       r: 'Population',
-      geography: "Community Area",
       description: "The Hardship Index tends to predict poor health outcomes (shown as Years of Potential Life Lost, or YPLL) fairly well, but there is a clear divergence among community areas. Some score highly on the Hardship Index without suffering higher YPLL."
     }, {
       name: 'A Hispanic Paradox', 
       x: 'Hardship Index',
       y: 'Years of Potential Life Lost',
       r: 'Latino',
-      geography: "Community Area",
       description: "By making the size of each bubble represent that community area's Latino population, we see that community areas that are majority Latino tend not to suffer worse health outcomes even when life is hard. Change the Y axis to different variables under Mortality, below, to see what diseases are causing this divergence in health outcomes."
     }, {
       name: 'Obesity Among the Uninsured', 
       x: 'Uninsured',
       y: 'Obesity Prevalence Estimate',
       r: 'Population',
-      geography: "Community Area",
       description: "We've long known that lack of health insurance is correlated with many adverse health indicators. Here we see that community areas with higher uninsurance rates also tend to have higher rates of obesity. (The sizes of bubbles are proportional to population.)"
     }, {
       name: 'What Makes Armour Square Different?',
       x: 'Uninsured',
       y: 'Obesity Prevalence Estimate',
       r: 'Asian, Non-Hispanic',
-      geography: "Community Area",
       description: "The clear outlier in the preceding graph is Armour Square, which has a high uninsured population but little obesity. By setting the size of bubbles proportional to their Asian, Non-Hispanic population, we find a possible explanation."
     }, {
       name: 'A Determinant of Infant Mortality', 
       x: 'Foreclosure Rate',
       y: 'Infant Mortality',
       r: 'Population',
-      geography: "Community Area",
       description: "Community areas with higher foreclosure rates are more likely to also have worse child health outcomes, especially infant mortality rates, which can increase by a factor of 10 in neighborhoods hard-hit by the foreclosure crisis."
     }, {
       name: 'Reset',
       x: 'Hardship Index',
       y: 'Infant Mortality',
       r: 'Population',
-      geography: "Community Area",
       description: ""
     }
   ],
   'Census Tract': [
     {
-
+      name: 'Red Hot Renter\'s Market',
+      x: 'Median gross rent (2005-2009)',
+      y: 'Median gross rent',
+      r: 'Severely rent-burdened',
+      description: 'In many places in the Chicagoland region, rent is substantially higher than it was five years ago, as shown by the numerous areas far above the diagonal line. However, the proportion of residents who are severely rent-burdened, spending more than 50% of their income on rent (shown by the size of the bubbles), is very worrisome.'
+    },
+    {
+      name: 'Walk Score and Commuting',
+      x: 'Walk Score',
+      y: 'Drive alone to work',
+      r: 'Population',
+      description: 'Redfin\'s Walk Score indicates how many daily errands can be accomplished on foot rather than by car. Communities that are very walkable (high Walk Score) tend to have far fewer residents driving alone to work--a habit that has been shown to bleed money and decrease life spans.'
+    },
+    {
+      name: 'High Walkability, High Potential',
+      x: 'Walk Score',
+      y: 'Poverty rate',
+      r: 'Population',
+      description: 'Given that the Walk Score measures the accessibility of shops, grocery stores, parks, and other amenities, we might expect it to be positively correlated with income. The opposite is true: places with a high Walk Score tend to have higher poverty rates. In Cook County, this finding may offer a silver lining. The most distressed communities tend to be found in older neighborhoods with abundant public and private infrastructure that could play a part in economic revitalization.'
+    },
+    {
+      name: 'A Determinant of Poverty',
+      x: 'Disability (working-age adults)',
+      y: 'Labor force participation',
+      r: 'Population',
+      description: 'A persistent cause of poverty is the debilitating effect of a physical or mental disability. Work-related injuries and health-related disabilities continue to strike especially hard in poor communities, permanently removing residents from the labor force and making it difficult to break the cycle.'
+    },
+    {
+      name: 'Vacant Houses and Health Insurance',
+      x: 'Vacant',
+      y: 'Uninsured',
+      r: 'Population',
+      description: 'Communities that were hit hard by the foreclosure crisis, and have very high vacancy rates, also tend to be those with large numbers of uninsured residents. The lack of stable housing wealth thus translates directly into poor health outcomes.'
+    },
+    {
+      name: 'Reaching the Uninsured',
+      x: 'Non-citizens',
+      y: 'Uninsured',
+      r: 'Speak English poorly',
+      description: 'It\'s well-known that many of those who still have no health insurance are immigrants, documented and undocumented, who face a number of barriers to enrolling in Medicaid or other insurance plans. As you can see here, those with the greatest need of health insurance also tend to speak the least English, adding a further challenge to enrollment efforts.'
+    },
+    {
+      name: 'Disconnected Youth',
+      x: 'Median earnings for workers',
+      y: 'Disconnected youth',
+      r: 'Population',
+      description: 'Researchers have drawn attention recently to a particularly troubling issue: a large percentage of young people in some communities are disconnected, both out of school and out of work. The fact that the median earnings in these communities tend to be lower could provide some insight: when those who do work earn a pittance, getting a job looks less attractive.'
+    },
+    {
+      name: 'Reset',
+      x: 'Household median income',
+      y: 'College graduation rate',
+      r: 'Population',
+      description: ''
     }
   ]
 };
@@ -169,8 +218,10 @@ var options = {
       return d['Community Area'] + ' (' + d.ID + ')';
     },
     sizeRange: [2, 12],       // [ minimum radius, maximum radius ] for bubbles
+    minCoverage: 0.5,        // minimum coverage a variable needs in the data to be included
     cols: [],                 // holds data from the master table
     idCols: [],               // just the identification (non-data) fields
+    statistics: {},
     regions: {}               // auto-generated list of regions with counts and id numbers
   },
   'Census Tract': {
@@ -178,18 +229,20 @@ var options = {
     ID: 'Tract',
     name: 'Tract',
     default: {
-      x: 'Median income',
-      y: 'HS grad or higher',
+      x: 'Household median income',
+      y: 'College graduation rate',
       r: 'Population',
       geofilter: 'County'
     },
     tooltipText: function(d){ // function to create the name/description in the tooltip
       return 'Tract ' + String(d['Tract']).substring(5) + 
-        '<br>' + d.County + ' County';
+        '<br>' + d.County;
     },
     sizeRange: [1, 10],
+    minCoverage: 0.3,
     cols: [],
     idCols: [],
+    statistics: {},
     regions: {}
   }
 }
@@ -236,6 +289,7 @@ function Scatter(geo){
 
   var coverage = {};
   var attributesPlaced = false;
+  attributes = {};
 
   geography = geo;
   options[geo].regions = {};
@@ -248,8 +302,6 @@ function Scatter(geo){
   // Read in, clean, and format the data
   d3.csv(options[geo].data, clean, function(data) {
     var drawn = false; // has it been drawn?
-    
-    var statistics = false;
 
     // create attributes table
     var colsTable = d3.select('#controls #attributes');
@@ -261,11 +313,10 @@ function Scatter(geo){
       {value: 'y'},
       {value: 'size'}
     ];
-    var attributes = {};
 
     // drop columns without full coverage
     options[geo].cols = options[geo].cols.filter(function(c){
-      return coverage[c.key] * 1.0 / data.length >= minCoverage;
+      return coverage[c.key] * 1.0 / data.length >= options[geo].minCoverage;
     });
 
     var cols = options[geo].cols;
@@ -308,6 +359,7 @@ function Scatter(geo){
     // this is the magic
     colsTable.selectAll('td a').on('click', selectAttribute);
     function selectAttribute(d) {
+      var geo = geography;
       attributes[d.col.value] = d.row;
       colsTable.selectAll('td a.' + d.col.value)
         .classed('selected', function (other) {
@@ -319,7 +371,7 @@ function Scatter(geo){
         redraw();
       
         // refresh statistics
-        if (statistics) {
+        if (Object.keys(options[geo].statistics).length) {
           var stats = ['mean', 'median', 'min', '25', '75', 'max'];
           var table = $('.statistics table');
           table.find('thead .' + d.col.value).html('<h5>' + d.row.key + '<br/>' + 
@@ -327,8 +379,9 @@ function Scatter(geo){
           // prettier stats number formats
           stats.forEach(function (s) {
             table.find('.' + s + ' .' + d.col.value).text(
-              statistics[d.row.key][s] > 999 ? d3.format(',g')(statistics[d.row.key][s]) : 
-              statistics[d.row.key][s]);
+              options[geo].statistics[d.row.key][s] > 999 ? 
+              d3.format(',g')(options[geo].statistics[d.row.key][s]) : 
+              options[geo].statistics[d.row.key][s]);
           });
         }
       }
@@ -337,7 +390,8 @@ function Scatter(geo){
 
     // get statistics after everything is drawn, and then "redraw" to show statistics
     setTimeout(function(){
-      statistics = getStatistics(data, cols);
+      var geo = geography;
+      options[geo].statistics = getStatistics(data, options[geo].cols);
       selectAttribute({row:findAttr(options[geo].default.x),col:attrs[0]});
       selectAttribute({row:findAttr(options[geo].default.y),col:attrs[1]});
       selectAttribute({row:findAttr(options[geo].default.r),col:attrs[2]});
@@ -353,8 +407,9 @@ function Scatter(geo){
 
     // this helps us programmatically select attributes
     function findAttr(search) {
+      var geo = geography;
       var lower = search.toLowerCase();
-      var v = cols.filter(function (attr) {
+      var v = options[geo].cols.filter(function (attr) {
         return attr.key.toLowerCase().indexOf(lower) > -1;
       })[0];
       if (v){ 
@@ -492,7 +547,8 @@ function Scatter(geo){
           .attr('r', 0)
           .on("mouseleave", mouseout)
           .on("mouseout", mouseout)
-          .on("mouseover", mouseover);
+          .on("mouseover", mouseover)
+          .on("click", function(){ alert(d.name); });
         areas.transition().duration(transitionDuration)
           .ease(easingFunc)
           .attr('r', function (d) { 
@@ -504,7 +560,9 @@ function Scatter(geo){
           .attr('cx', function (d) { 
             if (isNaN(x(d[attributes.x.key]))){
               console.log("error: this point has no " + attributes.x.key);
-              console.log(d[attributes.x.key]);
+              console.log("name: " + d[options[geo].name]);
+              console.log("value: " + d[attributes.x.key]);
+              console.log("translated value: " + x(d[attributes.x.key]));
             }
             return x(d[attributes.x.key]); })
           .attr('cy', function (d) { 
@@ -517,6 +575,7 @@ function Scatter(geo){
           .transition()
           .duration(transitionDuration)
           .ease(easingFunc)
+          .attr('r', 0)   // bubbles missing values will fade out, not blink out
           .remove();
 
         // trend line
@@ -652,8 +711,8 @@ function Scatter(geo){
         }
       });
       tip.style("display", null)
-          .style("top", (dy + margin.top + 35) + "px")
-          .style("left", (dx + margin.left + 10) + "px");
+          .style("top", (dy + margin.top + 55) + "px")
+          .style("left", (dx + margin.left + 15) + "px");
     }
 
     function mouseout(d) {
@@ -897,3 +956,14 @@ console.log("************************************************");
 console.log("Know how to work with JavaScript and want to make a difference in community health?");
 console.log("Get in touch to help us improve this project and find other ways to get involved. You can also join us on GitHub at https://github.com/lucaluca/SDH.");
 console.log("************************************************");
+
+/*
+
+years are being converted to numbers
+tracts with jails should be zeroed out? military bases?
+allow drag and zoom into graph
+bold variable name when select x/y/r
+when new areas come in, they are not highlighted/unhighlighted
+
+
+*/
