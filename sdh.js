@@ -358,7 +358,8 @@ function Scatter(geo){
 
     // this is the magic
     colsTable.selectAll('td a').on('click', selectAttribute);
-    function selectAttribute(d) {
+    function selectAttribute(d, runImmediately) {
+    var runImmediately = typeof runImmediately !== 'undefined' ? runImmediately : true;
       var geo = geography;
       attributes[d.col.value] = d.row;
       colsTable.selectAll('td a.' + d.col.value)
@@ -367,8 +368,9 @@ function Scatter(geo){
       });
 
       // refresh the chart (if all three dimensions have been selected)
-      if (Object.keys(attributes).length == 3) { 
+      if (runImmediately) { 
         redraw();
+      }
       
         // refresh statistics
         if (Object.keys(options[geo].statistics).length) {
@@ -384,7 +386,6 @@ function Scatter(geo){
               options[geo].statistics[d.row.key][s]);
           });
         }
-      }
       
     }
 
@@ -392,17 +393,17 @@ function Scatter(geo){
     setTimeout(function(){
       var geo = geography;
       options[geo].statistics = getStatistics(data, options[geo].cols);
-      selectAttribute({row:findAttr(options[geo].default.x),col:attrs[0]});
-      selectAttribute({row:findAttr(options[geo].default.y),col:attrs[1]});
-      selectAttribute({row:findAttr(options[geo].default.r),col:attrs[2]});
+      selectAttribute({row:findAttr(options[geo].default.x),col:attrs[0]}, false);
+      selectAttribute({row:findAttr(options[geo].default.y),col:attrs[1]}, false);
+      selectAttribute({row:findAttr(options[geo].default.r),col:attrs[2]}, true);
     }, 100);
 
 
 
 
-    selectAttribute({row:findAttr(options[geo].default.x),col:attrs[0]});
-    selectAttribute({row:findAttr(options[geo].default.y),col:attrs[1]});
-    selectAttribute({row:findAttr(options[geo].default.r),col:attrs[2]});
+    selectAttribute({row:findAttr(options[geo].default.x),col:attrs[0]}, false);
+    selectAttribute({row:findAttr(options[geo].default.y),col:attrs[1]}, false);
+    selectAttribute({row:findAttr(options[geo].default.r),col:attrs[2]}, true);
 
 
     // this helps us programmatically select attributes
@@ -429,9 +430,9 @@ function Scatter(geo){
       btn.addClass('active');
       var example = examples[geography].filter(function(o){ return o.name == btn.find('h4').text(); });
       if (example){
-        selectAttribute({row:findAttr(example[0].x),col:attrs[0]});
-        selectAttribute({row:findAttr(example[0].y),col:attrs[1]});
-        selectAttribute({row:findAttr(example[0].r),col:attrs[2]});
+        selectAttribute({row:findAttr(example[0].x),col:attrs[0]}, false);
+        selectAttribute({row:findAttr(example[0].y),col:attrs[1]}, false);
+        selectAttribute({row:findAttr(example[0].r),col:attrs[2]}, true);
       }
       if (example[0].name == 'Reset'){
         btn.removeClass('active');
