@@ -148,8 +148,8 @@ svg {
 }
 
 .ca.not-highlighted {
-  fill-opacity: 0.4;
-  stroke-opacity: 0.4;
+  fill-opacity: 0.3;
+  stroke-opacity: 0.3;
 }
 
 .ca.highlighted {
