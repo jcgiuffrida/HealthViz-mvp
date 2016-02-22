@@ -109,6 +109,20 @@ ul.tabs a.active {
   position: relative;
 }
 
+#chart .loading-div {
+  font-size: 20px;
+  font-style: italic;
+  padding: 35% 0;
+  width: 90%;
+  text-align: center;
+  background-color: rgba(230,230,230,0.7);
+  position: absolute;
+  top: 5%;
+  left: 10%;
+  z-index: 2;
+  border-radius: 50px;
+}
+
 svg {
   font: 12px sans-serif;
 }
@@ -200,6 +214,12 @@ svg {
 
 .label {
   font-size: 10px;
+}
+
+/* bootstrap tooltips */
+.tooltip-inner {
+  max-width: 350px;
+  font-size: 13px;
 }
 
 /* legend */
@@ -324,7 +344,7 @@ a.selected {
 
 .panel-title a:hover, .panel-title a:active,
 .panel-title a:focus {
-  color: #aaa;
+  color: #ccc;
 }
 
 #collapseExamples .list-group-item-text {
@@ -341,6 +361,36 @@ a.selected {
   padding-left: 10px;
 }
 
+
+/******************************* GEOFILTERS */
+#geofilters button {
+  margin: 20px 10px;
+}
+
+#geofilters .select2 li {
+  font-size: 14px;
+}
+
+#geofilters .select2-selection__clear {
+  font-size: 16px;
+  padding: 3px 5px;
+  margin: 2px 0px -5px -3px;
+}
+
+#geofilters .select2-selection__clear:hover {
+  color: #000;
+}
+
+.select2-results__option {
+  padding: 4px 15px;
+  text-align: left;
+  font-size: 14px;
+  color: #111;
+}
+
+#geofilters .select2-selection__choice {
+  color: #555;
+}
 
 /******************************* STATISTICS */
 .statistics {
