@@ -372,7 +372,9 @@ function Scatter(geo){
 
 
     // this is the magic
-    colsTable.selectAll('td a').on('click', selectAttribute);
+    colsTable.selectAll('td a').on('click', function(d, i){
+      selectAttribute(d);
+    });
     function selectAttribute(d, runImmediately) {
       var runImmediately = typeof runImmediately !== 'undefined' ? runImmediately : true;
       var geo = geography;
@@ -838,7 +840,7 @@ function Scatter(geo){
             }
           }
         }
-      } else {
+      } else if (options[geo].cols.filter(function(c){ return c.key == key; })){
         if (item[key] === "" || isNaN(item[key])) {
           item[key] = null;
         } else {
@@ -846,6 +848,7 @@ function Scatter(geo){
           coverage[key] = (coverage[key] || 0) + 1;
         }
       }
+      // if not in the master table, it will not be shown
     });
     return item;
   }
