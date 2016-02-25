@@ -784,7 +784,7 @@ function Scatter(geo){
       var optionObjects = [];
       optionList.forEach(function(o){ 
         o.split('|').forEach(function(p){
-          if (!(p in optionUnique)){
+          if (!(p in optionUnique) && p !== ''){
             optionUnique[p] = true;
             optionObjects.push({
               id: p,
