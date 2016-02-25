@@ -259,6 +259,7 @@ var options = {
 //   - the master table is sorted by geography (all similar geographies are listed together)
 //   - the non-data variables come first within each geography
 // the data table does NOT need to be sorted by rows or columns
+// any columns in the data csv that are not in the master table will not be shown
 
 Papa.parse("master.csv",{
     download: true,
@@ -308,21 +309,22 @@ function Scatter(geo){
 
   $('#legend').empty();
 
-
   // Read in, clean, and format the data
   d3.csv(options[geo].data, clean, function(data) {
-    
+
     /**********************
     ********* INITIALIZE
     **********************/
 
     var drawn = false; // has it been drawn yet?
 
-    // create attributes table
+    // create attributes table and drop-down select inputs
     var colsTable = d3.select('#controls #attributes');
+    
     colsTable.selectAll("*").remove();
-
     $('#controls #attributes').append('<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">');
+
+    $('.header-attributes select').empty();
     var attrs = [
       {value: 'x'},
       {value: 'y'},
@@ -341,6 +343,7 @@ function Scatter(geo){
     var panel = undefined;
     for (c in cols){
       var thisCategory = cols[c].category;
+      var thisCategoryHyphen = thisCategory.replace(/\s/g, "-");
       if (thisCategory !== currentCategory){
         // create and append panel
         panel = $(
@@ -354,17 +357,28 @@ function Scatter(geo){
             '</div>' + 
             '<div id="collapse' + c + '" class="panel-collapse collapse" role="tabpanel" ' + 
             'aria-labelledby="heading' + c + '" aria-expanded="true">' + 
-              '<div class="panel-body category-' + thisCategory.replace(/\s/g, "-") + '"></div>' + 
+              '<div class="panel-body category-' + thisCategoryHyphen + '"></div>' + 
             '</div>' + 
           '</div>');
         $('#controls #attributes .panel-group').append(panel);
+
+        // create and append option group
+        group = $('<optgroup label="' + thisCategory + '" class="category-' + thisCategoryHyphen + '">');
+        $('.header-attributes select').append(group);
+
         currentCategory = thisCategory;
       }
       
-      row(d3.select('#attributes .category-' + thisCategory.replace(/\s/g, "-")), 
+      row(d3.select('#attributes .category-' + thisCategoryHyphen), 
         attrs, cols[c].key, cols[c]);
+
+      $('.header-attributes select').find('.category-' + thisCategoryHyphen)
+        .append('<option value="' + cols[c].key + '">' + cols[c].key + '</option>');
     }
 
+    $('.header-attributes select').select2({
+      width: '25%'
+    });
     attributesPlaced = true;
 
     // open the first panel, whatever it is
@@ -375,6 +389,14 @@ function Scatter(geo){
     colsTable.selectAll('td a').on('click', function(d, i){
       selectAttribute(d);
     });
+
+    $('.header-attributes select').on('select2:select', function(e){
+      // this should not fire unless user selects attribute using the select2
+      var $select = $(this);
+      var ax = attrs.filter(function(d, i){ return $select.hasClass(d.value); });
+      selectAttribute({row:findAttr(e.params.data.id),col:ax[0]}, true);
+    });
+
     function selectAttribute(d, runImmediately) {
       var runImmediately = typeof runImmediately !== 'undefined' ? runImmediately : true;
       var geo = geography;
@@ -383,6 +405,9 @@ function Scatter(geo){
         .classed('selected', function (other) {
           return other.row.key === d.row.key;
           });
+
+      $('.header-attributes select').filter('.' + d.col.value)
+        .select2().val(d.row.key).trigger('change');
 
       // refresh the chart (if all three dimensions have been selected)
       if (runImmediately) { 
@@ -681,9 +706,9 @@ function Scatter(geo){
       // display R-squared
       $('#chartHeader .rSquared').text("R-squared: " + myRound(rSquared, true))
         .attr("data-original-title", function(){
-          return 'The R-squared measures the percentage of variation in ' + attributes.y.key + 
-            ' that is explained by ' + attributes.x.key + 
-            '. It ranges from 0 to 1, where 1 means that the relationship is perfect. ';
+          return 'The R-squared indicates that ' + myRound(rSquared*100, false) + 
+            '% of the variation in ' + attributes.y.key + 
+            ' can be explained by ' + attributes.x.key + '.';
         }).tooltip('fixTitle');
     }
 
