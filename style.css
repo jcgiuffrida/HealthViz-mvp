@@ -149,6 +149,7 @@ svg {
 .header-attributes {
   display: flex;
   justify-content: space-around;
+  margin-left: 20px;
 }
 
 .header-attributes .axis-header {

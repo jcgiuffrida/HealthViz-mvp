@@ -387,6 +387,7 @@ function Scatter(geo){
 
     // this is the magic
     colsTable.selectAll('td a').on('click', function(d, i){
+      $('#collapseExamples').find('a').removeClass('active');  // un-highlight all examples
       selectAttribute(d);
     });
 
@@ -394,6 +395,7 @@ function Scatter(geo){
       // this should not fire unless user selects attribute using the select2
       var $select = $(this);
       var ax = attrs.filter(function(d, i){ return $select.hasClass(d.value); });
+      $('#collapseExamples').find('a').removeClass('active');  // un-highlight all examples
       selectAttribute({row:findAttr(e.params.data.id),col:ax[0]}, true);
     });
 
@@ -745,8 +747,8 @@ function Scatter(geo){
         }
       });
       tip.style("display", null)
-          .style("top", (dy + margin.top + 55) + "px")
-          .style("left", (dx + margin.left + 15) + "px");
+          .style("top", (dy + margin.top + 95) + "px")
+          .style("left", (dx + margin.left + 25) + "px");
     }
 
     function mouseout(d) {
