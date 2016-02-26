@@ -244,7 +244,7 @@ var options = {
       }
       return t;
     },
-    sizeRange: [1, 10],
+    sizeRange: [1.5, 10],
     minCoverage: 0.3,
     cols: [],
     idCols: [],
@@ -322,7 +322,8 @@ function Scatter(geo){
     var colsTable = d3.select('#controls #attributes');
     
     colsTable.selectAll("*").remove();
-    $('#controls #attributes').append('<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">');
+    $('#controls #attributes').append('<div class="panel-group" id="accordion" ' + 
+      'role="tablist" aria-multiselectable="true">');
 
     $('.header-attributes select').empty();
     var attrs = [
@@ -761,6 +762,7 @@ function Scatter(geo){
     svg.selectAll("#lines").remove();
 
     if (drawn){
+      redrawLegend();
       redraw();
     }
 
@@ -768,6 +770,11 @@ function Scatter(geo){
     $('#chart').on('redraw', function(){
       redraw();
     });
+
+    $('#chart').on('redrawLegend', function(){
+      redrawLegend();
+      redraw();
+    });    
     
     // make it fit, heightwise
     var totalHeight = margin.top + margin.bottom + height + 60;
@@ -776,22 +783,44 @@ function Scatter(geo){
     d3.select(self.frameElement).style("height", totalHeight + "px");
     mouseout();
 
-    // add legend
-    var sortedRegions = [];
-    for (var r in options[geo].regions){
-      sortedRegions.push(options[geo].regions[r]);
-      sortedRegions.sort(function(a, b) {return b.count - a.count});
-    }
-    sortedRegions.forEach(function(r){
-      if (r.name !== "All"){
-        var entry = $('<div class="col-md-4">');
-        entry.append($('<table>')
-          .append($('<tr data-region="' + r.ID + '"><td style="background-color: ' + 
-            colorScale(r.ID) + 
-            ';"></td><td>' + r.name + '</td></tr>')));
-        $('#legend').append(entry);
+    function redrawLegend(){
+      $('#legend').empty();
+
+      // have to refill regions object
+      options[geo].regions = {};
+
+      // count the geofilters and assign ID numbers
+      var key = options[geo].default.geofilter;
+      data.forEach(function(item){
+        if (item[key] in options[geo].regions){
+          options[geo].regions[item[key]].count += 1;
+        } else {
+          // create new key
+          options[geo].regions[item[key]] = {
+            ID: Object.keys(options[geo].regions).length,
+            count: 1,
+            name: item[key]
+          }
+        }  
+      });
+
+      // add legend
+      var sortedRegions = [];
+      for (var r in options[geo].regions){
+        sortedRegions.push(options[geo].regions[r]);
+        sortedRegions.sort(function(a, b) {return b.count - a.count});
       }
-    });
+      sortedRegions.forEach(function(r){
+        if (r.name !== "All"){
+          var entry = $('<div class="col-md-4">');
+          entry.append($('<table>')
+            .append($('<tr data-region="' + r.ID + '"><td style="background-color: ' + 
+              colorScale(r.ID) + 
+              ';"></td><td>' + r.name + '</td></tr>')));
+          $('#legend').append(entry);
+        }
+      });
+    }
 
     // add geofilters
     $('#geofilters').empty();
