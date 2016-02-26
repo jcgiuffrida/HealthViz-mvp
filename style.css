@@ -117,7 +117,7 @@ ul.tabs a.active {
   text-align: center;
   background-color: rgba(230,230,230,0.7);
   position: absolute;
-  top: 5%;
+  top: 13%;
   left: 10%;
   z-index: 2;
   border-radius: 50px;
@@ -136,16 +136,61 @@ svg {
 
 
 /************************ CHART HEADER */
-#chartHeader .correlation,
 #chartHeader .rSquared {
   font-weight: bold;
   font-size: 14px;
+  margin-top: 15px;
 }
 
-#chartHeader .correlation:hover,
 #chartHeader .rSquared:hover {
   color: #444;
 }
+
+.header-attributes {
+  display: flex;
+  justify-content: space-around;
+  margin-left: 20px;
+}
+
+.header-attributes .axis-header {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.header-attributes select {
+  width: 28%;
+}
+
+.header-attributes .select2 {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+/* select2 colors */
+.header-attributes .select2:nth-of-type(1) .select2-selection {
+  background-color: #87D2DA;
+}
+
+.header-attributes .select2:nth-of-type(2) .select2-selection {
+  background-color: #7ABC43;
+}
+
+.header-attributes .select2:nth-of-type(3) .select2-selection {
+  background-color: #EEB91C;
+}
+
+.header-attributes .axis-header:nth-of-type(1) {
+  color: #6CA8AE;
+}
+
+.header-attributes .axis-header:nth-of-type(2) {
+  color: #629636;
+}
+
+.header-attributes .axis-header:nth-of-type(3) {
+  color: #BE9416;
+}
+
 
 /************************ CHART ELEMENTS */
 /* bubbles */
@@ -220,6 +265,8 @@ svg {
 .tooltip-inner {
   max-width: 350px;
   font-size: 13px;
+  opacity: 0.8;
+  border-radius: 5px;
 }
 
 /* legend */
@@ -254,7 +301,7 @@ svg {
 
 /******************************* CONTROLS */
 #controls {
-  height: 620px;
+  height: 680px;
   overflow-y: scroll;
   margin-top: 10px;
   border: 1px solid #3a87ad;
