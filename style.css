@@ -26,6 +26,10 @@ text {
   font: 12px sans-serif;  /* axis ticks */
 }
 
+.presence-logo {
+  margin-top: 5px;
+}
+
 /* bootstrap corrections */
 .btn-group-sm>.btn, .btn-sm {
   padding: 2px 7px;
@@ -198,6 +202,7 @@ svg {
   fill-opacity: 0.7;
   stroke: #555;
   stroke-opacity: 0.7;
+  transition: fill-opacity 0.5s, stroke-opacity 0.5s;
 }
 
 .ca:hover {
@@ -207,8 +212,8 @@ svg {
 }
 
 .ca.not-highlighted {
-  fill-opacity: 0.3;
-  stroke-opacity: 0.3;
+  fill-opacity: 0.2;
+  stroke-opacity: 0.2;
 }
 
 .ca.highlighted {
@@ -296,6 +301,15 @@ svg {
 #legend tr:hover td:first-child,
 #legend tr.selected td:first-child {
   opacity: 1;
+}
+
+.legend-dropdown .select2 {
+  font-weight: bold;
+  font-size: 1.3rem;
+}
+
+.legend-dropdown {
+  margin-bottom: 10px;
 }
 
 

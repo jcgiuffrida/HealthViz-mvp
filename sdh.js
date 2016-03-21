@@ -8,7 +8,8 @@ var margin = {top: 10, right: 30, bottom: 10, left: 80},
     easingFunc = 'cubic-in-out',
     geography = "Community Area",    // starting geography
     attributes = {},
-    filter = [];
+    filter = [],
+    currentLegend = 'Region';
 
 
 // create svg using global vars
@@ -240,7 +241,7 @@ var options = {
       var t = 'Tract ' + String(d['Tract']).substring(5) + 
         '<br>' + d.City + ', ' + d.County;
       if (d['ZIP Code'].length){
-        t += ' (' + d['ZIP Code'].split('|')[0] + ')';
+        t += ' (' + d['ZIP Code'][0] + ')';
       }
       return t;
     },
@@ -308,9 +309,25 @@ function Scatter(geo){
   $('#collapseExamples').collapse('hide');
 
   $('#legend').empty();
+  $('.legend-select').empty();
+
+  currentLegend = options[geo].default.geofilter;
 
   // Read in, clean, and format the data
   d3.csv(options[geo].data, clean, function(data) {
+
+
+    options[geo].idCols.forEach(function(c){
+      if (c.category == "Geofilter"){
+        $('.legend-select').append('<option value="' + c.key + '">' + c.key + '</option>');
+      }
+    });
+    $('.legend-select').append('<option value="random">Random colors</option>');
+
+    $('.legend-select').select2({
+      minimumResultsForSearch: Infinity,
+      width: '100%'
+    }).val(currentLegend);
 
     /**********************
     ********* INITIALIZE
@@ -541,12 +558,17 @@ function Scatter(geo){
           typeof d[attributes.y.key] === 'number';
       });
 
+      // apply the global filters
       if (filter.length){
         filteredData = filteredData.filter(function(d){
           var keep = false;
           filter.forEach(function(f){
             if (!keep){
               f.values.some(function(v){
+
+                // search within string
+                // TD make geofilters arrays instead of delimited strings, for speed of indexOf method
+                // TD geofilters should ultimately be contained in "overlap" tables in the mysql database
                 if (d[f.name].indexOf(v) !== -1){
                   keep = true;
                   return true;
@@ -557,8 +579,6 @@ function Scatter(geo){
           return keep;
         });
       }
-
-      // TD make all geofilters arrays instead of delimited strings, for speed of indexOf method
 
       // if insufficient data, stop
       if (filteredData.length < 2){
@@ -607,16 +627,21 @@ function Scatter(geo){
 
       var areas = svg.select('#circles').selectAll('.ca').data(filteredData, function (d) { return d[options[geo].name]; });
 
+      // put starting/permanent attributes here
       areas.enter().append('circle')
         .attr('class', 'ca')
-        .attr('region', function(d){
-          return options[geo].regions[d[options[geo].default.geofilter]].ID; })
         .attr('fill', function (d) { 
-          return colorScale(options[geo].regions[d[options[geo].default.geofilter]].ID); })
+          if (currentLegend !== "random"){
+            return colorScale(options[geo].regions[d[currentLegend][0]].ID); 
+          } else {
+            return colorScale(Math.floor(Math.random() * 24)); 
+          }
+        })
         .attr('r', 0)
         .on("mouseleave", mouseout)
         .on("mouseout", mouseout)
         .on("mouseover", mouseover);
+
       areas.transition().duration(transitionDuration)
         .ease(easingFunc)
         .attr('r', function (d) { 
@@ -638,7 +663,15 @@ function Scatter(geo){
             console.log("error: this point has no " + attributes.y.key);
             console.log(d[attributes.y.key]);
           }
-          return y(d[attributes.y.key]); });
+          return y(d[attributes.y.key]); })
+        .attr('fill', function (d) { 
+          if (currentLegend !== "random"){
+            return colorScale(options[geo].regions[d[currentLegend][0]].ID); 
+          } else {
+            return colorScale(Math.floor(Math.random() * 24)); 
+          }
+        });
+      
       areas.exit()
         .transition()
         .duration(transitionDuration)
@@ -790,31 +823,59 @@ function Scatter(geo){
       options[geo].regions = {};
 
       // count the geofilters and assign ID numbers
-      var key = options[geo].default.geofilter;
+      currentLegend = $('.legend-select').val();
+
+      // random coloring
+      if (currentLegend == "random"){
+        $('.legend-text').closest('p').hide();
+        return true;  // do nothing
+      }
+      
+      $('.legend-text').closest('p').show();
+      $('.legend-text').text(currentLegend.toLowerCase());
+
+      var key = currentLegend;
+
       data.forEach(function(item){
-        if (item[key] in options[geo].regions){
-          options[geo].regions[item[key]].count += 1;
-        } else {
-          // create new key
-          options[geo].regions[item[key]] = {
-            ID: Object.keys(options[geo].regions).length,
-            count: 1,
-            name: item[key]
+
+        var regions = item[key];
+
+        // use primary region to assign to legend
+        if (regions){
+          if (regions[0] in options[geo].regions){
+            options[geo].regions[regions[0]].count += 1;
+          } else {
+            // create new key
+            options[geo].regions[regions[0]] = {
+              ID: Object.keys(options[geo].regions).length,
+              count: 1,
+              name: regions[0]
+            }
           }
-        }  
+        }
       });
 
-      // add legend
+      // add legend, sorted alphabetically
       var sortedRegions = [];
       for (var r in options[geo].regions){
         sortedRegions.push(options[geo].regions[r]);
-        sortedRegions.sort(function(a, b) {return b.count - a.count});
+        sortedRegions.sort(function(a, b){ 
+          if (a.name == "N/A"){
+            return -1;
+          } else if (a.name > b.name){ 
+            return 1; 
+          } else if (a.name < b.name){
+            return -1;
+          } else {
+            return 0;
+          }
+        });
       }
       sortedRegions.forEach(function(r){
         if (r.name !== "All"){
           var entry = $('<div class="col-md-4">');
           entry.append($('<table>')
-            .append($('<tr data-region="' + r.ID + '"><td style="background-color: ' + 
+            .append($('<tr data-region="' + r.name + '"><td style="background-color: ' + 
               colorScale(r.ID) + 
               ';"></td><td>' + r.name + '</td></tr>')));
           $('#legend').append(entry);
@@ -824,7 +885,11 @@ function Scatter(geo){
 
     // add geofilters
     $('#geofilters').empty();
+
+    // get all geofilters
     var gfs = options[geo].idCols.filter(function(c){ return c.category == 'Geofilter'; });
+
+    // create a filter for each geofilter
     for (i in gfs){
       var select = $('<select class="geofilter" data-filter="' + 
         gfs[i].key + '" multiple="multiple"></select>');
@@ -834,12 +899,12 @@ function Scatter(geo){
           .append(select));
       $('#geofilters').append(container);
 
-      // build list of the regions
+      // build list of the regions in each geofilter
       var optionList = data.map(function(d){ return d[gfs[i].key]; });
       var optionUnique = {};
       var optionObjects = [];
       optionList.forEach(function(o){ 
-        o.split('|').forEach(function(p){
+        o.forEach(function(p){
           if (!(p in optionUnique) && p !== ''){
             optionUnique[p] = true;
             optionObjects.push({
@@ -850,9 +915,11 @@ function Scatter(geo){
         });
       });
 
-      // sort
+      // sort alphabetically
       optionObjects = optionObjects.sort(function(a, b){ 
-        if (a.text > b.text){ 
+        if (a.text === "N/A"){
+          return -1;
+        } else if (a.text > b.text){ 
           return 1; 
         } else if (a.text < b.text){
           return -1;
@@ -861,6 +928,7 @@ function Scatter(geo){
         }
       });
       
+      // initialize select2
       select.select2({
         data: optionObjects,
         placeholder: "Click to select",
@@ -870,6 +938,7 @@ function Scatter(geo){
 
     }
 
+    // add buttons at bottom
     $('#geofilters').append('<div class="col-md-12 text-center">' + 
       '<button class="btn btn-primary gf-filter">Apply filters</button>' + 
       '<button class="btn btn-default gf-clear">Clear all</button></div>');
@@ -882,21 +951,24 @@ function Scatter(geo){
   // convert incoming strings to numbers, convert blanks to null, and count variable coverage
   function clean(item) {
     d3.keys(item).forEach(function (key) {
-      if (options[geo].idCols.filter(function(c){ return c.key == key; }).length > 0) {
-        if (key == options[geo].default.geofilter) {
-          // count the geofilters and assign ID numbers
-          if (item[key] in options[geo].regions){
-            options[geo].regions[item[key]].count += 1;
-          } else {
-            // create new key
-            options[geo].regions[item[key]] = {
-              ID: Object.keys(options[geo].regions).length,
-              count: 1,
-              name: item[key]
-            }
-          }
+
+      // process geofilters
+      if (options[geo].idCols.filter(function(c){ 
+        return c.key == key && c.category == 'Geofilter'; 
+        }).length > 0){
+        
+        // split geofilter into an array
+        item[key] = item[key].split("|")
+          .map(function(i){ 
+            return String(i); 
+          });
+        if (item[key][0] === ""){
+          item[key] = ['N/A'];
         }
-      } else if (options[geo].cols.filter(function(c){ return c.key == key; })){
+
+      } else if (options[geo].cols.filter(function(c){ return c.key == key; }).length > 0){
+
+        // process numeric fields
         if (item[key] === "" || isNaN(item[key])) {
           item[key] = null;
         } else {
@@ -904,7 +976,7 @@ function Scatter(geo){
           coverage[key] = (coverage[key] || 0) + 1;
         }
       }
-      // if not in the master table, it will not be shown
+      // be aware: if not in the master table, it will not be shown in the variable table
     });
     return item;
   }
@@ -1055,57 +1127,68 @@ $(document).ready(function(){
     $('#chart').trigger('redraw');
   });
 
-
-  // legend
-  $('#legend').on('mouseover', 'tr', function(){
-    var region = $(this).data('region');
-    d3.selectAll('circle').each( function(d, i){
-      if(d3.select(this).attr("region") == region){
-        d3.select(this).classed("highlighted", true);
-      } else if (d3.select(this).attr("region") != highlighted) {
-        d3.select(this).classed("highlighted", false);
-      }
-    });
+  // redraw legend
+  $('.legend-select').on('select2:select', function(e){
+    $('#chart').trigger('redrawLegend');
   });
 
-  var highlighted = -1;
-  
-  $('#legend').on('mouseleave', 'tr', function(){
-    var region = $(this).data('region');
-    d3.selectAll('circle').each( function(d, i){
-      if(d3.select(this).attr("region") == region && highlighted != region){
-        d3.select(this).classed("highlighted", false);
-      }
-    });
-  });
 
-  $('#legend').on('click', 'tr', function(){
-    var region = $(this).data('region');
-    if (highlighted != region){
-      $(this).closest('.row').find('#legend tr').removeClass('selected');
-      $(this).addClass('selected');
-      highlighted = region;
-      d3.selectAll('circle').each( function(d, i){
-        if(d3.select(this).attr("region") == region){
-          d3.select(this).classed("highlighted", true);
-          d3.select(this).classed("not-highlighted", false);
-        } else {
-          d3.select(this).classed("highlighted", false);
-          d3.select(this).classed("not-highlighted", true);
-        }
+  // legend interactions
+
+  // keep track of which regions are highlighted
+  var highlighted = [];
+
+  // function to highlight all bubbles belonging to a region selected in the legend
+  var highlightLegend = function(){
+    var anyHighlighted = false;
+    d3.selectAll('circle').each(function(d, i){
+      var isHighlighted = false;
+      highlighted.forEach(function(h){
+        d[currentLegend].forEach(function(i){
+          if (i == String(h)){
+            isHighlighted = true;
+            anyHighlighted = true;
+          }
+        });
+      });
+      d3.select(this).classed("highlighted", isHighlighted);
+    });
+
+    // if any bubbles are highlighted, then fade the others
+    if (anyHighlighted){
+      d3.selectAll('circle').each(function(d, i){
+        d3.select(this).classed("not-highlighted", !(d3.select(this).classed("highlighted")));
       });
     } else {
-      $(this).removeClass('selected');
-      highlighted = -1;
-      d3.selectAll('circle').each( function(d, i){
-        if(d3.select(this).attr("region") == region){
-          d3.select(this).classed("highlighted", false);
-        } else {
-          // turn all highlighting off
-          d3.select(this).classed("not-highlighted", false);
-        }
-      });
+      // none are highlighted - return all to normal
+      d3.selectAll('circle').classed("not-highlighted", false);
     }
+  };
+
+  // on mouseover, highlight this region but don't fade the others
+  $('#legend').on('mouseover', 'tr', function(){
+    var region = String($(this).data('region'));
+    d3.selectAll('circle').each( function(d, i){
+      if(d[currentLegend].indexOf(region) !== -1 || d3.select(this).classed("highlighted")){
+        d3.select(this).classed("highlighted", true);
+      }
+    });
+  });
+
+  // on mouseleave, reset
+  $('#legend').on('mouseleave', 'tr', highlightLegend);
+
+  // on click, update [ highlighted ], and reset
+  $('#legend').on('click', 'tr', function(){
+    var alreadySelected = $(this).hasClass('selected');
+    if (!alreadySelected){
+      highlighted.push($(this).data('region'));
+    } else {
+      var c = String($(this).data('region'));
+      highlighted = highlighted.filter(function(h){ return String(h) !== c; });
+    }
+    $(this).toggleClass('selected');
+    highlightLegend();
   });
 
 });
