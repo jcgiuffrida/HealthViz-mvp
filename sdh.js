@@ -642,6 +642,9 @@ function Scatter(geo){
         .on("mouseout", mouseout)
         .on("mouseover", mouseover);
 
+      // reset bubble highlighting, in case new bubbles have appeared
+      highlightLegend();
+
       areas.transition().duration(transitionDuration)
         .ease(easingFunc)
         .attr('r', function (d) { 
@@ -1134,37 +1137,6 @@ $(document).ready(function(){
 
 
   // legend interactions
-
-  // keep track of which regions are highlighted
-  var highlighted = [];
-
-  // function to highlight all bubbles belonging to a region selected in the legend
-  var highlightLegend = function(){
-    var anyHighlighted = false;
-    d3.selectAll('circle').each(function(d, i){
-      var isHighlighted = false;
-      highlighted.forEach(function(h){
-        d[currentLegend].forEach(function(i){
-          if (i == String(h)){
-            isHighlighted = true;
-            anyHighlighted = true;
-          }
-        });
-      });
-      d3.select(this).classed("highlighted", isHighlighted);
-    });
-
-    // if any bubbles are highlighted, then fade the others
-    if (anyHighlighted){
-      d3.selectAll('circle').each(function(d, i){
-        d3.select(this).classed("not-highlighted", !(d3.select(this).classed("highlighted")));
-      });
-    } else {
-      // none are highlighted - return all to normal
-      d3.selectAll('circle').classed("not-highlighted", false);
-    }
-  };
-
   // on mouseover, highlight this region but don't fade the others
   $('#legend').on('mouseover', 'tr', function(){
     var region = String($(this).data('region'));
@@ -1192,6 +1164,36 @@ $(document).ready(function(){
   });
 
 });
+
+// keep track of which regions are highlighted
+var highlighted = [];
+
+// function to highlight all bubbles belonging to a region selected in the legend
+var highlightLegend = function(){
+  var anyHighlighted = false;
+  d3.selectAll('circle').each(function(d, i){
+    var isHighlighted = false;
+    highlighted.forEach(function(h){
+      d[currentLegend].forEach(function(i){
+        if (i == String(h)){
+          isHighlighted = true;
+          anyHighlighted = true;
+        }
+      });
+    });
+    d3.select(this).classed("highlighted", isHighlighted);
+  });
+
+  // if any bubbles are highlighted, then fade the others
+  if (anyHighlighted){
+    d3.selectAll('circle').each(function(d, i){
+      d3.select(this).classed("not-highlighted", !(d3.select(this).classed("highlighted")));
+    });
+  } else {
+    // none are highlighted - return all to normal
+    d3.selectAll('circle').classed("not-highlighted", false);
+  }
+};
 
 // for people who want to help
 console.log("************************************************");
