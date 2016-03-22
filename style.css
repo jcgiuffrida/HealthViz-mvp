@@ -26,6 +26,10 @@ text {
   font: 12px sans-serif;  /* axis ticks */
 }
 
+.presence-logo {
+  margin-top: 5px;
+}
+
 /* bootstrap corrections */
 .btn-group-sm>.btn, .btn-sm {
   padding: 2px 7px;
@@ -140,6 +144,7 @@ svg {
   font-weight: bold;
   font-size: 14px;
   margin-top: 15px;
+  cursor: default;
 }
 
 #chartHeader .rSquared:hover {
@@ -165,6 +170,17 @@ svg {
   font-weight: bold;
   font-size: 1.5rem;
 }
+
+/* the following two need better overrides */
+.select2-container--default .select2-results>.select2-results__options {
+  max-height: 250px !important;
+}
+
+.select2-results__option {
+  font-size: 12px !important;
+}
+
+/*    */
 
 /* select2 colors */
 .header-attributes .select2:nth-of-type(1) .select2-selection {
@@ -198,6 +214,7 @@ svg {
   fill-opacity: 0.7;
   stroke: #555;
   stroke-opacity: 0.7;
+  transition: fill-opacity 0.5s, stroke-opacity 0.5s;
 }
 
 .ca:hover {
@@ -207,8 +224,8 @@ svg {
 }
 
 .ca.not-highlighted {
-  fill-opacity: 0.3;
-  stroke-opacity: 0.3;
+  fill-opacity: 0.2;
+  stroke-opacity: 0.2;
 }
 
 .ca.highlighted {
@@ -298,6 +315,15 @@ svg {
   opacity: 1;
 }
 
+.legend-dropdown .select2 {
+  font-weight: bold;
+  font-size: 1.3rem;
+}
+
+.legend-dropdown {
+  margin-bottom: 10px;
+}
+
 
 /******************************* CONTROLS */
 #controls {
@@ -356,6 +382,10 @@ a.selected {
 
 #controls .small-instructions {  /* instructions at top */
   padding: 20px 15px 0 15px;
+}
+
+#controls .checkbox {
+  margin-left: 15px;
 }
 
 #controls td:first-child {

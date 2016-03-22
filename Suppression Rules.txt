@@ -1,0 +1,11 @@
+# jgiuffrida Mar 2016
+
+Counts are suppressed if:
+Cancer:
+* There were at least 1, but less than 10, occurrences in the area over the time period
+* The relevant population within the area was less than 20 over the time period
+	* In such a case, even a value of SUPPRESSED would otherwise give away meaningful information, as it's probably 1
+Hospitalizations:
+* There were at least 1, but less than 5, occurrences in the area over the time period
+* The relevant population within the area was less than 20 over the time period
+	* In such a case, even a value of SUPPRESSED would otherwise give away meaningful information, as it's probably 1
