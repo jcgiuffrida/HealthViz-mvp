@@ -9,7 +9,9 @@ var margin = {top: 10, right: 30, bottom: 10, left: 80},
     geography = "Community Area",    // starting geography
     attributes = {},
     filter = [],
-    currentLegend = 'Region';
+    currentLegend = 'Region',
+    hideSpecialAreas = true,
+    hideSmallAreas = false;
 
 
 // create svg using global vars
@@ -184,7 +186,8 @@ var examples = {
       r: 'Population',
       description: ''
     }
-  ]
+  ],
+  'ZIP Code': []
 };
 
 
@@ -208,8 +211,8 @@ function loadExamples(arr){
 var options = {
   'Community Area': {
     data: 'SDH ii.csv',       // name of local file
-    ID: 'ID',                 // name of numeric ID field
-    name: 'Community Area',   // name of display name field
+    ID: 'ID',                 // name of numeric ID field (must be unique)
+    name: 'Community Area',   // name of display name field (also unique)
     default: {                // default attributes for scatterplot
                               // important: these attributes must have roughly 100% coverage across ALL areas
       x: 'Hardship Index',
@@ -243,10 +246,37 @@ var options = {
       if (d['ZIP Code'].length){
         t += ' (' + d['ZIP Code'][0] + ')';
       }
+      if (d['Special area'].length){
+        t += '<br>' + d['Special area'];
+      }
       return t;
     },
     sizeRange: [1.5, 10],
     minCoverage: 0.3,
+    cols: [],
+    idCols: [],
+    statistics: {},
+    regions: {}
+  },
+  'ZIP Code': {
+    data: 'zip code.csv',
+    ID: 'ZIP',
+    name: 'ZIP',
+    default: {
+      x: 'Built 1979 or earlier',
+      y: 'Cancer incidence',
+      r: 'Population',
+      geofilter: 'County'
+    },
+    tooltipText: function(d){
+      var t = d['ZIP']; 
+      if (d['County'].length){
+        t += '<br>(' + d['County'].split('|')[0] + ')';
+      }
+      return t;
+    },
+    sizeRange: [2, 12],
+    minCoverage: 0.01,
     cols: [],
     idCols: [],
     statistics: {},
@@ -316,12 +346,13 @@ function Scatter(geo){
   // Read in, clean, and format the data
   d3.csv(options[geo].data, clean, function(data) {
 
-
+    // update legend select element with options for legend and coloring (including random)
     options[geo].idCols.forEach(function(c){
       if (c.category == "Geofilter"){
         $('.legend-select').append('<option value="' + c.key + '">' + c.key + '</option>');
       }
     });
+
     $('.legend-select').append('<option value="random">Random colors</option>');
 
     $('.legend-select').select2({
@@ -547,11 +578,11 @@ function Scatter(geo){
     drawn = true;
     var colorScale = d3.scale.category20();
 
-    var x, y, radius;
-    function redraw() {
-
+    // filter data
+    // TD refactor to accept arbitrary filters, so we can filter along variables too
+    function applyDataFilters(rawdata){
       // handle nulls by filtering
-      var filteredData = data.filter(function (d) {
+      var filteredData = rawdata.filter(function (d) {
         return typeof d[attributes.size.key] === 'number' &&
           d[attributes.size.key] !== 0 &&
           typeof d[attributes.x.key] === 'number' &&
@@ -579,6 +610,76 @@ function Scatter(geo){
           return keep;
         });
       }
+
+      // hide areas that are occupied by special institutions like jails and universities
+      if (hideSpecialAreas){
+        filteredData = filteredData.filter(function(d){
+          return !(d['Special area']);
+        });
+      }
+
+      // hide areas with small populations (numbers are arbitrary)
+      // TD make numbers user's choice?
+      if (hideSmallAreas){
+        filteredData = filteredData.filter(function(d){
+          return d['Population'] >= (
+            geography == 'Community Area' ? 5000 : 
+            geography == 'Census Tract' ? 1500 :
+            geography == 'ZIP Code' ? 1000 : 0);
+        });
+      }
+
+      return filteredData;
+      
+      // TD make all geofilters arrays instead of delimited strings, for speed of indexOf method
+    }
+
+    // download current data as CSV
+    function downloadCSV(){
+      var filteredData = applyDataFilters(data);
+      var csvRows = [];
+      csvRows.push([
+        '"' + geography + '"', 
+        '"' + attributes.x.key + '"', 
+        '"' + attributes.y.key + '"', 
+        '"' + attributes.size.key + '"'].join(','));
+      csvRows.push([
+        '""', 
+        '"' + attributes.x.units + '"', 
+        '"' + attributes.y.units + '"', 
+        '"' + attributes.size.units + '"'].join());
+      
+      var row;
+
+      filteredData.forEach(function(d, index){
+        row = [d[options[geo].name].trim()];
+        ['x', 'y', 'size'].forEach(function(a){
+          row.push(d[attributes[a].key]);
+        });
+        csvRows.push(row.join(','));
+      });
+
+
+      var csvString = csvRows.length > 2 ? csvRows.join('\n') : '';
+      var a = document.createElement('a');
+      a.href = 'data:attachment/csv,' +  encodeURIComponent(csvString);
+      a.target = '_blank';
+      a.download = geography + '.csv';
+
+      // TD bug: doesn't update "data" first time this function runs - and then it runs again
+      // this bug will be a big issue once geographies have variables with the same names
+      if (csvString.length > 0){
+        a.click();  
+      }
+
+      return true;
+    }
+
+    var x, y, radius;
+    function redraw() {
+
+      // filter
+      var filteredData = applyDataFilters(data);
 
       // if insufficient data, stop
       if (filteredData.length < 2){
@@ -630,6 +731,8 @@ function Scatter(geo){
       // put starting/permanent attributes here
       areas.enter().append('circle')
         .attr('class', 'ca')
+        .attr('region', function(d){
+          return options[geo].regions[d[options[geo].default.geofilter]].ID; })
         .attr('fill', function (d) { 
           if (currentLegend !== "random"){
             return colorScale(options[geo].regions[d[currentLegend][0]].ID); 
@@ -674,7 +777,7 @@ function Scatter(geo){
             return colorScale(Math.floor(Math.random() * 24)); 
           }
         });
-      
+
       areas.exit()
         .transition()
         .duration(transitionDuration)
@@ -810,7 +913,11 @@ function Scatter(geo){
     $('#chart').on('redrawLegend', function(){
       redrawLegend();
       redraw();
-    });    
+    }); 
+
+    $('#chart').on('downloadCSV', function(){
+      downloadCSV();
+    });
     
     // make it fit, heightwise
     var totalHeight = margin.top + margin.bottom + height + 60;
@@ -858,7 +965,7 @@ function Scatter(geo){
         }
       });
 
-      // add legend, sorted alphabetically
+      // add legend, sorted alphabetically (put N/A up top)
       var sortedRegions = [];
       for (var r in options[geo].regions){
         sortedRegions.push(options[geo].regions[r]);
@@ -1135,6 +1242,24 @@ $(document).ready(function(){
     $('#chart').trigger('redrawLegend');
   });
 
+  $('#specialAreas').change(function(){
+    if ($(this).is(":checked")){
+      hideSpecialAreas = true;
+    } else {
+      hideSpecialAreas = false;
+    }
+    $('#chart').trigger('redraw');
+  });
+
+  $('#smallAreas').change(function(){
+    if ($(this).is(":checked")){
+      hideSmallAreas = true;
+    } else {
+      hideSmallAreas = false;
+    }
+    $('#chart').trigger('redraw');
+  });
+
 
   // legend interactions
   // on mouseover, highlight this region but don't fade the others
@@ -1161,6 +1286,11 @@ $(document).ready(function(){
     }
     $(this).toggleClass('selected');
     highlightLegend();
+  });
+
+  // download
+  $('.download').on('click', function(){
+    $('#chart').trigger('downloadCSV');
   });
 
 });

@@ -40,6 +40,7 @@
     <ul class="tabs">
       <li><a href="#" class="active">Community Area</a></li>
       <li><a href="#">Census Tract</a></li>
+      <li><a href="#">ZIP Code</a></li>
     </ul>
   </div>
 </div>
@@ -88,6 +89,18 @@
         <div class="small-instructions">
           Choose variables from below to put in the interactive scatterplot, and mouse over each bubble to see which <span class="geography-text">community area</span> it represents. You can start by clicking on "Examples" below. <a href="#instructions" id="show-instructions">Full instructions</a>
         </div>
+        <div class="checkbox">
+          <label>
+            <input id="specialAreas" type="checkbox" checked="checked">
+              Hide special areas (like universities and jails)
+          </label>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input id="smallAreas" type="checkbox">
+              Hide areas with low population
+          </label>
+        </div>
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
           <div class="panel panel-default">
             <div class="panel-heading" role="tab" id="examples">
@@ -115,8 +128,11 @@
     <div class="col-md-2 col-md-offset-1 legend-dropdown">
       <select class="legend-select"></select>
     </div>
-    <div class="col-md-5 text-right">
+    <div class="col-md-4">
       <p>Bubbles are colored according to their primary <span class="legend-text">region</span>.</p>
+    </div>
+    <div class="col-md-2">
+      <button class="btn btn-primary download">Download data</button>
     </div>
   </div>
   <div class="row">
@@ -151,7 +167,7 @@
             </div>
             <div id="collapseInstructions" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingInstructions" aria-expanded="true">
               <div class="panel-body">
-                <b>This is an interactive scatterplot</b> to look at social determinants of health alongside various health outcomes in Chicago and Illinois. You can put any variables on the X and Y axes to look at their relationship by clicking <code>x</code> or <code>y</code> next to the variables you want in the list below. The size of the bubbles indicates a third variable, which you can change by clicking <code>size</code>. Mouse over the bubbles for more information and to identify which area a bubble represents. At first, this scatterplot shows how <code>Infant Mortality</code> increases in community areas that score highly on the <code>Hardship Index</code>, and the size of a bubble is proportional to the <code>Population</code> of that community area. You can also see summary statistics of the variables selected to the right.
+                <b>This is an interactive scatterplot</b> to look at social determinants of health alongside various health outcomes in Chicago and Illinois. You can put any variables on the X and Y axes to look at their relationship by clicking <code>x</code> or <code>y</code> next to the variables you want in the list below. The size of the bubbles indicates a third variable, which you can change by clicking <code>size</code>. Mouse over the bubbles for more information and to identify which area a bubble represents. At first, this scatterplot shows how <code>Infant Mortality</code> increases in community areas that score highly on the <code>Hardship Index</code>, and the size of a bubble is proportional to the <code>Population</code> of that community area. You can also see summary statistics of the variables selected to the right. All health outcome variables are risk-adjusted for age.
                 <br/>
                 <br/>
                 <b>It's important to remember</b> that this scatterplot shows relationships but not causal effects. Just because two variables show a clear trend does not mean that one causes the other: both could be caused by a third, hidden factor. We also recognize that it is difficult to draw broad conclusions about the health of residents by looking only at correlations between regions that represent vastly different populations and demographics. No community can be fully represented by a bubble on a graph. Even so, this tool can point us toward the right questions to investigate further.
