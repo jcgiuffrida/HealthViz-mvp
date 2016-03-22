@@ -30,6 +30,10 @@ text {
   margin-top: 5px;
 }
 
+.presence-logo:hover img, .hc-logo:hover img {
+  opacity: 0.8;
+}
+
 /* bootstrap corrections */
 .btn-group-sm>.btn, .btn-sm {
   padding: 2px 7px;

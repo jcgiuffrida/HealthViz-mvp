@@ -271,7 +271,7 @@ var options = {
     tooltipText: function(d){
       var t = d['ZIP']; 
       if (d['County'].length){
-        t += '<br>(' + d['County'].split('|')[0] + ')';
+        t += '<br>(' + d['County'][0] + ')';
       }
       return t;
     },
@@ -731,8 +731,6 @@ function Scatter(geo){
       // put starting/permanent attributes here
       areas.enter().append('circle')
         .attr('class', 'ca')
-        .attr('region', function(d){
-          return options[geo].regions[d[options[geo].default.geofilter]].ID; })
         .attr('fill', function (d) { 
           if (currentLegend !== "random"){
             return colorScale(options[geo].regions[d[currentLegend][0]].ID); 
