@@ -30,7 +30,7 @@ text {
   margin-top: 5px;
 }
 
-.presence-logo:hover img, .hc-logo:hover img {
+.presence-logo img:hover, .hc-logo img:hover {
   opacity: 0.8;
 }
 
@@ -246,7 +246,7 @@ svg {
   }
 
 /** tooltips */
-.tip {
+.tip, .trendlineTip {
   position: absolute;
   pointer-events: none;
   background-color: white;
@@ -258,7 +258,7 @@ svg {
   padding: 2px 5px 5px 0;
 }
 
-.tip .row {
+.tip .row, .trendlineTip .row {
   width: 100%;
   padding: 0;
   margin: 5px 0 0 5px;
@@ -277,6 +277,27 @@ svg {
 .tip .units {
   color: #888;
 }
+
+.trendlineTip {
+  background-color: #333;
+  color: #eee;
+  border-radius: 8px;
+  opacity: 0.85;
+  width: 250px;
+}
+
+.trendlineTip .row {
+  padding: 0 5px 0 5px;
+}
+
+.trendlineTip .corr {
+  font-weight: bold;
+}
+
+.trendlineTip .y.value {
+  font-weight: bold;
+}
+
 
 .label {
   font-size: 10px;

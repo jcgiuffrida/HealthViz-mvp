@@ -73,8 +73,9 @@ svg.append('g')
     .attr("transform", "translate(0," + (height+25) + ")")
   .append('text') 
     .attr('x', width)
-    .attr('dy', -3)
+    .attr('dy', -4)
     .style('text-anchor', 'end')
+    .style('font-size', '12px')
     .attr('class', 'x label');
 
 // y axis
@@ -83,8 +84,9 @@ svg.append('g')
     .attr("transform", "translate(-25,0)")
   .append('text')
     .attr('transform', 'rotate(-90)')
-    .attr('dy', 10)
+    .attr('dy', 12)
     .style('text-anchor', 'end')
+    .style('font-size', '12px')
     .attr('class', 'y label');
 
 
@@ -187,7 +189,15 @@ var examples = {
       description: ''
     }
   ],
-  'ZIP Code': []
+  'ZIP Code': [
+    {
+      name: 'Reset',
+      x: 'Hardship Index',
+      y: 'Cervical cancer incidence',
+      r: 'Population',
+      description: ''
+    }
+  ]
 };
 
 
@@ -223,7 +233,7 @@ var options = {
     tooltipText: function(d){ // function to create the name/description in the tooltip
       return d['Community Area'] + ' (' + d.ID + ')';
     },
-    sizeRange: [2, 12],       // [ minimum radius, maximum radius ] for bubbles
+    sizeRange: [2, 14],       // [ minimum radius, maximum radius ] for bubbles
     minCoverage: 0.5,        // minimum coverage a variable needs in the data to be included
     cols: [],                 // holds data from the master table
     idCols: [],               // just the identification (non-data) fields
@@ -252,7 +262,7 @@ var options = {
       return t;
     },
     sizeRange: [1.5, 10],
-    minCoverage: 0.3,
+    minCoverage: 0.1,
     cols: [],
     idCols: [],
     statistics: {},
@@ -263,8 +273,8 @@ var options = {
     ID: 'ZIP',
     name: 'ZIP',
     default: {
-      x: 'Built 1979 or earlier',
-      y: 'Cancer incidence',
+      x: 'Hardship Index',
+      y: 'Cervical cancer incidence',
       r: 'Population',
       geofilter: 'County'
     },
@@ -272,6 +282,9 @@ var options = {
       var t = d['ZIP']; 
       if (d['County'].length){
         t += '<br>(' + d['County'][0] + ')';
+      }
+      if (d['Special area'].length){
+        t += '<br>' + d['Special area'];
       }
       return t;
     },
@@ -324,7 +337,7 @@ Papa.parse("master.csv",{
 // Main function
 function Scatter(geo){
   // show loading screen
-  $('#chart .loading-div').text('Loading...');
+  $('#chart .loading-div i').text('Loading...');
   $('#chart .loading-div').show();
 
   var coverage = {};
@@ -707,8 +720,10 @@ function Scatter(geo){
       d3.select('#error').text(errors.join("<br>"));
 
       // label axes
-      d3.select('.x.label').text(attributes.x.key + (attributes.x.units ? (" (" + attributes.x.units + ")") : ""));
-      d3.select('.y.label').text(attributes.y.key + (attributes.y.units ? (" (" + attributes.y.units + ")") : ""));
+      d3.select('.x.label')
+        .text(attributes.x.key + (attributes.x.units ? (" (" + attributes.x.units + ")") : ""));
+      d3.select('.y.label')
+        .text(attributes.y.key + (attributes.y.units ? (" (" + attributes.y.units + ")") : ""));
 
       // set axes
       x.domain(xRange)
@@ -783,13 +798,16 @@ function Scatter(geo){
         .attr('r', 0)   // bubbles missing values will fade out, not blink out
         .remove();
 
-      // trend line
+
+      /**********************************/
+      /********** TREND LINE
+      /**********************************/
+
       // calculate trend line and correlation coefficient
       trendCalc = leastSquares(
         filteredData.map(function(d){return +d[attributes.x.key]; }), 
         filteredData.map(function(d){return +d[attributes.y.key]; })
       );
-      // console.log("calculations: " + trendCalc.map(function(d) { return " " + Math.floor(d * 100) / 100; }));
 
       var xSeries = filteredData.map(function(d){return +d[attributes.x.key]; });
       var ySeries = filteredData.map(function(d){return +d[attributes.y.key]; });
@@ -822,25 +840,58 @@ function Scatter(geo){
         x2 = (y2 - intercept) / slope;
       }
 
-      var trendData = [[x1,y1,x2,y2]];
-      // console.log("points: " + trendData[0].map(function(d) { return " " + Math.floor(d * 100) / 100; }));
+      // create data object with position and attributes
+      var trendData = [{
+        'x1': x1, 
+        'y1': y1, 
+        'x2': x2, 
+        'y2': y2,
+        'slope': slope,
+        'intercept': intercept,
+        'rSquared': rSquared,
+        'rXY': rXY
+        // TD add p-value, t-statistic
+      }];
 
+      // create "shadow" for trendline (to aid in mouseover)
+      // place this first so it sits underneath trend line
+      var trendlineShadow = svg.select('#lines').selectAll('.trendlineShadow')
+        .data(trendData);
+
+      trendlineShadow.enter()
+        .append('line')
+          .attr("class", "trendlineShadow")
+          .attr("stroke", "transparent")
+          .attr("stroke-width", 8)
+          .on("mousemove", mMove)
+          .on("mouseout", mOut);
+
+      // create trend line
       var trendline = svg.select('#lines').selectAll(".trendline")
         .data(trendData);
         
       trendline.enter()
         .append("line")
-        .attr("class", "trendline")
-        .attr("stroke", "black")
-        .attr("stroke-width", 0);
+          .attr("class", "trendline")
+          .attr("stroke", "black")
+          .attr("stroke-width", 0)
+          .on("mousemove", mMove)
+          .on("mouseout", mOut);
 
       trendline.transition()
         .duration(transitionDuration).ease(easingFunc)
-        .attr("x1", function(d) { return x(d[0]); })
-        .attr("y1", function(d) { return y(d[1]); })
-        .attr("x2", function(d) { return x(d[2]); })
-        .attr("y2", function(d) { return y(d[3]); })
+        .attr("x1", function(d) { return x(d['x1']); })
+        .attr("y1", function(d) { return y(d['y1']); })
+        .attr("x2", function(d) { return x(d['x2']); })
+        .attr("y2", function(d) { return y(d['y2']); })
         .attr("stroke-width", Math.abs(rXY) * 2);  // vary strength with correlation coefficient
+
+      trendlineShadow.transition()
+        .duration(transitionDuration).ease(easingFunc)
+        .attr("x1", function(d) { return x(d['x1']); })
+        .attr("y1", function(d) { return y(d['y1']); })
+        .attr("x2", function(d) { return x(d['x2']); })
+        .attr("y2", function(d) { return y(d['y2']); });
       
       
       // display R-squared
@@ -852,11 +903,11 @@ function Scatter(geo){
         }).tooltip('fixTitle');
     }
 
-    // handle interaction/tooltip
+    // handle interaction/tooltip for bubbles
     var tip = d3.select('.tip');
     tip.on("mouseover", mouseout);
 
-    // create text for tooltip
+    // create text for bubble tooltips
     function mouseover(d) {
       if (d.mouseover) { return; }
       mouseout();
@@ -889,9 +940,49 @@ function Scatter(geo){
           .style("left", (dx + margin.left + 25) + "px");
     }
 
+    // remove bubble tooltips
     function mouseout(d) {
       d3.selectAll('circle.ca').each(function (d) { d.mouseover = false; });
       tip.style("display", "none");
+    }
+
+    // interaction for trendline tooltip
+    function mMove(d){
+      var m = d3.mouse(this);
+      var ttip = d3.select('.trendlineTip');
+      d3.selectAll('.trendline')
+        .attr("stroke-width", Math.abs(d['rXY']) * 2 + 0.5); // get a little wider
+      // ttip.select('.corr .value').text(Math.round(d['rXY']*1000)/1000);
+
+      // scale appropriately with the variables
+      var extent = d3.max(xAxis.scale().ticks()) - d3.min(xAxis.scale().ticks());
+      var scale = extent > 2500000 ? [1000000, "million-unit"] : 
+                  extent > 250000 ? [100000, "hundred thousand-unit"] : 
+                  extent > 25000 ? [10000, "ten thousand-unit"] : 
+                  extent > 2500 ? [1000, "thousand-unit"] : 
+                  extent > 250 ? [100, "hundred-unit"] : 
+                  extent > 25 ? [10, "ten-unit"] : 
+                  extent > 2.5 ? [1, "unit"] : 
+                  extent > 0.25 ? [0.1, "0.1"] : 
+                  extent > 0.025 ? [0.01, "0.01"] : 
+                  [0.001, "0.001"];
+      ttip.select('.y.name').text(attributes.y.key);
+      ttip.select('.y.direction').text(d['slope'] >= 0 ? 'increase' : 'decrease');
+      ttip.select('.y.value').text(Math.abs(Math.round(d['slope']*scale[0]*1000)/1000));
+      ttip.select('.y.units').text(attributes.y.units);
+      ttip.select('.x.scale').text(scale[1]);
+      ttip.select('.x.name').text(attributes.x.key + 
+        (attributes.x.units.length ? (' (' + attributes.x.units + ')') : ''));
+      ttip.style("display", null)
+        .style("top", (m[1] + margin.top + 95) + "px")
+        .style("left", (m[0] + margin.left + 25) + "px");
+    }
+
+    // remove trendline tooltip
+    function mOut(d){
+      d3.select('.trendlineTip').style('display', 'none');
+      d3.selectAll('.trendline')
+        .attr("stroke-width", Math.abs(d['rXY']) * 2); // original width
     }
 
     // remove any existing scatterplots
@@ -1086,6 +1177,7 @@ function Scatter(geo){
       }
       // be aware: if not in the master table, it will not be shown in the variable table
     });
+
     return item;
   }
 
