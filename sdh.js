@@ -13,6 +13,7 @@ var margin = {top: 10, right: 30, bottom: 10, left: 80},
     hideSpecialAreas = true,
     hideSmallAreas = false;
 
+var masterComplete = false;
 
 // create svg using global vars
 var svg = d3.select("#chart").append("svg")
@@ -133,11 +134,32 @@ var examples = {
   ],
   'Census Tract': [
     {
-      name: 'Red Hot Renter\'s Market',
-      x: 'Median gross rent (2005-2009)',
-      y: 'Median gross rent',
-      r: 'Severely rent-burdened',
-      description: 'In many places in the Chicagoland region, rent is substantially higher than it was five years ago, as shown by the numerous areas far above the diagonal line. However, the proportion of residents who are severely rent-burdened, spending more than 50% of their income on rent (shown by the size of the bubbles), is very worrisome.'
+      name: 'Child Lead Levels',
+      x: 'Built 1979 or earlier',
+      y: 'Children with high blood lead levels, 2009-2013',
+      r: 'Population',
+      description: 'Buildings constructed before 1979, when lead was removed from paint, are correlated with high levels of lead in blood among children under 5 tested in Chicago between 2009 and 2013.'
+    },
+    {
+      name: 'Child Lead: Persistent Racial Disparities',
+      x: 'Built 1979 or earlier',
+      y: 'Children with high blood lead levels, 1995-1999',
+      r: 'Black',
+      description: 'Yet living in an older building by no means guarantees childhood lead poisoning. In the late 1990s, a clear racial disparity was evident between neighborhoods where lead was removed from old walls and pipes, and others--predominantly black--without such investment. (The size of each bubble is proportional to the black share of its population.) Almost no majority-black Census tracts saw the percentage of children with high blood lead levels dip below 30%, while it was almost never above 60% in majority-white Census tracts.'
+    },
+    {
+      name: 'Child Lead: Ongoing Racial Disparities',
+      x: 'Built 1979 or earlier',
+      y: 'Children with high blood lead levels, 2009-2013',
+      r: 'Black',
+      description: 'This disparity persists to the present day, though lead levels have plummeted all throughout Chicago, and almost eliminated in some minority neighborhoods.'
+    },
+    {
+      name: 'Child Lead: An Open Data Predictor',
+      x: 'Built 1979 or earlier',
+      y: 'Children with high blood lead levels, 2009-2013',
+      r: 'Building violations',
+      description: 'When trying to explain high lead levels, an even better predictor than race is the number of building violations reported to the Department of Buildings (shown here as the size of the bubbles). Building violations may indicate poor upkeep of housing or absentee landlords, factors which contribute to accidental lead poisoning. In fact, the proportion of old buildings and the rate of violations can almost entirely identify which Census tracts have the highest blood lead levels in children--and may help prevent lead poisoning before it occurs.'
     },
     {
       name: 'Walk Score and Commuting',
@@ -325,6 +347,7 @@ Papa.parse("master.csv",{
           continue;
         }
       }
+      masterComplete = true;
   }
 });
 
@@ -337,7 +360,8 @@ Papa.parse("master.csv",{
 // Main function
 function Scatter(geo){
   // show loading screen
-  $('#chart .loading-div i').text('Loading...');
+  $('#chart .loading-div .text').show()
+    .find('.geography-text').text(geo.toLowerCase());
   $('#chart .loading-div').show();
 
   var coverage = {};
@@ -696,13 +720,14 @@ function Scatter(geo){
 
       // if insufficient data, stop
       if (filteredData.length < 2){
-        $('#chart .loading-div').html('<b>Insufficient data.</b><br/><br/>Please change the filters in order to view this chart.');
+        $('#chart .loading-div .error').html('<b>Insufficient data.</b><br/><br/>Please change the filters in order to view this chart.');
+        $('#chart .loading-div .text').hide();
         $('#chart .loading-div').show();
         return true;
       } else {
         if ($('#chart .loading-div').is(':visible')){
           // hide loading screen
-          $('#chart .loading-div').html('Loading...');
+          //$('#chart .loading-div .progress-bar').css('width', '0%').attr('aria-valuenow', 0);
           $('#chart .loading-div').hide();
         }
       }
@@ -1143,12 +1168,13 @@ function Scatter(geo){
       '<button class="btn btn-default gf-clear">Clear all</button></div>');
 
     // hide loading screen
-    $('#chart .loading-div').hide();
+    //$('#chart .loading-div').hide();
     
   });
 
   // convert incoming strings to numbers, convert blanks to null, and count variable coverage
   function clean(item) {
+
     d3.keys(item).forEach(function (key) {
 
       // process geofilters
@@ -1201,8 +1227,14 @@ function Scatter(geo){
 };
 
 // launch the application
-Scatter("Community Area");
+var launch = setInterval(function(){
+  if (masterComplete){
+    clearLaunch();
+    Scatter("Community Area");
+  }
+}, 50);
 
+function clearLaunch(){ clearInterval(launch); }
 
 
 /***************************
