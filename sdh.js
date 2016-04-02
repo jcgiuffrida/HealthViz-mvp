@@ -667,8 +667,6 @@ function Scatter(geo){
       }
 
       return filteredData;
-      
-      // TD make all geofilters arrays instead of delimited strings, for speed of indexOf method
     }
 
     // download current data as CSV
@@ -1040,6 +1038,7 @@ function Scatter(geo){
     d3.select(self.frameElement).style("height", totalHeight + "px");
     mouseout();
 
+    // redraw legend and bubble colors
     function redrawLegend(){
       $('#legend').empty();
 
@@ -1111,7 +1110,7 @@ function Scatter(geo){
     $('#geofilters').empty();
 
     // get all geofilters
-    var gfs = options[geo].idCols.filter(function(c){ return c.category == 'Geofilter'; });
+    var gfs = options[geo].idCols.filter(function(c){ return c.category == 'Geofilter' || c.key == options[geo].name; });
 
     // create a filter for each geofilter
     for (i in gfs){
@@ -1128,6 +1127,9 @@ function Scatter(geo){
       var optionUnique = {};
       var optionObjects = [];
       optionList.forEach(function(o){ 
+        if (typeof(o) == 'string'){
+          o = o.split("|");
+        }
         o.forEach(function(p){
           if (!(p in optionUnique) && p !== ''){
             optionUnique[p] = true;
