@@ -14,6 +14,7 @@ var margin = {top: 10, right: 30, bottom: 10, left: 80},
     hideSmallAreas = false;
 
 var masterComplete = false;
+var mapDrawn = false;
 
 // create svg using global vars
 var svg = d3.select("#chart").append("svg")
@@ -89,6 +90,119 @@ svg.append('g')
     .style('text-anchor', 'end')
     .style('font-size', '12px')
     .attr('class', 'y label');
+
+
+
+
+
+
+// initialize the map
+var map = L.map('map', {
+  center: [39.739306, -89.503639],
+  zoom: 7
+});
+
+L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="http://mapbox.com">Mapbox</a>',
+    maxZoom: 18,
+    minZoom: 6,
+    id: 'mapbox.light',
+    accessToken: 'pk.eyJ1IjoiamdpdWZmcmlkYSIsImEiOiJjaW1pZnF3cXMwMDl5dXRrZ2FwbDAxOGx3In0.u5objUUR9x0mfHYy1PtYCQ'
+}).addTo(map);
+
+
+// extend geojson to include topojson
+// Copyright (c) 2013 Ryan Clark
+L.TopoJSON = L.GeoJSON.extend({  
+  addData: function(jsonData) {    
+    if (jsonData.type === "Topology") {
+      for (key in jsonData.objects) {
+        geojson = topojson.feature(jsonData, jsonData.objects[key]);
+        L.GeoJSON.prototype.addData.call(this, geojson);
+      }
+    }    
+    else {
+      L.GeoJSON.prototype.addData.call(this, jsonData);
+    }
+  }  
+});
+
+// create empty layer
+var topoLayer = new L.TopoJSON();
+
+// style for features
+var defaultStyle = {
+  fillColor: null,
+  fillOpacity: 0.5,
+  color:'#FFF', // line
+  weight:0.5,     // line
+  opacity:0.5,   // line
+  smoothFactor: 0.95
+};
+
+// dictionary for leaflet ids
+var leaflet_IDs = {};
+
+// repository for hidden features
+var featureRepo = [];
+
+var getLeafletID = function(id, geo){
+  var str = [geo.replace(" ", "_") + "_" + id];
+  return leaflet_IDs[str];
+};
+
+
+// map methods
+
+// set initial styles for features
+var onEachFeature = function(feature, layer){
+  layer.setStyle(defaultStyle);
+}
+
+// highlight layer on mouse over
+function enterLayer(){  
+  var layer = this;
+  this.bringToFront();
+  this.setStyle({
+    weight: 2,
+    opacity: 1
+  });
+
+  // highlight corresponding bubble
+  // TD replace with options[geo].ID or a standard ID field
+  d3.selectAll('circle').each(function(d, i){
+    if (d[options[geography].ID] === layer.feature.properties.id){
+      d3.select(this).classed("temp-highlighted", true);
+    }
+  });
+}
+
+// un-highlight layer on mouse over
+function leaveLayer(){  
+  var layer = this;
+  this.bringToBack();
+  this.setStyle({
+    weight: 0.5,
+    opacity: 0.5
+  });
+
+  // un-highlight corresponding bubble
+  d3.selectAll('circle').each(function(d, i){
+    if (d[options[geography].ID] === layer.feature.properties.id){
+      d3.select(this).classed("temp-highlighted", false);
+    }
+  });
+}
+
+// zoom to feature on mouse click
+function zoomToFeature(e) {
+    map.fitBounds(e.target.getBounds());
+}
+
+
+
+
+
 
 
 // examples
@@ -243,6 +357,7 @@ function loadExamples(arr){
 var options = {
   'Community Area': {
     data: 'SDH ii.csv',       // name of local file
+    shapes: 'data/communityareas.topo.json',  // name of local topoJSON file for map
     ID: 'ID',                 // name of numeric ID field (must be unique)
     name: 'Community Area',   // name of display name field (also unique)
     default: {                // default attributes for scatterplot
@@ -264,6 +379,7 @@ var options = {
   },
   'Census Tract': {
     data: 'census tract.csv',
+    shapes: 'data/tracts.topo.json',
     ID: 'Tract',
     name: 'Tract',
     default: {
@@ -292,6 +408,7 @@ var options = {
   },
   'ZIP Code': {
     data: 'zip code.csv',
+    shapes: 'data/zipcodes.topo.json',
     ID: 'ZIP',
     name: 'ZIP',
     default: {
@@ -362,6 +479,7 @@ function Scatter(geo){
   // show loading screen
   $('#chart .loading-div .text').show()
     .find('.geography-text').text(geo.toLowerCase());
+  $('#chart .loading-div .error').html('');
   $('#chart .loading-div').show();
 
   var coverage = {};
@@ -379,6 +497,9 @@ function Scatter(geo){
   $('.legend-select').empty();
 
   currentLegend = options[geo].default.geofilter;
+
+  featureRepo = [];
+  mapDrawn = false;
 
   // Read in, clean, and format the data
   d3.csv(options[geo].data, clean, function(data) {
@@ -666,6 +787,60 @@ function Scatter(geo){
         });
       }
 
+      // filter the map too
+      var currentlyShown = [];
+      filteredData.forEach(function(d){
+        currentlyShown.push(d[options[geo].ID]);
+      });
+
+      // first add anything in featureRepo that should be shown
+      if (currentlyShown.length){
+        for (i = 0; i < featureRepo.length; i++){
+          if (currentlyShown.indexOf(featureRepo[i].properties.id) !== -1){
+            topoLayer.addData(featureRepo[i]);
+            featureRepo[i] = null;
+          }
+        }
+
+        featureRepo = featureRepo.filter(function(f){ return f !== null; });
+
+        // now remove anything in the map that shouldn't be there
+        if (mapDrawn){
+          topoLayer.eachLayer(function(e){
+            if (currentlyShown.indexOf(e.feature.properties.id) === -1){
+              // currently shown; remove it
+              featureRepo.push(e.toGeoJSON());
+              topoLayer.removeLayer(e);
+            }
+          });
+
+          // update styles
+          topoLayer.eachLayer(function(i){
+
+            // record the leaflet ID so we can access this feature later
+            leaflet_IDs[geo.replace(" ", "_") + "_" + i.feature.properties.id] = i._leaflet_id;
+
+            // color
+            var fillColor = mapColorScale(i.feature.properties.id).hex();
+
+            // apply default style
+            i.setStyle(defaultStyle);
+            i.setStyle({
+              fillColor: fillColor
+            });
+
+            i.on({
+              mouseover: enterLayer,
+              mouseout: leaveLayer,
+              dblclick: zoomToFeature
+            });
+            i.bindPopup(i.feature.properties.name);
+          });
+
+          map.fitBounds(topoLayer.getBounds());
+        }
+      }
+
       return filteredData;
     }
 
@@ -713,6 +888,8 @@ function Scatter(geo){
     var x, y, radius;
     function redraw() {
 
+      // TD this function gets called with old data every time the geography changes
+
       // filter
       var filteredData = applyDataFilters(data);
 
@@ -725,7 +902,7 @@ function Scatter(geo){
       } else {
         if ($('#chart .loading-div').is(':visible')){
           // hide loading screen
-          //$('#chart .loading-div .progress-bar').css('width', '0%').attr('aria-valuenow', 0);
+          $('#chart .loading-div .error').html('<b>Insufficient data.</b><br/><br/>Please change the filters in order to view this chart.');
           $('#chart .loading-div').hide();
         }
       }
@@ -764,7 +941,10 @@ function Scatter(geo){
       svg.append("g").attr("id", "lines");
       svg.append("g").attr("id", "circles");
 
-      var areas = svg.select('#circles').selectAll('.ca').data(filteredData, function (d) { return d[options[geo].name]; });
+      var areas = svg.select('#circles').selectAll('.ca')
+        .data(filteredData, function (d) { 
+          return d[options[geo].name]; 
+        });
 
       // put starting/permanent attributes here
       areas.enter().append('circle')
@@ -924,6 +1104,31 @@ function Scatter(geo){
             '% of the variation in ' + attributes.y.key + 
             ' can be explained by ' + attributes.x.key + '.';
         }).tooltip('fixTitle');
+
+      // update map
+      var mapColorScale = chroma
+        .scale(['#D5E3FF', '#003171'])
+        .domain(d3.extent(ySeries));
+
+      // add y data to map layer
+      // TD this would be a good place to record what data we've passed to the map layer
+      // so we don't have to repeat
+      if (mapDrawn){
+        filteredData.forEach(function(d){
+          var value = d[attributes.y.key];
+          var featureID = geo.replace(" ", "_") + "_" + d[options[geo].ID];
+          try {
+            topoLayer.getLayer(leaflet_IDs[featureID]).setStyle({
+              fillColor: mapColorScale(value).hex()
+            }).feature.properties[attributes.y.key] = value;
+          } catch(err) {
+            console.log(featureID);
+            console.log(err);
+          }
+        });
+      }
+
+
     }
 
     // handle interaction/tooltip for bubbles
@@ -961,12 +1166,20 @@ function Scatter(geo){
       tip.style("display", null)
           .style("top", (dy + margin.top + 95) + "px")
           .style("left", (dx + margin.left + 25) + "px");
+
+      // highlight in map
+      map._layers[getLeafletID(d[options[geo].ID], geo)].fire('mouseover');
     }
 
     // remove bubble tooltips
     function mouseout(d) {
       d3.selectAll('circle.ca').each(function (d) { d.mouseover = false; });
       tip.style("display", "none");
+
+      // un-highlight in map
+      if (d){
+        map._layers[getLeafletID(d[options[geo].ID], geo)].fire('mouseout');
+      }
     }
 
     // interaction for trendline tooltip
@@ -1222,11 +1435,62 @@ function Scatter(geo){
     }
   }, 50);
 
-  // and finally, initialize the correlation tooltip
+  // and initialize the correlation tooltip
   $('#chartHeader div').tooltip({
     placement: 'bottom'
   });
+
+  // finally, update the map
+  // color features
+  var mapColorScale = chroma
+    .scale(['#D5E3FF', '#003171'])
+    .domain([1, 77]);
+
+  // download topoJSON data asynchronously
+  $.getJSON(options[geo].shapes)
+    .done(addTopoData);
+
+  // load the topoJSON data
+  function addTopoData(topoData){  
+    // clear topoJSON layer
+    topoLayer.clearLayers();
+    
+    // add data to the empty layer
+    topoLayer.addData(topoData);
+
+    // properties for each feature
+    topoLayer.eachLayer(function(i){
+
+      // record the leaflet ID so we can access this feature later
+      leaflet_IDs[geo.replace(" ", "_") + "_" + i.feature.properties.id] = i._leaflet_id;
+
+      // color
+      var fillColor = mapColorScale(i.feature.properties.id).hex();
+
+      // apply default style
+      i.setStyle(defaultStyle);
+      i.setStyle({
+        fillColor: fillColor,
+        smoothFactor: 0.95
+      });
+
+      i.on({
+        mouseover: enterLayer,
+        mouseout: leaveLayer,
+        dblclick: zoomToFeature
+      });
+      i.bindPopup(i.feature.properties.name);
+    });
+
+    map.addLayer(topoLayer);
+    map.fitBounds(topoLayer.getBounds());
+    
+    // show that we're done
+    mapDrawn = true;
+  }
 };
+
+
 
 // launch the application
 var launch = setInterval(function(){
@@ -1450,14 +1714,8 @@ var highlightLegend = function(){
 };
 
 // for people who want to help
-console.log("************************************************");
-console.log("Know how to work with JavaScript and want to make a difference in community health?");
-console.log("Get in touch to help us improve this project and find other ways to get involved. You can also join us on GitHub at https://github.com/lucaluca/SDH.");
-console.log("************************************************");
+// console.log("************************************************");
+// console.log("Know how to work with JavaScript and want to make a difference in community health?");
+// console.log("Get in touch to help us improve this project and find other ways to get involved. You can also join us on GitHub at https://github.com/lucaluca/SDH.");
+// console.log("************************************************");
 
-/*
-
-
-
-
-*/
