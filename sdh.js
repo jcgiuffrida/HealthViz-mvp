@@ -593,6 +593,13 @@ function Scatter(geo){
   svg.selectAll("#lines").remove();
   topoLayer.clearLayers();
 
+  // turn off all existing click events or you'll have serious problems
+  $('.header-attributes select').off('select2:select');
+  $('#collapseExamples').off('click');
+  $('#chart').off('redraw');
+  $('#chart').off('redrawLegend');
+  $('#chart').off('downloadCSV');
+
 
   // Read in, clean, and format the data
   d3.csv(options[geo].data, clean, function(data) {
@@ -687,6 +694,8 @@ function Scatter(geo){
     colsTable.selectAll('td a').on('click', function(d, i){
       $('#collapseExamples').find('a').removeClass('active');  // un-highlight all examples
       selectAttribute(d);
+      $('.header-attributes select').filter('.' + d.col.value)
+        .select2().val(d.row.key);
     });
 
     $('.header-attributes select').on('select2:select', function(e){
@@ -707,7 +716,7 @@ function Scatter(geo){
           });
 
       $('.header-attributes select').filter('.' + d.col.value)
-        .select2().val(d.row.key).trigger('change');
+        .select2().val(d.row.key);
 
       // refresh the chart (if all three dimensions have been selected)
       if (runImmediately) { 
@@ -981,8 +990,6 @@ function Scatter(geo){
 
     var x, y, radius;
     function redraw() {
-
-      // TD this function gets called with old data every time the geography changes
 
       // filter
       var filteredData = applyDataFilters(data);
