@@ -10,10 +10,14 @@ var margin = {top: 10, right: 30, bottom: 10, left: 80},
     attributes = {},
     filter = [],
     currentLegend = 'Region',
-    hideSpecialAreas = true,
+    hideSpecialAreas = false,
     hideSmallAreas = false;
 
+    var chroma1 = 'e';
+
 var masterComplete = false;
+var mapDrawn = false;
+var elementsLoaded = 0;
 
 // create svg using global vars
 var svg = d3.select("#chart").append("svg")
@@ -89,6 +93,192 @@ svg.append('g')
     .style('text-anchor', 'end')
     .style('font-size', '12px')
     .attr('class', 'y label');
+
+
+
+
+
+
+// initialize the map
+var map = L.map('map', {
+  center: [41.8338, -87.7334],
+  zoom: 10,
+  zoomControl: false
+});
+
+L.control.zoom({
+  position: 'topright'
+}).addTo(map);
+
+L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>- <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a> | Imagery &copy; <a href="http://mapbox.com">Mapbox</a>',
+    maxZoom: 18,
+    minZoom: 6,
+    id: 'mapbox.light',
+    accessToken: 'pk.eyJ1IjoiamdpdWZmcmlkYSIsImEiOiJjaW1pZnF3cXMwMDl5dXRrZ2FwbDAxOGx3In0.u5objUUR9x0mfHYy1PtYCQ'
+}).addTo(map);
+
+// control for map to show values
+var mapinfo = L.control({
+  position: 'topleft'
+});
+
+mapinfo.onAdd = function (map) {
+    this._div = L.DomUtil.create('div', 'mapinfo');
+    this.update();
+    return this._div;
+};
+
+// update based on feature properties passed
+mapinfo.update = function (props) {
+  var html = '';
+  if (Object.keys(attributes).length){
+    html += '<h4>' + attributes.y.key + '</h4>';
+  } else {
+    html += '<h4></h4>';
+  }
+  html += (props ? (props.name + '<br><b>' + props[attributes.y.key] + 
+    '</b> ' + (attributes.y.units || '') + 
+    '<br>') : 'Hover over an area');
+  this._div.innerHTML = html;
+};
+
+mapinfo.addTo(map);
+
+
+// extend geojson to include topojson
+// Copyright (c) 2013 Ryan Clark
+L.TopoJSON = L.GeoJSON.extend({  
+  addData: function(jsonData) {    
+    if (jsonData.type === "Topology") {
+      for (key in jsonData.objects) {
+        geojson = topojson.feature(jsonData, jsonData.objects[key]);
+        L.GeoJSON.prototype.addData.call(this, geojson);
+      }
+    }    
+    else {
+      L.GeoJSON.prototype.addData.call(this, jsonData);
+    }
+  }  
+});
+
+// create empty layer
+var topoLayer = new L.TopoJSON();
+
+// style for features
+var defaultStyle = {
+  fillColor: "transparent",
+  fillOpacity: 0.8,
+  color:'#FFF', // line
+  weight:0.5,     // line
+  opacity:0.5,   // line
+  smoothFactor: 0.95
+};
+
+// color features
+var mapColorScale;
+
+// dictionary for leaflet ids
+var leaflet_IDs = {};
+
+// repository for hidden features
+var featureRepo = [];
+
+var getLeafletID = function(id, geo){
+  var str = [geo.replace(" ", "_") + "_" + id];
+  return leaflet_IDs[str];
+};
+
+
+// map methods
+
+// set initial styles for features
+var onEachFeature = function(feature, layer){
+  layer.setStyle(defaultStyle);
+}
+
+var mouseOverMap = false;
+
+// highlight layer on mouse over
+function enterLayer(){  
+  mouseOverMap = true;
+  var layer = this;
+  this.bringToFront();
+  this.setStyle({
+    weight: 2,
+    opacity: 1
+  });
+
+  mapinfo.update(this.feature.properties);
+
+  // highlight corresponding bubble
+  // TD replace with options[geo].ID or a standard ID field
+  d3.selectAll('circle').classed("not-highlighted", true);
+  d3.selectAll('circle').each(function(d, i){
+    if (d[options[geography].ID] === layer.feature.properties.id){
+      d3.select(this).classed("temp-highlighted", true);
+    }
+  });
+}
+
+// un-highlight layer on mouse over
+function leaveLayer(){  
+  mouseOverMap = false;
+  var layer = this;
+  this.bringToBack();
+  this.setStyle({
+    weight: 0.5,
+    opacity: 0.5
+  });
+
+  mapinfo.update();
+
+  // un-highlight corresponding bubble
+  // build in delay so bubbles don't blink when mouse goes over a crack in the map
+  mouseOverStill = setTimeout(function(){
+    if (!(mouseOverMap)){
+      d3.selectAll('circle').classed("not-highlighted", false);
+      highlightLegend(); // reset
+    }
+  }, 50);
+
+  d3.selectAll('circle').each(function(d, i){
+    if (d[options[geography].ID] === layer.feature.properties.id){
+      d3.select(this).classed("temp-highlighted", false);
+    }
+  });
+}
+
+// temporarily highlight layer on mouse over corresponding bubble
+function highlightLayer(){
+  var layer = this;
+  this.bringToFront();
+  this.setStyle({
+    weight: 2,
+    opacity: 1
+  });
+
+  // mapinfo.update(this.feature.properties);
+}
+
+function unhighlightLayer(){
+  var layer = this;
+  this.bringToBack();
+  this.setStyle({
+    weight: 0.5,
+    opacity: 0.5
+  });
+}
+
+// zoom to feature on mouse click
+function zoomToFeature(e) {
+    map.fitBounds(e.target.getBounds());
+}
+
+
+
+
+
 
 
 // examples
@@ -215,7 +405,7 @@ var examples = {
     {
       name: 'Reset',
       x: 'Hardship Index',
-      y: 'Cervical cancer incidence',
+      y: 'Lung cancer incidence',
       r: 'Population',
       description: ''
     }
@@ -243,6 +433,7 @@ function loadExamples(arr){
 var options = {
   'Community Area': {
     data: 'SDH ii.csv',       // name of local file
+    shapes: 'data/communityareas.topo.json',  // name of local topoJSON file for map
     ID: 'ID',                 // name of numeric ID field (must be unique)
     name: 'Community Area',   // name of display name field (also unique)
     default: {                // default attributes for scatterplot
@@ -250,7 +441,8 @@ var options = {
       x: 'Hardship Index',
       y: 'Infant Mortality',
       r: 'Population',
-      geofilter: 'Region'     // name of default geofilter / color coding field
+      geofilter: 'Region',    // name of default geofilter / color coding field
+      filter: []              // initial filter
     },
     tooltipText: function(d){ // function to create the name/description in the tooltip
       return d['Community Area'] + ' (' + d.ID + ')';
@@ -264,13 +456,19 @@ var options = {
   },
   'Census Tract': {
     data: 'census tract.csv',
+    shapes: 'data/tracts.topo.json',
     ID: 'Tract',
     name: 'Tract',
     default: {
       x: 'Household median income',
       y: 'College graduation rate',
       r: 'Population',
-      geofilter: 'County'
+      geofilter: 'County',
+      filter: [{
+        name: "ZIP Code", 
+        values: ["60608", "60609", "60612", "60622", "60623", "60624", 
+                 "60629", "60632", "60639", "60644", "60647", "60651"]
+      }]
     },
     tooltipText: function(d){ // function to create the name/description in the tooltip
       var t = 'Tract ' + String(d['Tract']).substring(5) + 
@@ -292,18 +490,23 @@ var options = {
   },
   'ZIP Code': {
     data: 'zip code.csv',
+    shapes: 'data/zipcodes.topo.json',
     ID: 'ZIP',
     name: 'ZIP',
     default: {
       x: 'Hardship Index',
-      y: 'Cervical cancer incidence',
+      y: 'Lung cancer incidence',
       r: 'Population',
-      geofilter: 'County'
+      geofilter: 'County',
+      filter: [{
+        name: 'County',
+        values: ["Cook County"]
+      }]
     },
     tooltipText: function(d){
       var t = d['ZIP']; 
       if (d['County'].length){
-        t += '<br>(' + d['County'][0] + ')';
+        t += '<br>' + d['County'][0];
       }
       if (d['Special area'].length){
         t += '<br>' + d['Special area'];
@@ -360,14 +563,15 @@ Papa.parse("master.csv",{
 // Main function
 function Scatter(geo){
   // show loading screen
-  $('#chart .loading-div .text').show()
+  $('.loading-div .text').show()
     .find('.geography-text').text(geo.toLowerCase());
-  $('#chart .loading-div').show();
+  $('.loading-div .error').html('');
+  $('.loading-div').show();
 
   var coverage = {};
   var attributesPlaced = false;
   attributes = {};              // clear attributes from previous scatterplot
-  filter = [];
+  filter = options[geo].default.filter;
 
   geography = geo;              // tell everyone we're doing this geography
   options[geo].regions = {};
@@ -379,6 +583,26 @@ function Scatter(geo){
   $('.legend-select').empty();
 
   currentLegend = options[geo].default.geofilter;
+
+  featureRepo = [];
+  mapDrawn = false;
+  elementsLoaded = 0;
+
+  // clear current things
+  d3.select('#controls #attributes').selectAll("*").remove();
+  $('.header-attributes select').empty();
+  $('#geofilters').empty();
+  svg.selectAll("#circles").remove();
+  svg.selectAll("#lines").remove();
+  topoLayer.clearLayers();
+
+  // turn off all existing click events or you'll have serious problems
+  $('.header-attributes select').off('select2:select');
+  $('#collapseExamples').off('click');
+  $('#chart').off('redraw');
+  $('#chart').off('redrawLegend');
+  $('#chart').off('downloadCSV');
+
 
   // Read in, clean, and format the data
   d3.csv(options[geo].data, clean, function(data) {
@@ -406,11 +630,9 @@ function Scatter(geo){
     // create attributes table and drop-down select inputs
     var colsTable = d3.select('#controls #attributes');
     
-    colsTable.selectAll("*").remove();
     $('#controls #attributes').append('<div class="panel-group" id="accordion" ' + 
       'role="tablist" aria-multiselectable="true">');
 
-    $('.header-attributes select').empty();
     var attrs = [
       {value: 'x'},
       {value: 'y'},
@@ -475,6 +697,8 @@ function Scatter(geo){
     colsTable.selectAll('td a').on('click', function(d, i){
       $('#collapseExamples').find('a').removeClass('active');  // un-highlight all examples
       selectAttribute(d);
+      $('.header-attributes select').filter('.' + d.col.value)
+        .select2().val(d.row.key);
     });
 
     $('.header-attributes select').on('select2:select', function(e){
@@ -495,7 +719,7 @@ function Scatter(geo){
           });
 
       $('.header-attributes select').filter('.' + d.col.value)
-        .select2().val(d.row.key).trigger('change');
+        .select2().val(d.row.key);
 
       // refresh the chart (if all three dimensions have been selected)
       if (runImmediately) { 
@@ -613,6 +837,7 @@ function Scatter(geo){
 
     // Render the scatterplot
     drawn = true;
+    elementsLoaded += 1;
     var colorScale = d3.scale.category20();
 
     // filter data
@@ -666,9 +891,63 @@ function Scatter(geo){
         });
       }
 
+      // filter the map too
+      var currentlyShown = [];
+      filteredData.forEach(function(d){
+        currentlyShown.push(d[options[geo].ID]);
+      });
+
+      // first add anything in featureRepo that should be shown
+      if (currentlyShown.length){
+        for (i = 0; i < featureRepo.length; i++){
+          if (currentlyShown.indexOf(featureRepo[i].properties.id) !== -1){
+            topoLayer.addData(featureRepo[i]);
+            featureRepo[i] = null;
+          }
+        }
+
+        featureRepo = featureRepo.filter(function(f){ return f !== null; });
+
+        // now remove anything in the map that shouldn't be there
+        if (mapDrawn){
+          topoLayer.eachLayer(function(e){
+            if (currentlyShown.indexOf(e.feature.properties.id) === -1){
+              // currently shown; remove it
+              featureRepo.push(e.toGeoJSON());
+              topoLayer.removeLayer(e);
+            }
+          });
+
+          // update styles
+          topoLayer.eachLayer(function(i){
+
+            // record the leaflet ID so we can access this feature later
+            leaflet_IDs[geo.replace(" ", "_") + "_" + i.feature.properties.id] = i._leaflet_id;
+
+            // color
+            //var fillColor = mapColorScale(i.feature.properties.id).hex();
+
+            // apply default style
+            i.setStyle(defaultStyle);
+            i.setStyle({
+              fillColor: "transparent"
+            });
+
+            i.on({
+              mouseover: enterLayer,
+              mouseout: leaveLayer,
+              highlight: highlightLayer,
+              unhighlight: unhighlightLayer,
+              dblclick: zoomToFeature
+            });
+            //i.bindPopup(i.feature.properties.name);
+          });
+
+          map.fitBounds(topoLayer.getBounds());
+        }
+      }
+
       return filteredData;
-      
-      // TD make all geofilters arrays instead of delimited strings, for speed of indexOf method
     }
 
     // download current data as CSV
@@ -720,15 +999,15 @@ function Scatter(geo){
 
       // if insufficient data, stop
       if (filteredData.length < 2){
-        $('#chart .loading-div .error').html('<b>Insufficient data.</b><br/><br/>Please change the filters in order to view this chart.');
-        $('#chart .loading-div .text').hide();
-        $('#chart .loading-div').show();
+        $('.loading-div .error').html('<b>Insufficient data.</b><br/><br/>Please change the filters in order to view this chart.');
+        $('.loading-div .text').hide();
+        $('.loading-div').show();
         return true;
       } else {
-        if ($('#chart .loading-div').is(':visible')){
+        if (elementsLoaded == 2 && $('.loading-div').is(':visible')){
           // hide loading screen
-          //$('#chart .loading-div .progress-bar').css('width', '0%').attr('aria-valuenow', 0);
-          $('#chart .loading-div').hide();
+          $('.loading-div .error').html('');
+          $('.loading-div').hide();
         }
       }
 
@@ -766,7 +1045,10 @@ function Scatter(geo){
       svg.append("g").attr("id", "lines");
       svg.append("g").attr("id", "circles");
 
-      var areas = svg.select('#circles').selectAll('.ca').data(filteredData, function (d) { return d[options[geo].name]; });
+      var areas = svg.select('#circles').selectAll('.ca')
+        .data(filteredData, function (d) { 
+          return d[options[geo].name]; 
+        });
 
       // put starting/permanent attributes here
       areas.enter().append('circle')
@@ -781,7 +1063,8 @@ function Scatter(geo){
         .attr('r', 0)
         .on("mouseleave", mouseout)
         .on("mouseout", mouseout)
-        .on("mouseover", mouseover);
+        .on("mouseover", mouseover)
+        .on("click", click);
 
       // reset bubble highlighting, in case new bubbles have appeared
       highlightLegend();
@@ -926,6 +1209,33 @@ function Scatter(geo){
             '% of the variation in ' + attributes.y.key + 
             ' can be explained by ' + attributes.x.key + '.';
         }).tooltip('fixTitle');
+
+      // update map
+      $('.mapinfo h4').text(attributes.y.key);
+
+      var mapColorScale = chroma
+        .scale('GnBu').padding([0.2, 0])
+        .domain(chroma.limits(ySeries, 'q', 5));
+
+      // add y data to map layer
+      // TD this would be a good place to record what data we've passed to the map layer
+      // so we don't have to repeat
+      if (mapDrawn){
+        filteredData.forEach(function(d){
+          var value = d[attributes.y.key];
+          var featureID = geo.replace(" ", "_") + "_" + d[options[geo].ID];
+          try {
+            topoLayer.getLayer(leaflet_IDs[featureID]).setStyle({
+              fillColor: mapColorScale(value).hex()
+            }).feature.properties[attributes.y.key] = value;
+          } catch(err) {
+            console.log(featureID);
+            console.log(err);
+          }
+        });
+      }
+
+
     }
 
     // handle interaction/tooltip for bubbles
@@ -963,12 +1273,26 @@ function Scatter(geo){
       tip.style("display", null)
           .style("top", (dy + margin.top + 95) + "px")
           .style("left", (dx + margin.left + 25) + "px");
+
+      // highlight in map
+      map._layers[getLeafletID(d[options[geo].ID], geo)].fire('highlight');
     }
 
     // remove bubble tooltips
     function mouseout(d) {
       d3.selectAll('circle.ca').each(function (d) { d.mouseover = false; });
       tip.style("display", "none");
+
+      // un-highlight in map
+      if (d){
+        map._layers[getLeafletID(d[options[geo].ID], geo)].fire('unhighlight');
+      }
+    }
+
+    // zoom to area
+    function click(d){
+      // highlight in map
+      map._layers[getLeafletID(d[options[geo].ID], geo)].fire('dblclick');
     }
 
     // interaction for trendline tooltip
@@ -1010,10 +1334,6 @@ function Scatter(geo){
         .attr("stroke-width", Math.abs(d['rXY']) * 2); // original width
     }
 
-    // remove any existing scatterplots
-    svg.selectAll("#circles").remove();
-    svg.selectAll("#lines").remove();
-
     if (drawn){
       redrawLegend();
       redraw();
@@ -1040,6 +1360,7 @@ function Scatter(geo){
     d3.select(self.frameElement).style("height", totalHeight + "px");
     mouseout();
 
+    // redraw legend and bubble colors
     function redrawLegend(){
       $('#legend').empty();
 
@@ -1083,18 +1404,18 @@ function Scatter(geo){
       var sortedRegions = [];
       for (var r in options[geo].regions){
         sortedRegions.push(options[geo].regions[r]);
-        sortedRegions.sort(function(a, b){ 
-          if (a.name == "N/A"){
-            return -1;
-          } else if (a.name > b.name){ 
-            return 1; 
-          } else if (a.name < b.name){
-            return -1;
-          } else {
-            return 0;
-          }
-        });
       }
+      sortedRegions.sort(function(a, b){ 
+        if (a.name == "N/A"){
+          return -1;
+        } else if (a.name > b.name){ 
+          return 1; 
+        } else if (a.name < b.name){
+          return -1;
+        } else {
+          return 0;
+        }
+      });
       sortedRegions.forEach(function(r){
         if (r.name !== "All"){
           var entry = $('<div class="col-md-4">');
@@ -1108,10 +1429,8 @@ function Scatter(geo){
     }
 
     // add geofilters
-    $('#geofilters').empty();
-
     // get all geofilters
-    var gfs = options[geo].idCols.filter(function(c){ return c.category == 'Geofilter'; });
+    var gfs = options[geo].idCols.filter(function(c){ return c.category == 'Geofilter' || c.key == options[geo].name; });
 
     // create a filter for each geofilter
     for (i in gfs){
@@ -1128,6 +1447,9 @@ function Scatter(geo){
       var optionUnique = {};
       var optionObjects = [];
       optionList.forEach(function(o){ 
+        if (typeof(o) == 'string'){
+          o = o.split("|");
+        }
         o.forEach(function(p){
           if (!(p in optionUnique) && p !== ''){
             optionUnique[p] = true;
@@ -1153,11 +1475,18 @@ function Scatter(geo){
       });
       
       // initialize select2
-      select.select2({
+      var select2 = select.select2({
         data: optionObjects,
         placeholder: "Click to select",
         width: '100%',
         allowClear: true
+      });
+
+      // apply default filter
+      filter.forEach(function(f){
+        if (f.name == gfs[i].key){
+          select2.val(f.values).trigger("change");
+        }
       });
 
     }
@@ -1166,9 +1495,6 @@ function Scatter(geo){
     $('#geofilters').append('<div class="col-md-12 text-center">' + 
       '<button class="btn btn-primary gf-filter">Apply filters</button>' + 
       '<button class="btn btn-default gf-clear">Clear all</button></div>');
-
-    // hide loading screen
-    //$('#chart .loading-div').hide();
     
   });
 
@@ -1220,11 +1546,60 @@ function Scatter(geo){
     }
   }, 50);
 
-  // and finally, initialize the correlation tooltip
+  // and initialize the correlation tooltip
   $('#chartHeader div').tooltip({
     placement: 'bottom'
   });
+
+  // finally, create the map
+  // download topoJSON data asynchronously
+  $.getJSON(options[geo].shapes)
+    .done(addTopoData);
+
+  // load the topoJSON data
+  function addTopoData(topoData){  
+    // don't clear featureRepo
+    // TD retain existing shapes in featureRepo to quickly re-load map
+    
+    // add data to the empty layer
+    topoLayer.addData(topoData);
+
+    // properties for each feature
+    topoLayer.eachLayer(function(i){
+
+      // record the leaflet ID so we can access this feature later
+      leaflet_IDs[geo.replace(" ", "_") + "_" + i.feature.properties.id] = i._leaflet_id;
+
+      // apply default style
+      i.setStyle(defaultStyle);
+      i.setStyle({
+        fillColor: "transparent",
+        smoothFactor: 0.95
+      });
+
+      i.on({
+        mouseover: enterLayer,
+        mouseout: leaveLayer,
+        highlight: highlightLayer,
+        unhighlight: unhighlightLayer,
+        dblclick: zoomToFeature
+      });
+      //i.bindPopup(i.feature.properties.name);
+    });
+
+    map.addLayer(topoLayer);
+    // map.fitBounds(topoLayer.getBounds()); // not yet
+    
+    // show that we're done
+    mapDrawn = true;
+    elementsLoaded += 1;
+
+    // now, apply the Y series and initial filters to the chart
+    $('#chart').trigger('redraw');
+  }
 };
+
+
 
 // launch the application
 var launch = setInterval(function(){
@@ -1232,7 +1607,7 @@ var launch = setInterval(function(){
     clearLaunch();
     Scatter("Community Area");
   }
-}, 50);
+}, 10);
 
 function clearLaunch(){ clearInterval(launch); }
 
@@ -1448,14 +1823,8 @@ var highlightLegend = function(){
 };
 
 // for people who want to help
-console.log("************************************************");
-console.log("Know how to work with JavaScript and want to make a difference in community health?");
-console.log("Get in touch to help us improve this project and find other ways to get involved. You can also join us on GitHub at https://github.com/lucaluca/SDH.");
-console.log("************************************************");
+// console.log("************************************************");
+// console.log("Know how to work with JavaScript and want to make a difference in community health?");
+// console.log("Get in touch to help us improve this project and find other ways to get involved. You can also join us on GitHub at https://github.com/lucaluca/SDH.");
+// console.log("************************************************");
 
-/*
-
-
-
-
-*/
