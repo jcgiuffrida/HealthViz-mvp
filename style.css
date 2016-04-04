@@ -113,17 +113,15 @@ ul.tabs a.active {
   position: relative;
 }
 
-#chart .loading-div {
-  font-size: 20px;
+.loading-div {
+  font-size: 24px;
   font-style: italic;
-  padding: 35% 0;
-  width: 90%;
+  padding: 28% 0;
+  width: 100%;
   text-align: center;
   background-color: rgba(230,230,230,0.7);
   position: absolute;
-  top: 13%;
-  left: 10%;
-  z-index: 2;
+  z-index: 1001;
   border-radius: 50px;
 }
 
@@ -219,7 +217,7 @@ svg {
   fill-opacity: 0.7;
   stroke: #555;
   stroke-opacity: 0.7;
-  transition: fill-opacity 0.5s, stroke-opacity 0.5s;
+  transition: fill-opacity 0.3s, stroke-opacity 0.3s;
 }
 
 .ca:hover {
@@ -539,4 +537,26 @@ a.selected {
     float: left;
     margin-right: 8px;
     opacity: 0.7;
+}
+
+.mapinfo {
+    padding: 6px 8px;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    background: white;
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+}
+
+.mapinfo h4 {
+    margin: 0 0 5px;
+    color: #777;
+}
+
+.leaflet-container path{ 
+  transition: fill 1s; /* transition feature fill color */
+}
+
+.leaflet-container .leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.4);
 }
