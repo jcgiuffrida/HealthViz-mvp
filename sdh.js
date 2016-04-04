@@ -405,7 +405,7 @@ var examples = {
     {
       name: 'Reset',
       x: 'Hardship Index',
-      y: 'Cervical cancer incidence',
+      y: 'Lung cancer incidence',
       r: 'Population',
       description: ''
     }
@@ -495,15 +495,18 @@ var options = {
     name: 'ZIP',
     default: {
       x: 'Hardship Index',
-      y: 'Cervical cancer incidence',
+      y: 'Lung cancer incidence',
       r: 'Population',
       geofilter: 'County',
-      filter: []
+      filter: [{
+        name: 'County',
+        values: ["Cook County"]
+      }]
     },
     tooltipText: function(d){
       var t = d['ZIP']; 
       if (d['County'].length){
-        t += '<br>(' + d['County'][0] + ')';
+        t += '<br>' + d['County'][0];
       }
       if (d['Special area'].length){
         t += '<br>' + d['Special area'];
@@ -1401,18 +1404,18 @@ function Scatter(geo){
       var sortedRegions = [];
       for (var r in options[geo].regions){
         sortedRegions.push(options[geo].regions[r]);
-        sortedRegions.sort(function(a, b){ 
-          if (a.name == "N/A"){
-            return -1;
-          } else if (a.name > b.name){ 
-            return 1; 
-          } else if (a.name < b.name){
-            return -1;
-          } else {
-            return 0;
-          }
-        });
       }
+      sortedRegions.sort(function(a, b){ 
+        if (a.name == "N/A"){
+          return -1;
+        } else if (a.name > b.name){ 
+          return 1; 
+        } else if (a.name < b.name){
+          return -1;
+        } else {
+          return 0;
+        }
+      });
       sortedRegions.forEach(function(r){
         if (r.name !== "All"){
           var entry = $('<div class="col-md-4">');
