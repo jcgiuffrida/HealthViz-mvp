@@ -463,7 +463,7 @@ var options = {
       x: 'Household median income',
       y: 'College graduation rate',
       r: 'Population',
-      geofilter: 'County',
+      geofilter: 'random',
       filter: [{
         name: "ZIP Code", 
         values: ["60608", "60609", "60612", "60622", "60623", "60624", 
@@ -497,7 +497,7 @@ var options = {
       x: 'Hardship Index',
       y: 'Lung cancer incidence',
       r: 'Population',
-      geofilter: 'County',
+      geofilter: 'random',
       filter: [{
         name: 'County',
         values: ["Cook County"]
@@ -726,19 +726,6 @@ function Scatter(geo){
         if (drawn){ 
           redraw();
         }
-      }
-      
-      // refresh statistics
-      if (Object.keys(options[geo].statistics).length) {
-        var stats = ['mean', 'median', 'min', '25', '75', 'max'];
-        var table = $('.statistics table');
-        table.find('thead .' + d.col.value).html('<h5>' + d.row.key + '<br/>' + 
-          '<small>' + (d.row.units ? d.row.units : '') + '</small></h5>');
-        // prettier stats number formats
-        stats.forEach(function (s) {
-          table.find('.' + s + ' .' + d.col.value).text(
-            options[geo].statistics[d.row.key][s]);
-        });
       }
       
     }
@@ -1234,6 +1221,24 @@ function Scatter(geo){
           }
         });
       }
+
+      // update statistics for all 3 variables for the selected areas
+      // doing this here lets us calculate weighted averages for the areas currently
+      // visible; however, it means re-calculating for all three variables every 
+      // time we re-select any one variable
+      // TD make more efficient by only calculating stats for new variables
+
+      // if (Object.keys(options[geo].statistics).length) {
+      //   var stats = ['mean', 'median', 'min', '25', '75', 'max'];
+      //   var table = $('.statistics table');
+      //   table.find('thead .' + d.col.value).html('<h5>' + d.row.key + '<br/>' + 
+      //     '<small>' + (d.row.units ? d.row.units : '') + '</small></h5>');
+      //   // prettier stats number formats
+      //   stats.forEach(function (s) {
+      //     table.find('.' + s + ' .' + d.col.value).text(
+      //       options[geo].statistics[d.row.key][s]);
+      //   });
+      // }
 
 
     }

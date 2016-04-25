@@ -160,18 +160,16 @@ svg {
   margin-left: 20px;
 }
 
-.header-attributes .axis-header {
+.header-attributes .axis-header,
+.header-attributes .select2,
+.header-attributes .attr-info,
+.header-attributes .mean {
   font-weight: bold;
   font-size: 1.5rem;
 }
 
 .header-attributes select {
   width: 28%;
-}
-
-.header-attributes .select2 {
-  font-weight: bold;
-  font-size: 1.5rem;
 }
 
 /* the following two need better overrides */
@@ -183,7 +181,6 @@ svg {
   font-size: 12px !important;
 }
 
-/*    */
 
 /* select2 colors */
 .header-attributes .select2:nth-of-type(1) .select2-selection {
