@@ -463,7 +463,7 @@ var options = {
       x: 'Household median income',
       y: 'College graduation rate',
       r: 'Population',
-      geofilter: 'County',
+      geofilter: 'random',
       filter: [{
         name: "ZIP Code", 
         values: ["60608", "60609", "60612", "60622", "60623", "60624", 
@@ -497,7 +497,7 @@ var options = {
       x: 'Hardship Index',
       y: 'Lung cancer incidence',
       r: 'Population',
-      geofilter: 'County',
+      geofilter: 'random',
       filter: [{
         name: 'County',
         values: ["Cook County"]
@@ -727,20 +727,24 @@ function Scatter(geo){
           redraw();
         }
       }
-      
-      // refresh statistics
-      if (Object.keys(options[geo].statistics).length) {
-        var stats = ['mean', 'median', 'min', '25', '75', 'max'];
-        var table = $('.statistics table');
-        table.find('thead .' + d.col.value).html('<h5>' + d.row.key + '<br/>' + 
-          '<small>' + (d.row.units ? d.row.units : '') + '</small></h5>');
-        // prettier stats number formats
-        stats.forEach(function (s) {
-          table.find('.' + s + ' .' + d.col.value).text(
-            options[geo].statistics[d.row.key][s]);
-        });
-      }
-      
+
+      // update attribute info in chart header NOWNOWNOW
+      // this is the same function as in row() so we can consolidate later TD
+      $('#chartHeader .attr-info.' + d.col.value)
+        .attr("data-original-title", function(){
+          var name = d.row;
+          var title = [name.units, name.period].filter(function(a){ return a; }).join(', ');
+          if (name.source){
+            return [title, name.description, ("Source: " + name.source)]
+              .filter(function(a){ return a; }).join('<br><br>');
+          } else {
+          return [title, name.description]
+              .filter(function(a){ return a; }).join('<br><br>');
+          }
+        }).tooltip('fixTitle')
+        .text(function(){
+          return $(this).attr("data-original-title") == "" ? "" : "(Hover for attribute info)";
+        });      
     }
 
     // get statistics after everything is drawn, and then "redraw" to show statistics
@@ -1235,6 +1239,37 @@ function Scatter(geo){
         });
       }
 
+      // update statistics for all 3 variables for the selected areas
+      // doing this here lets us calculate weighted averages for the areas currently
+      // visible; however, it means re-calculating for all three variables every 
+      // time we re-select any one variable
+      // TD make more efficient by only calculating stats for new variables
+
+      // NOWNOWNOW
+      // for each attribute
+      Object.keys(attributes).forEach(function(a){
+        // calculate weighted average for the bubbles that are showing
+        if (attributes[a].key !== "Population"){
+          var avg = getWeightedAverage(filteredData, attributes[a].key);
+          $('#chartHeader .mean.' + a).text("Weighted average: " + avg);
+        }
+      });
+
+      // update tooltip for all attributes to show current filtered areas
+      $('#chartHeader .mean')
+        .attr("data-original-title", function(){
+          var str = "This is the average (weighted by 2010-2014 population) across ";
+          if (filter.length == []){
+            str += 'all areas.';
+          } else {
+            str += 'the following areas:<br><br>';
+            filter.forEach(function(f){
+              str += f.name + ": " + 
+                f.values.map(function(v){ return v.trim(); }).join(', ') + '<br><br>';
+            });
+          }
+          return str;
+        }).tooltip('fixTitle');
 
     }
 
@@ -1547,7 +1582,17 @@ function Scatter(geo){
   }, 50);
 
   // and initialize the correlation tooltip
-  $('#chartHeader div').tooltip({
+  $('#chartHeader .attr-info').tooltip({
+    placement: 'bottom',
+    html: true
+  });
+
+  $('#chartHeader .mean').tooltip({
+    placement: 'bottom',
+    html: true
+  });
+
+  $('#chartHeader .rSquared').tooltip({
     placement: 'bottom'
   });
 
@@ -1596,6 +1641,24 @@ function Scatter(geo){
 
     // now, apply the Y series and initial filters to the chart
     $('#chart').trigger('redraw');
+  }
+
+  function getWeightedAverage(data, attr){
+    if (typeof attr == "undefined" || typeof data == "undefined"){
+      return ''; // no attr or data
+    }
+    var a = []; // attribute
+    var s = 0; // dot product of attr * population
+    var t = 0; // sum of population
+    data.forEach(function(d){
+      if (d[attr] && d.Population){
+        a.push(d[attr]);
+        s += d[attr] * d.Population;
+        t += d.Population;
+      }
+    });
+    var smallRange = (d3.max(a) - d3.min(a) < 3);
+    return myRound(s / t, smallRange);
   }
 };
 

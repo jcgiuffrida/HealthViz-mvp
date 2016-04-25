@@ -70,9 +70,21 @@
               <div class="axis-header size">Size</div>
             </div>
             <div class="col-md-12 header-attributes">
-              <select class="x"></select>
-              <select class="y"></select>
-              <select class="size"></select>
+              <div>
+                <select class="x"></select>
+                <div class="mean x"></div>
+                <div class="attr-info x"></div>
+              </div>
+              <div>
+                <select class="y"></select>
+                <div class="mean y"></div>
+                <div class="attr-info y"></div>
+              </div>
+              <div>
+                <select class="size"></select>
+                <div class="mean size"></div>
+                <div class="attr-info size"></div>
+              </div>
             </div>
             <div class="rSquared col-md-12 text-center" data-original-title="">R-squared: 0.293</div>
           </div>
@@ -148,7 +160,7 @@
               </div>
               <div id="collapseInstructions" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingInstructions" aria-expanded="true">
                 <div class="panel-body">
-                  <b>This is an interactive scatterplot</b> to look at social determinants of health alongside various health outcomes in Chicago and Illinois. You can put any variables on the X and Y axes to look at their relationship by clicking <code>x</code> or <code>y</code> next to the variables you want in the list below. The size of the bubbles indicates a third variable, which you can change by clicking <code>size</code>. Mouse over the bubbles for more information and to identify which area a bubble represents. At first, this scatterplot shows how <code>Infant Mortality</code> increases in community areas that score highly on the <code>Hardship Index</code>, and the size of a bubble is proportional to the <code>Population</code> of that community area. You can also see summary statistics of the variables selected to the right. All health outcome variables are risk-adjusted for age. To learn more about a variable, hover over the variable name in the right-side panel. 
+                  <b>This is an interactive scatterplot</b> to look at social determinants of health alongside various health outcomes in Chicago and Illinois. You can put any variables on the X and Y axes to look at their relationship by clicking <code>x</code> or <code>y</code> next to the variables you want in the list below. The size of the bubbles indicates a third variable, which you can change by clicking <code>size</code>. Mouse over the bubbles for more information and to identify which area a bubble represents. At first, this scatterplot shows how <code>Infant Mortality</code> increases in community areas that score highly on the <code>Hardship Index</code>, and the size of a bubble is proportional to the <code>Population</code> of that community area. You can also see the weighted average of each variable under the drop-downs at the top. All health outcome variables are risk-adjusted for age. To learn more about a variable, hover over the variable name in the right-side panel. 
                   <br/>
                   <br/>
                   <b>It's important to remember</b> that this scatterplot shows relationships but not causal effects. Just because two variables show a clear trend does not mean that one causes the other: both could be caused by a third, hidden factor, or the association could be due to random chance. We also recognize that it is difficult to draw broad conclusions about the health of residents by looking only at correlations between regions that represent vastly different populations and demographics. No community can be fully represented by a bubble on a graph. Even so, this tool can point us toward the right questions to investigate further.
@@ -220,38 +232,6 @@
             <table id="attributes">
             </table>
           </form>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-12 statistics pull-right">
-          <table>
-            <thead>
-              <tr>
-                <td></td><td class="x"></td><td class="y"></td><td class="size"></td>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="mean">
-                <td>Mean</td><td class="x"></td><td class="y"></td><td class="size"></td>
-              </tr>
-              <tr class="min">
-                <td>Minimum</td><td class="x"></td><td class="y"></td><td class="size"></td>
-              </tr>
-              <tr class="25">
-                <td>25%</td><td class="x"></td><td class="y"></td><td class="size"></td>
-              </tr>
-              <tr class="median">
-                <td>Median</td><td class="x"></td><td class="y"></td><td class="size"></td>
-              </tr>
-              <tr class="75">
-                <td>75%</td><td class="x"></td><td class="y"></td><td class="size"></td>
-              </tr>
-              <tr class="max">
-                <td>Maximum</td><td class="x"></td><td class="y"></td><td class="size"></td>
-              </tr>
-            </tbody>
-          </table>
         </div>
       </div>
     

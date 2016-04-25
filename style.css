@@ -150,7 +150,9 @@ svg {
   cursor: default;
 }
 
-#chartHeader .rSquared:hover {
+#chartHeader .rSquared:hover,
+#chartHeader .mean:hover,
+#chartHeader .attr-info:hover {
   color: #444;
 }
 
@@ -160,18 +162,18 @@ svg {
   margin-left: 20px;
 }
 
-.header-attributes .axis-header {
+.header-attributes .axis-header,
+.header-attributes .select2,
+.header-attributes .attr-info,
+.header-attributes .mean {
   font-weight: bold;
   font-size: 1.5rem;
+  cursor: default;
 }
 
 .header-attributes select {
-  width: 28%;
-}
-
-.header-attributes .select2 {
-  font-weight: bold;
-  font-size: 1.5rem;
+  width: 75%;
+  cursor: pointer;
 }
 
 /* the following two need better overrides */
@@ -183,18 +185,17 @@ svg {
   font-size: 12px !important;
 }
 
-/*    */
 
 /* select2 colors */
-.header-attributes .select2:nth-of-type(1) .select2-selection {
+.header-attributes>div:nth-of-type(1) .select2-selection {
   background-color: #87D2DA;
 }
 
-.header-attributes .select2:nth-of-type(2) .select2-selection {
+.header-attributes>div:nth-of-type(2) .select2-selection {
   background-color: #7ABC43;
 }
 
-.header-attributes .select2:nth-of-type(3) .select2-selection {
+.header-attributes>div:nth-of-type(3) .select2-selection {
   background-color: #EEB91C;
 }
 
@@ -314,6 +315,10 @@ svg {
   font-size: 13px;
   opacity: 0.8;
   border-radius: 5px;
+}
+
+.header-mean .tooltip-inner {
+  text-align: left;
 }
 
 /* legend */
