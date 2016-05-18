@@ -719,7 +719,7 @@ function Scatter(geo){
           });
 
       $('.header-attributes select').filter('.' + d.col.value)
-        .select2().val(d.row.key);
+        .select2().val(d.row.key).trigger('change');
 
       // refresh the chart (if all three dimensions have been selected)
       if (runImmediately) { 
