@@ -26,7 +26,8 @@ text {
   font: 12px sans-serif;  /* axis ticks */
 }
 
-.hc-logo img:hover {
+.hc-logo img:hover,
+.presence-logo img:hover {
   opacity: 0.8;
 }
 
