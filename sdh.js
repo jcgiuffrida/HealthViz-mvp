@@ -13,8 +13,6 @@ var margin = {top: 10, right: 30, bottom: 10, left: 80},
     hideSpecialAreas = false,
     hideSmallAreas = false;
 
-    var chroma1 = 'e';
-
 var masterComplete = false;
 var mapDrawn = false;
 var elementsLoaded = 0;
@@ -168,7 +166,7 @@ var topoLayer = new L.TopoJSON();
 // style for features
 var defaultStyle = {
   fillColor: "transparent",
-  fillOpacity: 0.8,
+  fillOpacity: 0.75,
   color:'#FFF', // line
   weight:0.5,     // line
   opacity:0.5,   // line
@@ -728,7 +726,7 @@ function Scatter(geo){
         }
       }
 
-      // update attribute info in chart header NOWNOWNOW
+      // update attribute info in chart header
       // this is the same function as in row() so we can consolidate later TD
       $('#chartHeader .attr-info.' + d.col.value)
         .attr("data-original-title", function(){
@@ -1003,7 +1001,7 @@ function Scatter(geo){
 
       // if insufficient data, stop
       if (filteredData.length < 2){
-        $('.loading-div .error').html('<b>Insufficient data.</b><br/><br/>Please change the filters in order to view this chart.');
+        $('.loading-div .error').html('<b>Insufficient data.</b><br/><br/>Please change the filters or pick different variables in order to view this chart.');
         $('.loading-div .text').hide();
         $('.loading-div').show();
         return true;
@@ -1245,13 +1243,14 @@ function Scatter(geo){
       // time we re-select any one variable
       // TD make more efficient by only calculating stats for new variables
 
-      // NOWNOWNOW
       // for each attribute
       Object.keys(attributes).forEach(function(a){
         // calculate weighted average for the bubbles that are showing
         if (attributes[a].key !== "Population"){
           var avg = getWeightedAverage(filteredData, attributes[a].key);
           $('#chartHeader .mean.' + a).text("Weighted average: " + avg);
+        } else {
+          $('#chartHeader .mean.' + a).text("");
         }
       });
 
@@ -1268,6 +1267,7 @@ function Scatter(geo){
                 f.values.map(function(v){ return v.trim(); }).join(', ') + '<br><br>';
             });
           }
+          str += 'For age-adjusted rates, this weighted average is <b>not</b> the age-adjusted rate for the full area. Instead, it is an approximation.';
           return str;
         }).tooltip('fixTitle');
 
