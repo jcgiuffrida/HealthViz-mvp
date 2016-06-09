@@ -12,7 +12,8 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = [
-    # Examples:
+    # attributes
+    url(r'^attr/', include('attributes.urls')),
     url(r'^$', 'home.views.home', name='home'),
     url(r'^contact$', 'home.views.contact', name='contact'),
     url(r'^about', 'home.views.about', name='about'),

@@ -1,0 +1,9 @@
+{% if attribute_list %}
+    <ul>
+    {% for attr in attribute_list %}
+        <li>{{ attr.key }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No attributes are available.</p>
+{% endif %}
