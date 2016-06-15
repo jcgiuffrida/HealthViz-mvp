@@ -1,7 +1,7 @@
 {% if attribute_list %}
     <ul>
     {% for attr in attribute_list %}
-        <li>{{ attr.key }}</li>
+        <li><a href="{% url 'attributes:attribute_detail' attr.id %}">{{ attr.key }}</a></li>
     {% endfor %}
     </ul>
 {% else %}

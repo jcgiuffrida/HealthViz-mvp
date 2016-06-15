@@ -37,7 +37,7 @@ urlpatterns = [
         name='logout'),
 
     # port of original Health Viz
-    url(r'^SDH$', 'home.views.SDH', name='SDH'),
+    # url(r'^SDH$', 'home.views.SDH', name='SDH'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
