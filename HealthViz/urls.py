@@ -5,6 +5,8 @@ Definition of urls for HealthViz.
 from datetime import datetime
 from django.conf.urls import patterns, url
 from home.forms import BootstrapAuthenticationForm
+from home.views import home, contact, about
+from django.contrib.auth.views import login, logout
 
 # Uncomment the next lines to enable the admin:
 from django.conf.urls import include
@@ -14,11 +16,10 @@ admin.autodiscover()
 urlpatterns = [
     # attributes
     url(r'^attr/', include('attributes.urls')),
-    url(r'^$', 'home.views.home', name='home'),
-    url(r'^contact$', 'home.views.contact', name='contact'),
-    url(r'^about', 'home.views.about', name='about'),
-    url(r'^login/$',
-        'django.contrib.auth.views.login',
+    url(r'^$', home, name='home'),
+    url(r'^contact$', contact, name='contact'),
+    url(r'^about', about, name='about'),
+    url(r'^login/$', login,
         {
             'template_name': 'home/login.html',
             'authentication_form': BootstrapAuthenticationForm,
@@ -29,8 +30,7 @@ urlpatterns = [
             }
         },
         name='login'),
-    url(r'^logout$',
-        'django.contrib.auth.views.logout',
+    url(r'^logout$', logout, 
         {
             'next_page': '/',
         },
