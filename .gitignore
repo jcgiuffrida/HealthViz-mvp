@@ -13,3 +13,5 @@ build/
 tests/report/
 HealthViz/settings/
 *.sqlite3
+.gitattributes
+migrations/

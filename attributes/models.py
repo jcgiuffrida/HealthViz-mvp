@@ -5,18 +5,18 @@ from django.contrib.auth.models import User
 class Source(models.Model):
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField()
-    url = models.URLField(max_length=200, blank=True)
+    url = models.URLField(max_length=200, blank=True, null=True)
 
     def __str__(self):
         return self.name
 
 
 class Parent_Attribute(models.Model):
-    key = models.CharField(max_length=12, unique=True, blank=True)
+    key = models.CharField(max_length=12, unique=True, blank=True, null=True)
     name = models.CharField(max_length=127, unique=True)
-    units = models.CharField(max_length=127, blank=True)
-    category = models.CharField(max_length=127, blank=True)
-    technical_notes = models.TextField("Detailed notes on how this attribute was collected or calculated.", blank=True)
+    units = models.CharField(max_length=127, blank=True, null=True)
+    category = models.CharField(max_length=127, blank=True, null=True)
+    technical_notes = models.TextField("Detailed notes on how this attribute was collected or calculated.", blank=True, null=True)
     # may want to add suppression_notes (textfield)
 
     def __str__(self):
@@ -24,14 +24,14 @@ class Parent_Attribute(models.Model):
 
 
 class Attribute(models.Model):
-    key = models.CharField(max_length=12, unique=True, blank=True)
+    key = models.CharField(max_length=12, unique=True, blank=True, null=True)
     name = models.ForeignKey(Parent_Attribute, on_delete=models.CASCADE)
-    denominator = models.ForeignKey('Attribute', on_delete=models.SET_NULL, null=True, blank=True)
+    denominator = models.ForeignKey('Attribute', on_delete=models.SET_NULL, null=True, blank=True, null=True)
     source = models.ForeignKey(Source)
-    source_exact = models.CharField("E.g. table number, product name", max_length=255, blank=True)
+    source_exact = models.CharField("E.g. table number, product name", max_length=255, blank=True, null=True)
     period = models.CharField(max_length=127)
-    description = models.TextField(blank=True)
-    source_url = models.URLField("URL of the original source or a link to more technical notes.", blank=True)
+    description = models.TextField(blank=True, null=True)
+    source_url = models.URLField("URL of the original source or a link to more technical notes.", blank=True, null=True)
 
     AGES = (
         (None, ''),
@@ -55,9 +55,9 @@ class Attribute(models.Model):
         ('H', 'Hispanic/Latino'),
     )
     
-    age_strat = models.CharField("age", max_length=1, choices=AGES, blank=True)
-    sex_strat = models.CharField("sex", max_length=1, choices=SEXES, blank=True)
-    race_strat = models.CharField("race/ethnicity", max_length=1, choices=RACES, blank=True)
+    age_strat = models.CharField("age", max_length=1, choices=AGES, blank=True, null=True)
+    sex_strat = models.CharField("sex", max_length=1, choices=SEXES, blank=True, null=True)
+    race_strat = models.CharField("race/ethnicity", max_length=1, choices=RACES, blank=True, null=True)
     date_added = models.DateField(auto_now_add=True)
     added_by = models.ForeignKey(User, null=True, blank=True)
 
