@@ -1,0 +1,10 @@
+{% if geo_type_list %}
+    <ul>
+      <li><a href="{% url 'geo:region_list' %}">Region</a></li>
+    {% for type in geo_type_list %}
+        <li><a href="{% url 'geo:list' type.slug %}">{{ type.name }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No geographies are available.</p>
+{% endif %}

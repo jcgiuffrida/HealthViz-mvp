@@ -1,3 +1,27 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Type, Geography, Region
+
+
+admin.site.register(Type)
+
+
+class GeographyAdmin(admin.ModelAdmin):
+    list_display = ['__str__', 'type', 'special_area']
+    list_filter = ['type', 'special_area']
+    search_fields = ['name', 'special_area_name']
+    ordering = ('type', 'name')
+
+admin.site.register(Geography, GeographyAdmin)
+
+
+class RegionAdmin(admin.ModelAdmin):
+    list_display = ['name', 'added_by']
+    list_filter = ['added_by']
+    search_fields = ['name', 'description']
+
+    def save_model(self, request, obj, form, change):
+      obj.added_by = request.user
+      obj.save()
+
+admin.site.register(Region, RegionAdmin)

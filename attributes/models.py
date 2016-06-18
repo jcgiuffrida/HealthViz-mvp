@@ -19,6 +19,8 @@ class Parent_Attribute(models.Model):
     technical_notes = models.TextField("Detailed notes on how this attribute was collected or calculated.", blank=True, null=True)
     # may want to add suppression_notes (textfield)
 
+    class Meta:
+        verbose_name_plural = "parent attributes"
     def __str__(self):
         return self.name
 
@@ -26,7 +28,7 @@ class Parent_Attribute(models.Model):
 class Attribute(models.Model):
     key = models.CharField(max_length=12, unique=True, blank=True, null=True)
     name = models.ForeignKey(Parent_Attribute, on_delete=models.CASCADE)
-    denominator = models.ForeignKey('Attribute', on_delete=models.SET_NULL, null=True, blank=True, null=True)
+    denominator = models.ForeignKey('Attribute', on_delete=models.SET_NULL, blank=True, null=True)
     source = models.ForeignKey(Source)
     source_exact = models.CharField("E.g. table number, product name", max_length=255, blank=True, null=True)
     period = models.CharField(max_length=127)

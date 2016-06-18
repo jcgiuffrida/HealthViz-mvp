@@ -1,0 +1,10 @@
+<a href="{% url 'geo:index' %}">All geographies</a>
+{% if region_list %}
+    <ul>
+    {% for region in region_list %}
+        <li><a href="{% url 'geo:region' region.id %}">{{ region.name }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No regions are available.</p>
+{% endif %}
