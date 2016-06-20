@@ -1,6 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_list_or_404, get_object_or_404
 from django.views import generic
-from django.shortcuts import get_list_or_404, get_object_or_404
 
 from .models import Type, Geography, Region
 from eav.models import EAV
@@ -29,7 +28,7 @@ def detail(request, UrlSlug, geoid):
     return render(request, 'geo/detail.html', {
         'geo': geo,
         'current_type': current_type,
-        'coverage': coverage
+        'coverage': coverage,
     })
 
 

@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-import csv
 
 
 class Type(models.Model):
