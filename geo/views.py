@@ -3,6 +3,7 @@ from django.views import generic
 from django.shortcuts import get_list_or_404, get_object_or_404
 
 from .models import Type, Geography, Region
+from eav.models import EAV
 
 
 class IndexView(generic.ListView):
@@ -23,9 +24,12 @@ def list(request, UrlSlug):
 def detail(request, UrlSlug, geoid):
     current_type = Type.objects.filter(slug=UrlSlug)[0]
     geo = get_object_or_404(Geography, type=current_type, geoid=geoid)
+    coverage = EAV.objects.filter(geography=geo)
+
     return render(request, 'geo/detail.html', {
         'geo': geo,
         'current_type': current_type,
+        'coverage': coverage
     })
 
 

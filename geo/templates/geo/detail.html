@@ -5,6 +5,14 @@
 <a href="{% url 'geo:list' current_type.slug %}">Back to {% if current_type.plural_name %}{{current_type.plural_name}}{% else %}{{ current_type.name }}s{% endif %}</a>
 {% if geo %}
     <h3>{{ geo }}</h3>
+    {% if coverage %}
+    This geography has values for the following attributes:
+    <ul>
+      {% for cov in coverage %}
+      <li>{{ cov.attribute }} ({{ cov.attribute.period }})</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
 {% else %}
     <p>No geography available.</p>
 {% endif %}
