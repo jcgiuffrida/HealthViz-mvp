@@ -13,5 +13,5 @@ urlpatterns = [
 	# ex: /geo/zip/
     url(r'^(?P<UrlSlug>[A-Za-z-]+)/$', views.list, name='list'),
 	# ex: /geo/zip/60647/
-	url(r'^(?P<UrlSlug>[A-Za-z-]+)/(?P<name>[\w-]+)/$', views.detail, name='detail'),
+	url(r'^(?P<UrlSlug>[A-Za-z-]+)/(?P<geoid>[\w-]+)/$', views.detail, name='detail'),
 ]

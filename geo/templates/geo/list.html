@@ -1,10 +1,16 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
 <a href="{% url 'geo:index' %}">All geographies</a>
 {% if geo_list %}
     <ul>
     {% for geo in geo_list %}
-        <li><a href="{% url 'geo:detail' current_type.slug geo.name %}">{{ geo.name }}</a></li>
+        <li><a href="{% url 'geo:detail' current_type.slug geo.geoid %}">{{ geo.name }}</a></li>
     {% endfor %}
     </ul>
 {% else %}
     <p>No geographies are available.</p>
 {% endif %}
+
+{% endblock %}

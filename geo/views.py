@@ -20,9 +20,9 @@ def list(request, UrlSlug):
     })
 
 
-def detail(request, UrlSlug, name):
+def detail(request, UrlSlug, geoid):
     current_type = Type.objects.filter(slug=UrlSlug)[0]
-    geo = get_object_or_404(Geography, type=current_type, name=name)
+    geo = get_object_or_404(Geography, type=current_type, geoid=geoid)
     return render(request, 'geo/detail.html', {
         'geo': geo,
         'current_type': current_type,

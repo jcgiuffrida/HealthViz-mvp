@@ -1,18 +1,21 @@
 from django.db import models
 from django.contrib.auth.models import User
+import csv
 
 
 class Type(models.Model):
 	name = models.CharField(max_length=127, unique=True)
 	slug = models.CharField(max_length=15, unique=True)
 	description = models.TextField(blank=True, null=True)
+	plural_name = models.CharField(max_length=127, unique=True, null=True, blank=True)
 
 	def __str__(self):
 		return self.name
 
 
 class Geography(models.Model):
-	name = models.CharField(max_length=31)
+	geoid = models.CharField(max_length=15, verbose_name='GEOID', help_text='The <a href="https://www.census.gov/geo/reference/geoidentifiers.html" target="_blank">GEOID</a> for this geography, e.g. 60601 for a ZIP code, 17031 for a county, or 17031110100 for a census tract. The code must be numeric (with leading zeros) and uniquely identify each geography of this type.')
+	name = models.CharField(max_length=63)
 	type = models.ForeignKey(Type, on_delete=models.CASCADE)
 	latitude = models.DecimalField("Latitude of the centroid", max_digits=12, decimal_places=10, blank=True, null=True)
 	longitude = models.DecimalField("Longitude of the centroid", max_digits=12, decimal_places=10, blank=True, null=True)
@@ -20,7 +23,9 @@ class Geography(models.Model):
 	special_area_name = models.CharField(max_length=127, blank=True, null=True)
 
 	class Meta:
-		unique_together = (("name", "type"),)
+		unique_together = (
+			("name", "type"),
+			("geoid", "type"))
 		index_together = [
 			["type", "name"]
 		]

@@ -1,3 +1,7 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
 <a href="{% url 'geo:index' %}">All geographies</a>
 {% if region_list %}
     <ul>
@@ -8,3 +12,5 @@
 {% else %}
     <p>No regions are available.</p>
 {% endif %}
+
+{% endblock %}

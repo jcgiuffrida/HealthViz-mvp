@@ -1,3 +1,7 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
 {% if geo_type_list %}
     <ul>
       <li><a href="{% url 'geo:region_list' %}">Region</a></li>
@@ -8,3 +12,5 @@
 {% else %}
     <p>No geographies are available.</p>
 {% endif %}
+
+{% endblock %}

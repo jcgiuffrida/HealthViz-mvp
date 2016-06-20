@@ -1,3 +1,7 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
 {% if attribute_list %}
     <ul>
     {% for attr in attribute_list %}
@@ -7,3 +11,5 @@
 {% else %}
     <p>No attributes are available.</p>
 {% endif %}
+
+{% endblock %}

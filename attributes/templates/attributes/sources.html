@@ -1,3 +1,7 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
 {% if source_list %}
     <ul>
     {% for source in source_list %}
@@ -7,3 +11,5 @@
 {% else %}
     <p>No sources are available.</p>
 {% endif %}
+
+{% endblock %}

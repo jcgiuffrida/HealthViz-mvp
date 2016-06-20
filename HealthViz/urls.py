@@ -15,8 +15,8 @@ admin.autodiscover()
 
 urlpatterns = [
     # attributes
-    url(r'^attr/', include('attributes.urls')),
-    url(r'^geo/', include('geo.urls')),
+    url(r'^attr/', include('attributes.urls', namespace='attributes')),
+    url(r'^geo/', include('geo.urls', namespace='geo')),
     url(r'^$', home, name='home'),
     url(r'^contact$', contact, name='contact'),
     url(r'^about', about, name='about'),

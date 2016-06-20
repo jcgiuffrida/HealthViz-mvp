@@ -1,6 +1,12 @@
-<a href="{% url 'geo:list' current_type.slug %}">Back to {{ current_type.name }}s</a>
+{% extends "layout.html" %}
+
+{% block content %}
+
+<a href="{% url 'geo:list' current_type.slug %}">Back to {% if current_type.plural_name %}{{current_type.plural_name}}{% else %}{{ current_type.name }}s{% endif %}</a>
 {% if geo %}
     <h3>{{ geo }}</h3>
 {% else %}
     <p>No geography available.</p>
 {% endif %}
+
+{% endblock %}
