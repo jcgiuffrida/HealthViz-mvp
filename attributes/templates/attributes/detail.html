@@ -4,4 +4,15 @@
 
 {{ attribute }}
 
+{% if coverage %}
+<br/>
+<br/>
+The following geographies are covered by this attribute:
+<ul>
+  {% for cov in coverage %}
+  <li>{{ cov.type }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
+
 {% endblock %}
