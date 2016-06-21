@@ -1,4 +1,6 @@
 from django.contrib import admin
+from import_export import resources
+from import_export.admin import ImportExportModelAdmin
 
 from .models import Type, Geography, Region
 
@@ -6,7 +8,7 @@ from .models import Type, Geography, Region
 admin.site.register(Type)
 
 
-class GeographyAdmin(admin.ModelAdmin):
+class GeographyAdmin(ImportExportModelAdmin):
     list_display = ['__str__', 'type', 'special_area']
     list_filter = ['type', 'special_area']
     search_fields = ['name', 'special_area_name']

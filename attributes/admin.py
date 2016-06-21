@@ -5,13 +5,13 @@ from import_export.admin import ImportExportModelAdmin
 from .models import Source, Parent_Attribute, Attribute
 
 
-class SourceResource(resources.ModelResource):
+# class SourceResource(resources.ModelResource):
 
-    class Meta:
-        model = Source
-        skip_unchanged = True
-        report_skipped = True
-        export_order = ('id', 'description', 'name', 'url',)
+#     class Meta:
+#         model = Source
+#         skip_unchanged = True
+#         report_skipped = True
+#         export_order = ('id', 'description', 'name', 'url',)
 
 
 class SourceAdmin(ImportExportModelAdmin):
@@ -20,10 +20,15 @@ class SourceAdmin(ImportExportModelAdmin):
 
 admin.site.register(Source, SourceAdmin)
 
-admin.site.register(Parent_Attribute)
+
+class ParentAttributeAdmin(ImportExportModelAdmin):
+    pass
 
 
-class AttributeAdmin(admin.ModelAdmin):
+admin.site.register(Parent_Attribute, ParentAttributeAdmin)
+
+
+class AttributeAdmin(ImportExportModelAdmin):
     fieldsets = [
         (None, {'fields': ['name', 'key', 'source', 'source_exact', 'period', 'description']}),
         ('Advanced', {'fields': ['denominator', 'source_url',], 'classes': ['collapse']}),
