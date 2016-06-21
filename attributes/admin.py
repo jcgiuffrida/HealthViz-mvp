@@ -1,8 +1,25 @@
 from django.contrib import admin
+from import_export import resources
+from import_export.admin import ImportExportModelAdmin
 
 from .models import Source, Parent_Attribute, Attribute
 
-admin.site.register(Source)
+
+class SourceResource(resources.ModelResource):
+
+    class Meta:
+        model = Source
+        skip_unchanged = True
+        report_skipped = True
+        export_order = ('id', 'description', 'name', 'url',)
+
+
+class SourceAdmin(ImportExportModelAdmin):
+    pass
+
+
+admin.site.register(Source, SourceAdmin)
+
 admin.site.register(Parent_Attribute)
 
 
@@ -23,3 +40,6 @@ class AttributeAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Attribute, AttributeAdmin)
+
+
+
