@@ -2,7 +2,14 @@
 
 {% block content %}
 
-<a href="{% url 'geo:index' %}">All geographies</a>
+{% include "geo/layout_geo.html" %}
+
+<ol class="breadcrumb">
+  <li><a href="{% url 'home' %}">Home</a></li>
+  <li><a href="{% url 'geo:index' %}">Geographies</a></li>
+  <li class="active">Regions</li>
+</ol>
+
 {% if region_list %}
     <ul>
     {% for region in region_list %}

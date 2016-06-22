@@ -2,6 +2,8 @@
 
 {% block content %}
 
+{% include "geo/layout_geo.html" %}
+
 {% if geo_type_list %}
     <ul>
       <li><a href="{% url 'geo:region_list' %}">Region</a></li>

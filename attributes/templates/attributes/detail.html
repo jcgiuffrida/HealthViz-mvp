@@ -2,6 +2,14 @@
 
 {% block content %}
 
+{% include "attributes/layout_attr.html" %}
+
+<ol class="breadcrumb">
+  <li><a href="{% url 'home' %}">Home</a></li>
+  <li><a href="{% url 'attributes:index' %}">Attributes</a></li>
+  <li class="active">{{ attribute }}</li>
+</ol>
+
 {{ attribute }}
 
 {% if coverage %}

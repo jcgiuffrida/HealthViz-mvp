@@ -2,7 +2,15 @@
 
 {% block content %}
 
-<a href="{% url 'geo:region_list' %}">Back to regions</a>
+{% include "geo/layout_geo.html" %}
+
+<ol class="breadcrumb">
+  <li><a href="{% url 'home' %}">Home</a></li>
+  <li><a href="{% url 'geo:index' %}">Geographies</a></li>
+  <li><a href="{% url 'geo:region_list' %}">Regions</a></li>
+  <li class="active">{{ region.name }}</li>
+</ol>
+
 <h3>{{ region.name }}</h3>
 <p>{{ region.description }}</p>
 

@@ -17,6 +17,7 @@ def list(request, UrlSlug):
     return render(request, 'geo/list.html', {
         'geo_list': geo_list, 
         'current_type': current_type,
+        'title': current_type,
     })
 
 
@@ -29,6 +30,7 @@ def detail(request, UrlSlug, geoid):
         'geo': geo,
         'current_type': current_type,
         'coverage': coverage,
+        'UrlSlug': UrlSlug,
     })
 
 

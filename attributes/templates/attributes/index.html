@@ -2,6 +2,10 @@
 
 {% block content %}
 
+{% include "attributes/layout_attr.html" %}
+
+<a href="{% url 'attributes:sources' %}">Sources</a>
+
 {% if attribute_list %}
     <ul>
     {% for attr in attribute_list %}

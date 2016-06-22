@@ -2,7 +2,15 @@
 
 {% block content %}
 
-<a href="{% url 'geo:list' current_type.slug %}">Back to {% if current_type.plural_name %}{{current_type.plural_name}}{% else %}{{ current_type.name }}s{% endif %}</a>
+{% include "geo/layout_geo.html" %}
+
+<ol class="breadcrumb">
+  <li><a href="{% url 'home' %}">Home</a></li>
+  <li><a href="{% url 'geo:index' %}">Geographies</a></li>
+  <li><a href="{% url 'geo:list' UrlSlug %}">{{ current_type }}</a></li>
+  <li class="active">{{ geo }}</li>
+</ol>
+
 {% if geo %}
     <h3>{{ geo }}</h3>
     {% if coverage %}

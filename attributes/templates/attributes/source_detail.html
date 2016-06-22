@@ -2,6 +2,15 @@
 
 {% block content %}
 
+{% include "attributes/layout_attr.html" %}
+
+<ol class="breadcrumb">
+  <li><a href="{% url 'home' %}">Home</a></li>
+  <li><a href="{% url 'attributes:index' %}">Attributes</a></li>
+  <li><a href="{% url 'attributes:sources' %}">Sources</a></li>
+  <li class="active">{{ source }}</li>
+</ol>
+
 {{ source }}
 
 {% endblock %}
