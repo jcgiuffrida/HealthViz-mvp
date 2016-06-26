@@ -5,7 +5,7 @@ Definition of urls for HealthViz.
 from datetime import datetime
 from django.conf.urls import patterns, url
 from home.forms import BootstrapAuthenticationForm
-from home.views import home, contact, about
+from home.views import home, terms, about
 from django.contrib.auth.views import login, logout
 
 # Uncomment the next lines to enable the admin:
@@ -19,7 +19,7 @@ urlpatterns = [
     url(r'^geo/', include('geo.urls', namespace='geo')),
     url(r'^data/', include('eav.urls', namespace='eav')),
     url(r'^$', home, name='home'),
-    url(r'^contact$', contact, name='contact'),
+    url(r'^contact$', terms, name='terms'),
     url(r'^about', about, name='about'),
     url(r'^login/$', login,
         {

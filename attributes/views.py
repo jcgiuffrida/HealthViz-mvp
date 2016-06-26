@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from django.views import generic
+from datetime import datetime
 
-from .models import Attribute, Source
-from eav.models import Coverage
+from .models import Parent_Attribute, Attribute, Source
+from eav.models import Coverage, EAV
 
 
 class AttrList(generic.ListView):
@@ -12,8 +13,17 @@ class AttrList(generic.ListView):
 
     # we only want the first 10 attributes
     def get_queryset(self):
-        """Return the first 10 attributes."""
-        return Attribute.objects.order_by('key')[:10]
+        """Return all attributes."""
+        return Attribute.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(AttrList, self).get_context_data(**kwargs)
+        context['attr_count'] = super(AttrList, self).get_queryset().count()
+        context['source_count'] = Source.objects.all().count()
+        context['eav_count'] = EAV.objects.all().count()
+        context['title'] = "Attributes"
+        context['year'] = datetime.now().year
+        return context
 
 
 class AttrDetail(generic.DetailView):
