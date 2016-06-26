@@ -7,6 +7,8 @@ class Source(models.Model):
     description = models.TextField()
     url = models.URLField(max_length=200, blank=True, null=True)
 
+    class Meta:
+        ordering = ['name',]
     def __str__(self):
         return self.name
 

@@ -32,3 +32,8 @@ ul.stats-tabs a:active {
   text-decoration: none;
   color: #0f7864;
 }
+
+/* statistics table */
+table#statistics {
+  min-width: 300px;
+}
