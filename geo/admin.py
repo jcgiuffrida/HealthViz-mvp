@@ -9,7 +9,7 @@ admin.site.register(Type)
 
 
 class GeographyAdmin(ImportExportModelAdmin):
-    list_display = ['__str__', 'type', 'special_area']
+    list_display = ['__str__', 'type', 'special_area', 'special_area_name',]
     list_filter = ['type', 'special_area']
     search_fields = ['name', 'special_area_name']
     ordering = ('type', 'name')

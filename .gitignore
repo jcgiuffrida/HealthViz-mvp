@@ -16,3 +16,4 @@ HealthViz/settings/
 .gitattributes
 migrations/
 HealthViz/static
+local/

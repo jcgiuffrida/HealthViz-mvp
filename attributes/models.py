@@ -78,7 +78,7 @@ class Attribute(models.Model):
     added_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, editable=False)
 
     def __str__(self):
-        v = self.parent.name
+        v = self.parent.name + " (" + self.key + ")"
         if self.age_strat:
             v += ', ' + self.get_age_strat_display()
         if self.sex_strat:

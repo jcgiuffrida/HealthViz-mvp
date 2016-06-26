@@ -18,7 +18,7 @@ class Geography(models.Model):
 	type = models.ForeignKey(Type, on_delete=models.CASCADE)
 	latitude = models.DecimalField("Latitude of the centroid", max_digits=12, decimal_places=10, blank=True, null=True)
 	longitude = models.DecimalField("Longitude of the centroid", max_digits=12, decimal_places=10, blank=True, null=True)
-	special_area = models.BooleanField("Does this geography contain a special area, like a university, jail, or central business district?", default=False)
+	special_area = models.BooleanField(default=False, help_text="Does this geography contain a special area, like a university, jail, or central business district?")
 	special_area_name = models.CharField(max_length=127, blank=True, null=True)
 
 	class Meta:
