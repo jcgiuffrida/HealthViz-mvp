@@ -1,36 +1,40 @@
 {% extends "layout.html" %}
 
 {% block content %}
+{% load staticfiles %}
 
 <div class="jumbotron">
-    <h1>Health Viz</h1>
-    <p class="lead">Health Viz is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://www.djangoproject.com/" class="btn btn-primary btn-large">Learn more &raquo;</a></p>
+  <div class="row">
+    <div class="col-md-8">
+      <h1>Health Viz</h1>
+      <p class="lead">Health Viz is a platform for understanding, analyzing, and visualizing information about Illinois communities.</p>
+      <p><a href="{% url 'about' %}" class="btn btn-success btn-large">Learn more &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+      <img class="img-responsive pull-right" src="{% static '/media/images/region.png' %}" width="100%" style="border-radius: 5px;" />
+    </div>
+  </div>
 </div>
 
 <div class="row">
     <div class="col-md-4">
-        <h2>Scatterplot</h2>
+        <h2>Attributes</h2>
         <p>
-            Django gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
+            Health Viz includes hundreds of data attributes from dozens of public and private data sources.
         </p>
-        <p><a class="btn btn-default" href="http://www.djangobook.com/en/2.0/index.html">Learn more &raquo;</a></p>
+        <p><a class="btn btn-primary" href="{% url 'attributes:index' %}">Explore attributes &raquo;</a></p>
     </div>
     <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>The Python Package Index is a repository of software for the Python programming language.</p>
-        <p><a class="btn btn-default" href="https://pypi.python.org/pypi">Learn more &raquo;</a></p>
+        <h2>Geographic areas</h2>
+        <p>Health Viz includes data about every ZIP code, Census tract, and county in Illinois, as well as thousands of other geographic levels.</p>
+        <p><a class="btn btn-primary" href="{% url 'geo:index' %}">See all geographies &raquo;</a></p>
     </div>
     <div class="col-md-4">
-        <h2>Python Tools for Visual Studio</h2>
+        <h2>Open source</h2>
         <p>
-            PTVS is a free, open source plugin that turns Visual Studio into a Python IDE 
-            with support for editing, browsing, IntelliSense, Azure remote debugging, 
-            profiling and more.
+            Health Viz is entirely free to use and built using open source tools. That means you can help build more features into the site.
         </p>
-        <p><a class="btn btn-default" href="http://pytools.codeplex.com">Learn more &raquo;</a></p>
+        <p><a class="btn btn-primary" href="https://github.com/lucaluca/SDH">Join us &raquo;</a></p>
     </div>
 </div>
 

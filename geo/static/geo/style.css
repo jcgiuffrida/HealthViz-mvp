@@ -2,7 +2,7 @@
 /* geography types */
 .type {
   width: 100%;
-  border-radius: 15px;
+  border-radius: 10px;
   text-align: center;
   cursor: pointer;
   min-height: 250px;
@@ -17,7 +17,7 @@
   padding: 0;
   background-color: #fff;
   opacity: 0.75;
-  border-radius: 15px;
+  border-radius: 10px;
   min-height: 250px;
   transition: opacity 0.25s;
 }

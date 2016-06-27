@@ -1,10 +1,27 @@
 {% extends "layout.html" %}
 
 {% block content %}
+{% load humanize %}
 
-<h2>{{ title }}.</h2>
-<h3>{{ message }}</h3>
-
-<p>Use this area to provide additional information.</p>
+<div class="row">
+  <div class="col-md-12">
+    <h2>About Health Viz <small>Visualize Illinois communities</small></h2>
+    <p>Health Viz is a platform for understanding, analyzing, and visualizing information about Illinois communities.</p>
+    <p>We incorporate data from public and private sources to build a holistic picture of the state of health in Illinois and the "social determinants" that affect health.</p>
+    <br>
+    <p class="lead">Health Viz is growing every day, and currently includes:</p>
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <ul class="stats-tabs">
+          <li><a href="{% url 'attributes:index' %}">{{ attr_count|intcomma }} <span>attributes</span></a></li>
+          <li><a href="{% url 'geo:index' %}">{{ geo_count|intcomma }} <span>locations</span></a></li>
+          <li><a href="#">{{ eav_count|intcomma }} <span>data points</span></a></li>
+        </ul>
+      </div>
+    </div>
+    <br>
+    <p>If you'd like to get involved, <a href="https://github.com/lucaluca/SDH">join us on GitHub</a>.</p>
+  </div>
+</div>
 
 {% endblock %}

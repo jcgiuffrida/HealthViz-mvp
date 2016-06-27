@@ -4,8 +4,10 @@ from import_export.admin import ImportExportModelAdmin
 
 from .models import Type, Geography, Region
 
+class TypeAdmin(ImportExportModelAdmin):
+    pass
 
-admin.site.register(Type)
+admin.site.register(Type, TypeAdmin)
 
 
 class GeographyAdmin(ImportExportModelAdmin):
@@ -17,7 +19,7 @@ class GeographyAdmin(ImportExportModelAdmin):
 admin.site.register(Geography, GeographyAdmin)
 
 
-class RegionAdmin(admin.ModelAdmin):
+class RegionAdmin(ImportExportModelAdmin):
     list_display = ['name', 'added_by']
     list_filter = ['added_by']
     search_fields = ['name', 'description']

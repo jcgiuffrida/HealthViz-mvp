@@ -29,7 +29,7 @@ urlpatterns = [
             'authentication_form': BootstrapAuthenticationForm,
             'extra_context':
             {
-                'title':'Log in',
+                'title':'Admin Login',
                 'year':datetime.now().year,
             }
         },

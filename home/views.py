@@ -7,6 +7,10 @@ from django.http import HttpRequest
 from django.template import RequestContext
 from datetime import datetime
 
+from attributes.models import Attribute
+from geo.models import Geography
+from eav.models import EAV
+
 def home(request):
     """Renders the home page."""
     assert isinstance(request, HttpRequest)
@@ -37,15 +41,14 @@ def terms(request):
 def about(request):
     """Renders the about page."""
     assert isinstance(request, HttpRequest)
-    return render(
-        request,
-        'home/about.html',
-        context_instance = RequestContext(request,
-        {
-            'title':'About',
-            'message':'Your application description page.',
-            'year':datetime.now().year,
-        })
+    context = {
+        'year': datetime.now().year,
+        'attr_count': Attribute.objects.count(),
+        'geo_count': Geography.objects.count(),
+        'eav_count': EAV.objects.count(),
+    }
+    return render(request, 'home/about.html',
+        context_instance = RequestContext(request, context)
     )
 
 def SDH(request):
