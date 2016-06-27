@@ -36,7 +36,7 @@ class AttrDetail(generic.DetailView):
         # Add in a QuerySet of this attribute's coverage
         object = super(AttrDetail, self).get_object()
         # determine best coverage: first entry in Type (ZIP, then CT, then County)
-        cov = Coverage.objects.filter(attribute=object).filter(original=True).order_by('type')
+        cov = Coverage.objects.filter(attribute=object).order_by('type')
         if bool(cov):
             cov_list = []
             for c in cov:
@@ -45,7 +45,7 @@ class AttrDetail(generic.DetailView):
                     'count': EAV.objects.filter(attribute=object).filter(geography__type=c.type).count(),
                     # TD this will be expensive as the EAV table grows
                 })
-            best_cov = cov[0].type
+            best_cov = cov.filter(original=True)[0].type
             context['stats_coverage'] = best_cov
             data = EAV.objects.filter(attribute=object).filter(geography__type=best_cov)
             # TD this may include null values

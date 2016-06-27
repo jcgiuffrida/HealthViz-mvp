@@ -11,7 +11,7 @@ urlpatterns = [
     # ex: /geo/region/1/
     url(r'^region/(?P<pk>\d+)/$', views.RegionView.as_view(), name='region'),
 	# ex: /geo/zip/
-    url(r'^(?P<UrlSlug>[A-Za-z-]+)/$', views.list, name='list'),
+    url(r'^(?P<slug>[A-Za-z-]+)/$', views.GeoListView.as_view(), name='list'),
 	# ex: /geo/zip/60647/
-	url(r'^(?P<UrlSlug>[A-Za-z-]+)/(?P<geoid>[\w-]+)/$', views.detail, name='detail'),
+	url(r'^(?P<slug>[A-Za-z-]+)/(?P<geoid>[\w-]+)/$', views.GeoDetailView.as_view(), name='detail'),
 ]

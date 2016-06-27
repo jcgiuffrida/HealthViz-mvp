@@ -20,16 +20,16 @@ def home(request):
         })
     )
 
-def contact(request):
-    """Renders the contact page."""
+def terms(request):
+    """Renders the terms of use page."""
     assert isinstance(request, HttpRequest)
     return render(
         request,
-        'home/contact.html',
+        'home/terms.html',
         context_instance = RequestContext(request,
         {
-            'title':'Contact',
-            'message':'Your contact page.',
+            'title':'Terms of Use',
+            'message':'Terms of use for Health Viz.',
             'year':datetime.now().year,
         })
     )

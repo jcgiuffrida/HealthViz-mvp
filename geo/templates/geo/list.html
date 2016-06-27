@@ -3,21 +3,63 @@
 {% block content %}
 
 {% include "geo/layout_geo.html" %}
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'home/content/datatables.min.css' %}" />
 
 <ol class="breadcrumb">
   <li><a href="{% url 'home' %}">Home</a></li>
   <li><a href="{% url 'geo:index' %}">Geographies</a></li>
-  <li class="active">{{ current_type }}</li>
+  <li class="active">{{ type }}</li>
 </ol>
 
-{% if geo_list %}
-    <ul>
-    {% for geo in geo_list %}
-        <li><a href="{% url 'geo:detail' current_type.slug geo.geoid %}">{{ geo.name }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No geographies are available.</p>
+<h1>{{ type.plural_name }}</h1>
+<p class="lead">{{ type.description }}</p>
+{% if type.technical_description %}
+<h3>Technical Notes</h3>
+<p>{{ type.technical_description }}</p>
 {% endif %}
+<p>Currently, the {{ type.plural_name }} in Health Viz are limited to Illinois.</p>
 
+{% if geo_list %}
+<div class="row">
+  <div class="col-md-8">
+    <table id="all_geos" class="table table-striped table-hover table-condensed" cellspacing="0" width="100%">
+    <thead>
+      <tr>
+        <th>GEOID</th>
+        <th>Geography</th>
+        <th>Special Area</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for geo in geo_list %}
+        <tr>
+          <td><a href="{% url 'geo:detail' type.slug geo.geoid %}">{{ geo.geoid }}</a></td>
+          <td>{{ geo }}</td>
+          <td>{{ geo.special_area_name }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+    </table>
+    {% else %}
+        <p>No geographies are available.</p>
+    {% endif %}
+  </div>
+  <div class="col-md-4">
+    <img class="img-responsive" src="{{ type.image.url }}" />
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'home/scripts/datatables.min.js' %}"></script>
+<script>
+$(document).ready(function(){
+  $('#all_geos').DataTable({
+    "lengthChange": false,
+    "pageLength": 20,
+    "dom": '<"pull-left"f>rt<"pull-left"p><"pull-right"i><"clear">',
+  });
+});
+</script>
 {% endblock %}

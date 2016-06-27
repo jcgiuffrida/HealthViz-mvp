@@ -3,6 +3,8 @@
 {% block content %}
 
 {% include "geo/layout_geo.html" %}
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'home/content/datatables.min.css' %}" />
 
 <ol class="breadcrumb">
   <li><a href="{% url 'home' %}">Home</a></li>
@@ -10,14 +12,49 @@
   <li class="active">Regions</li>
 </ol>
 
-{% if region_list %}
-    <ul>
-    {% for region in region_list %}
-        <li><a href="{% url 'geo:region' region.id %}">{{ region.name }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No regions are available.</p>
-{% endif %}
+<h1>Regions</h1>
+<p class="lead">Regions, defined by Health Viz users, are composed of other geographies and can represent neighborhoods, service areas, municipalities, or any other areas.</p>
 
+{% if region_list %}
+<div class="row">
+  <div class="col-md-8">
+    <table id="all_regions" class="table table-striped table-hover table-condensed" cellspacing="0" width="100%">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Added by</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for region in region_list %}
+        <tr>
+          <td><a href="{% url 'geo:region' region.id %}">{{ region }}</a></td>
+          <td>{{ region.description }}</td>
+          <td>{{ region.added_by.first_name }} {{ region.added_by.last_name }} </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+    </table>
+    {% else %}
+        <p>No regions are available.</p>
+    {% endif %}
+  </div>
+  <div class="col-md-4">
+    <img class="img-responsive" src="{% static '/media/images/region.png' %}" />
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'home/scripts/datatables.min.js' %}"></script>
+<script>
+$(document).ready(function(){
+  $('#all_regions').DataTable({
+    "lengthChange": false,
+    "pageLength": 20,
+    "dom": '<"pull-left"f>rt<"pull-left"p><"pull-right"i><"clear">',
+  });
+});
+</script>
 {% endblock %}

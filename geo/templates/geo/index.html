@@ -3,16 +3,34 @@
 {% block content %}
 
 {% include "geo/layout_geo.html" %}
+{% load staticfiles %}
 
-{% if geo_type_list %}
-    <ul>
-      <li><a href="{% url 'geo:region_list' %}">Region</a></li>
-    {% for type in geo_type_list %}
-        <li><a href="{% url 'geo:list' type.slug %}">{{ type.name }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No geographies are available.</p>
-{% endif %}
+<div class="row">
+  <div class="col-md-12">
+    <h2>What places are in Health Viz?</h2>
+    <p>Health Viz shows data at different geographic levels, from large areas like counties to small ones like neighborhoods and Census tracts.</p>
+    <p>Click on an option to see maps and explore the available data.</p>
+  </div>
+  {% for type in geo_type_list %}
+  <div class="col-md-4">
+    <div class="type" style="background-image: url('{{ type.image.url }}');" onclick="window.location='{% url 'geo:list' type.slug %}';">
+      <div class="transparency">
+        <br/>
+        <h2><a href="{% url 'geo:list' type.slug %}">{{ type.plural_name }}</a></h2>
+        <p class="description">{{ type.description }}</p>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  <div class="col-md-4">
+    <div class="type" style="background-image: url('{% static '/media/images/region.png' %}');" onclick="window.location='{% url 'geo:region_list' %}';">
+      <div class="transparency">
+        <br/>
+        <h2><a href="{% url 'geo:region_list' %}">Regions</a></h2>
+        <p class="description">Regions, defined by Health Viz users, are composed of other geographies and can represent neighborhoods, service areas, municipalities, or any other areas.</p>
+      </div>
+    </div>
+  </div>
+</div>
 
 {% endblock %}
