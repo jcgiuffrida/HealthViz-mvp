@@ -1,4 +1,3 @@
 django<2
-mysqlclient==1.3.7
 django-import-export
 Pillow==3.2.0
