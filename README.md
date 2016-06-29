@@ -14,6 +14,7 @@ If you have ideas about how this scatterplot might be improved, or would like to
 To run Health Viz on your own computer:
 
 **If you don't already have Django**
+
 1. Install python 3.5
 2. Install [pip](https://pip.pypa.io/)
 3. Create a folder to hold all your virtual environments, e.g. `mkdir ~/.virtualenvs`
@@ -23,6 +24,7 @@ To run Health Viz on your own computer:
 7. Verify that django was installed: type `python` to load Python, then type `import django; print(django.get_version())`. You should have version 1.9.
 
 **After installing Django**
+
 8. Go through the [Django tutorial](https://docs.djangoproject.com/en/1.9/intro/tutorial01/) to learn the basics of the Django framework. Just use the included SQLite database. 
 9. When you're ready to work on Health Viz, clone the GitHub repo to a folder within your Django virtual environment. This folder will be your local repo.
 10. Install the dependencies: `pip install -r requirements.txt`
