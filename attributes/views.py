@@ -37,8 +37,8 @@ class AttrDetail(generic.DetailView):
         object = super(AttrDetail, self).get_object()
         # determine best coverage: first entry in Type (ZIP, then CT, then County)
         cov = Coverage.objects.filter(attribute=object).order_by('type')
+        cov_list = []
         if bool(cov):
-            cov_list = []
             for c in cov:
                 cov_list.append({
                     'name': c.type,
