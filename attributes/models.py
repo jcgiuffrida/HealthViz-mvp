@@ -3,9 +3,10 @@ from django.contrib.auth.models import User
 
 
 class Source(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    description = models.TextField()
-    url = models.URLField(max_length=200, blank=True, null=True)
+    """ A source of data in Health Viz. Examples include the Chicago Department of Public Health, EPA, U.S. Census Bureau, or Presence Health. This should be the "main source" of the data, i.e. the reference you would include under a chart or graph. Details about where exactly the data came from can be included in the Parent_Attribute.source_exact field. """
+    name = models.CharField(max_length=255, unique=True, help_text="Name of the source. This should be fairly short and only include the name of the data product if it's well-known.")
+    description = models.TextField("Description of the source.")
+    url = models.URLField("A URL for the source, such as the organization's home page.", max_length=200, blank=True, null=True, help_text="This should be a generic URL, not the URL holding the data itself.")
 
     class Meta:
         ordering = ['name',]
@@ -80,7 +81,11 @@ class Attribute(models.Model):
     added_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, editable=False)
 
     def __str__(self):
-        v = self.parent.name + " (" + self.key + ")"
+        """ Use try/except to address https://github.com/django-import-export/django-import-export/issues/439 during import/export. Once the data is in the database, it seems to pull self.parent.name just fine """
+        try:
+            v = self.parent.name + " (" + self.key + ")"
+        except:
+            v = self.key
         if self.age_strat:
             v += ', ' + self.get_age_strat_display()
         if self.sex_strat:

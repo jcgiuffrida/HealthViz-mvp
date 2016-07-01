@@ -50,16 +50,3 @@ def about(request):
     return render(request, 'home/about.html',
         context_instance = RequestContext(request, context)
     )
-
-def SDH(request):
-    """Renders a port of the original Health Viz."""
-    assert isinstance(request, HttpRequest)
-    return render(
-        request,
-        'home/SDH/index.html',
-        context_instance = RequestContext(request,
-        {
-            'title':'SDH',
-            'year':datetime.now().year,
-        })
-    )

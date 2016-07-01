@@ -21,7 +21,7 @@ urlpatterns = [
     url(r'^geo/', include('geo.urls', namespace='geo')),
     url(r'^data/', include('eav.urls', namespace='eav')),
     url(r'^$', home, name='home'),
-    url(r'^contact$', terms, name='terms'),
+    url(r'^terms$', terms, name='terms'),
     url(r'^about', about, name='about'),
     url(r'^login/$', login,
         {

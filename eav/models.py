@@ -38,4 +38,8 @@ class Coverage(models.Model):
         )
 
     def __str__(self):
-        return '%s, %s' % (self.attribute, self.type)
+        """ Use try/except to address https://github.com/django-import-export/django-import-export/issues/439 during import/export. Once the data is in the database, it seems to pull self.attribute and self.type just fine """
+        try:
+            return '%s, %s' % (self.attribute, self.type)
+        except:
+            return 'Coverage %s' % self.id
