@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 
 class Source(models.Model):
-    """ A data source. Each entry in this model should be an entity that provides data (e.g. a government agency, organization, or company) rather than the specific name of the product. The sole exception is the American Community Survey, because it is used so frequently. """
+    """ A source of data in Health Viz. Examples include the Chicago Department of Public Health, EPA, U.S. Census Bureau, or Presence Health. This should be the "main source" of the data, i.e. the reference you would include under a chart or graph. Details about where exactly the data came from can be included in the Parent_Attribute.source_exact field. """
     name = models.CharField(max_length=255, unique=True, help_text="Name of the source. This should be fairly short and only include the name of the data product if it's well-known.")
     description = models.TextField("Description of the source.")
     url = models.URLField("A URL for the source, such as the organization's home page.", max_length=200, blank=True, null=True, help_text="This should be a generic URL, not the URL holding the data itself.")
