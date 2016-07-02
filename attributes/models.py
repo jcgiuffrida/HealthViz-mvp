@@ -3,9 +3,10 @@ from django.contrib.auth.models import User
 
 
 class Source(models.Model):
+    """ A data source. Each entry in this model should be an entity that provides data (e.g. a government agency, organization, or company) rather than the specific name of the product. The sole exception is the American Community Survey, because it is used so frequently."""
     name = models.CharField(max_length=255, unique=True)
     description = models.TextField()
-    url = models.URLField(max_length=200, blank=True, null=True)
+    url = models.URLField(max_length=200, blank=True, null=True, help_text="URL of the organization's home page or data page")
 
     class Meta:
         ordering = ['name',]
@@ -14,6 +15,7 @@ class Source(models.Model):
 
 
 class Category(models.Model):
+    """ Category for attributes. These are derived from existing sources like Healthy People 2020. """
     name = models.CharField(max_length=63, unique=True)
 
     class Meta:
@@ -22,15 +24,16 @@ class Category(models.Model):
         return self.name
 
 class Parent_Attribute(models.Model):
-    base_key = models.CharField(max_length=12, unique=True)
+    """ The primary model for an attribute. Each Attribute is essentially an instance of this model which may have certain stratifications. """
+    base_key = models.CharField(max_length=12, unique=True, help_text="A unique three-letter key which can be used to search for this attribute and any of its stratifications.")
     name = models.CharField(max_length=127, unique=True)
-    units = models.CharField(max_length=127, blank=True, null=True, default="% of residents")
+    units = models.CharField(max_length=127, blank=True, null=True, default="% of residents", help_text="E.g. percent of residents, count, $.")
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True)
-    period = models.CharField(max_length=127)
-    description = models.TextField(blank=True, null=True)
+    period = models.CharField(max_length=127, help_text="The time period over which this data was collected or to which it refers.")
+    description = models.TextField(blank=True, null=True, help_text="A short description of this attribute which will be displayed to the user.")
     source = models.ForeignKey(Source)
-    source_exact = models.CharField("E.g. table number, product name", max_length=255, blank=True, null=True)
-    technical_notes = models.TextField("Detailed notes on how this attribute was collected or calculated.", blank=True, null=True)
+    source_exact = models.CharField("Exact source of the data", max_length=255, blank=True, null=True, help_text="E.g. table number, product name. This should be specific enough that a user can use it to find the original data.")
+    technical_notes = models.TextField(blank=True, null=True, help_text="Detailed notes on how this attribute was collected or calculated.")
 
     DENOMINATORS = (
         (None, ''),
@@ -38,7 +41,7 @@ class Parent_Attribute(models.Model):
         ('Housing units', 'Housing units'),
         ('Land area', 'Land area'),
     )
-    denominator = models.CharField(max_length=31, choices=DENOMINATORS, blank=True, null=True)
+    denominator = models.CharField(max_length=31, choices=DENOMINATORS, blank=True, null=True, help_text="The base unit for this attribute when calculating rates or weighted averages across geographies.")
     headline = models.BooleanField("Show by default", default=False)
 
     class Meta:
@@ -48,8 +51,9 @@ class Parent_Attribute(models.Model):
 
 
 class Attribute(models.Model):
+    """ An instance of the Parent_Attribute model which may have stratifications on age, sex, and/or race-ethnicity. Attribute is the model which other apps connect to and inherits most of its information from its parent. """
     parent = models.ForeignKey(Parent_Attribute, on_delete=models.CASCADE)
-    key = models.CharField(max_length=12)
+    key = models.CharField(max_length=12, help_text="A unique key consisting of the parent's base key and any stratifications. For instance, \"POP\" is the full population of this geography, while \"POP-M\" is the male population, and \"POP-MHY\" is the population of male Hispanic youth.")
 
     AGES = (
         (None, ''),

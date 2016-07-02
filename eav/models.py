@@ -4,8 +4,13 @@ from geo.models import Geography, Type
 
 
 class Suppression(models.Model):
-    name = models.CharField(max_length=63)
-    description = models.TextField(blank=True, null=True)
+    """ Reasons for suppressing individual values. Some examples:
+    - The numerator for a calculated rate is too small to protect privacy.
+    - The denominator for a calculated rate is too small resulting in high variance on the estimate.
+    - The value is an extreme outlier not supported by other facts.
+    """
+    name = models.CharField(max_length=63, help_text="A short reason for suppressing this value")
+    description = models.TextField(blank=True, null=True, help_text="Detailed rules for when such values are suppressed")
 
     def __str__(self):
         return self.name
@@ -26,10 +31,11 @@ class EAV(models.Model):
 
 
 class Coverage(models.Model):
+    """ This model shows which attributes are available at which geographic levels. """
     attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE)
     type = models.ForeignKey(Type, on_delete=models.CASCADE)
-    original = models.BooleanField(default=True)
-    interpolated = models.BooleanField(default=False)
+    original = models.BooleanField(default=True, help_text="Data available from the original source at this geographic level and has not been altered.")
+    interpolated = models.BooleanField(default=False, help_text="Data was not available from the original source at this geographic level, so it has been calculated from another geographic level using overlap tables.")
     notes = models.TextField(blank=True, null=True)
 
     class Meta:

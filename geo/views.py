@@ -7,6 +7,13 @@ from eav.models import EAV
 
 
 class IndexView(generic.ListView):
+    """ Show all geography types with a picture and quick description.
+
+    User stories:
+    - Home page for Geographies app
+    - I want to understand how Health Viz works
+    - I want to decide at what level I need data
+    """
     model = Type
     template_name = 'geo/index.html'
     context_object_name = 'geo_type_list'
@@ -19,6 +26,13 @@ class IndexView(generic.ListView):
 
 
 class GeoListView(generic.ListView):
+    """ Show all geographies of a particular type. 
+
+    User stories:
+    - I want to find/search for a specific geography
+    - I want to see geographies side by side
+    - (?) I want to see an attribute in a full choropleth map
+    """
     model = Geography
     template_name = 'geo/list.html'
     context_object_name = 'geo_list'
@@ -39,6 +53,13 @@ class GeoListView(generic.ListView):
 
 
 class GeoDetailView(generic.DetailView):
+    """ Show information about one geography. 
+
+    User stories:
+    - I want to learn about my neighborhood.
+    - I want to know how it stands out.
+    - I want to know what places are similar.
+    """
     model = Geography
     template_name = 'geo/detail.html'
 
@@ -57,6 +78,7 @@ class GeoDetailView(generic.DetailView):
 
 
 class RegionListView(generic.ListView):
+    """ Show all regions. """
     model = Region
     template_name = 'geo/region_list.html'
     context_object_name = 'region_list'
@@ -70,6 +92,7 @@ class RegionListView(generic.ListView):
 
 
 class RegionView(generic.DetailView):
+    """ Show information about one region. """
     model = Region
     template_name = 'geo/region.html'
 

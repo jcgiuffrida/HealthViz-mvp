@@ -8,6 +8,12 @@ from eav.models import Coverage, EAV
 
 
 class AttrList(generic.ListView):
+    """ Show all available attributes.
+
+    User stories:
+    - I want to see what data is available.
+    - I want to search for specific data or topics.
+    """
     model = Attribute
     template_name = 'attributes/index.html'
     context_object_name = 'attribute_list'
@@ -28,6 +34,15 @@ class AttrList(generic.ListView):
 
 
 class AttrDetail(generic.DetailView):
+    """ Show information about one attribute.
+
+    User stories:
+    - I want to learn more about an attribute.
+    - I want to see where an attribute's data comes from.
+    - I want to see summary statistics about an attribute.
+    - I want to see an attribute's geographic coverage.
+    - I want to find similar attributes.
+    """
     model = Attribute
     template_name = 'attributes/detail.html'
 
@@ -72,6 +87,11 @@ class AttrDetail(generic.DetailView):
 
 
 class SourcesList(generic.ListView):
+    """ Show all data sources.
+
+    User stories:
+    - I want to see where data is drawn from.
+    """
     template_name = 'attributes/sources.html'
     context_object_name = 'source_list'
 
@@ -87,6 +107,12 @@ class SourcesList(generic.ListView):
 
 
 class SourceDetail(generic.DetailView):
+    """ Show information about one data source.
+
+    User stories:
+    - I want to learn more about how an attribute is calculated.
+    - I want to know where to find the original data.
+    """
     model = Source
     template_name = 'attributes/source_detail.html'
 
