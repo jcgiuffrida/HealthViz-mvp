@@ -72,10 +72,15 @@ class AttrDetail(generic.DetailView):
                 'min': data.aggregate(Min('value'))['value__min'],
             }
             values = data.values_list('value', flat=True).order_by('value')
-            if data.count() % 2 == 1:  # odd number
-                context['statistics']['median'] = values[int(round(data.count()/2))]
-            else:
-                context['statistics']['median'] = sum(values[data.count()/2-1 : data.count()/2+1]) / 2.0
+            try:
+                if data.count() % 2 == 1:  # odd number
+                    context['statistics']['median'] = values[int(round(data.count()/2))]
+                else:
+                    context['statistics']['median'] = sum(values[data.count()/2-1 : data.count()/2+1]) / 2.0
+            except AssertionError:
+                # no data for this attribute
+                context['statistics']['median'] = 'N/A'
+
         else:
             pass
         related_attrs = Attribute.objects.filter(parent__category=object.parent.category).exclude(pk=object.id)[:5]
