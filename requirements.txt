@@ -1,4 +1,4 @@
 django<2
 django-import-export
-Pillow==3.2.0
+pillow
 docutils

@@ -5,6 +5,7 @@
 {% include "geo/layout_geo.html" %}
 {% load staticfiles %}
 <link rel="stylesheet" type="text/css" href="{% static 'home/content/datatables.min.css' %}" />
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
 
 <ol class="breadcrumb">
   <li><a href="{% url 'home' %}">Home</a></li>
@@ -12,54 +13,53 @@
   <li class="active">{{ type }}</li>
 </ol>
 
-<h1>{{ type.plural_name }}</h1>
-<p class="lead">{{ type.description }}</p>
-{% if type.technical_description %}
-<h3>Technical Notes</h3>
-<p>{{ type.technical_description }}</p>
-{% endif %}
-<p>Currently, the {{ type.plural_name }} in Health Viz are limited to Illinois.</p>
-
-{% if geo_list %}
 <div class="row">
-  <div class="col-md-8">
+  <div class="col-md-7">
+    <h1>{{ type.plural_name }}</h1>
+    <p class="lead">{{ type.description }}</p>
+    {% if type.technical_description %}
+    <h3>Technical Notes</h3>
+    <p>{{ type.technical_description }}</p>
+    {% endif %}
+    <p>Currently, the {{ type.plural_name }} in Health Viz are limited to Illinois.</p>
+    {% if geo_list %}
     <table id="all_geos" class="table table-striped table-hover table-condensed" cellspacing="0" width="100%">
-    <thead>
-      <tr>
-        <th>GEOID</th>
-        <th>Geography</th>
-        <th>Special Area</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for geo in geo_list %}
+      <thead>
         <tr>
-          <td><a href="{% url 'geo:detail' type.slug geo.geoid %}">{{ geo.geoid }}</a></td>
-          <td>{{ geo }}</td>
-          <td>{{ geo.special_area_name }}</td>
+          <th>GEOID</th>
+          <th>Geography</th>
+          <th>Special Area</th>
         </tr>
-      {% endfor %}
-    </tbody>
+      </thead>
+      <tbody>
+        {% load humanize %}
+        {% for geo in geo_list %}
+          <tr>
+            <td><a href="{% url 'geo:detail' type.slug geo.geoid %}">{{ geo.geoid }}</a></td>
+            <td>{{ geo }}</td>
+            <td>{{ geo.special_area_name }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
     </table>
     {% else %}
-        <p>No geographies are available.</p>
+    <p>No geographies are available.</p>
     {% endif %}
   </div>
-  <div class="col-md-4">
-    <img class="img-responsive" src="{{ type.image.url }}" />
+  <div class="col-md-5" id="map" style="height: 750px;">
   </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script src="{% static 'home/scripts/datatables.min.js' %}"></script>
+<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script src="{% static 'geo/initialize-map.js' %}"></script>
 <script>
-$(document).ready(function(){
-  $('#all_geos').DataTable({
-    "lengthChange": false,
-    "pageLength": 20,
-    "dom": '<"pull-left"f>rt<"pull-left"p><"pull-right"i><"clear">',
-  });
-});
+var shapes = {{ shapes|safe }};
+var type = '{{ type }}';
+var url = "{% url 'geo:list' type.slug %}";
 </script>
+<script src="{% static 'geo/list.js' %}"></script>
 {% endblock %}

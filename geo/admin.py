@@ -2,7 +2,7 @@ from django.contrib import admin
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 
-from .models import Type, Geography, Region
+from .models import Type, Geography, Region, Shape
 
 class TypeAdmin(ImportExportModelAdmin):
     pass
@@ -17,6 +17,12 @@ class GeographyAdmin(ImportExportModelAdmin):
     ordering = ('type', 'name')
 
 admin.site.register(Geography, GeographyAdmin)
+
+
+class ShapeAdmin(ImportExportModelAdmin):
+    pass
+
+admin.site.register(Shape, ShapeAdmin)
 
 
 class RegionAdmin(ImportExportModelAdmin):

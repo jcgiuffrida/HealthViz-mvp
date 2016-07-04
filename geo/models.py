@@ -1,5 +1,7 @@
 from django.db import models
+import jsonfield
 from django.contrib.auth.models import User
+
 
 
 class Type(models.Model):
@@ -10,6 +12,7 @@ class Type(models.Model):
 	technical_description = models.TextField(blank=True, null=True, help_text="Advanced details about this geography, such as how it is created or caveats.")
 	plural_name = models.CharField(max_length=127, null=True, blank=True, help_text="The plural form of the name.")
 	image = models.ImageField(upload_to='images', blank=True, null=True, help_text="A sample image of this geography, such as from a map or drawing.")
+	shapes = models.FileField(upload_to='shapes', blank=True, null=True, help_text="A TopoJSON file of all the shapes which are part of this Type.")
 
 	def __str__(self):
 		return self.name
@@ -38,6 +41,11 @@ class Geography(models.Model):
 	def __str__(self):
 		return self.name
 
+
+class Shape(models.Model):
+	""" GeoJSON and/or TopoJSON for the geographies. We store this data separately because it can be large and slow down the main table. """
+	geoid = models.ForeignKey(Geography, on_delete=models.CASCADE)
+	shape = jsonfield.JSONField()
 
 # class Overlap(models.Model):
 # 	"""Store the overlap of different geographies, e.g. ZIP code and census tract. This table is de-normalized for simplicity because all information will be loaded at once. The table can help do the following things:

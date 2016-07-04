@@ -6,6 +6,7 @@
 {% load staticfiles %}
 {% load humanize %}
 <link rel="stylesheet" type="text/css" href="{% static 'home/content/datatables.min.css' %}" />
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
 
 <ol class="breadcrumb">
   <li><a href="{% url 'home' %}">Home</a></li>
@@ -46,8 +47,14 @@
         <p>No attributes are available.</p>
     {% endif %}
   </div>
-  {% if regions %}
+  
   <div class="col-md-4">
+    <div class="row">
+      <div class="col-md-12" id="map">
+      </div>
+    </div>
+    
+    {% if regions %}
     <h4>Regions that include {{ geography }}</h4>
     <ul class="list-group">
     {% for region in regions %}
@@ -59,16 +66,80 @@
 </div>
 <br/>
 
+
 {% endblock %}
 
 {% block scripts %}
 <script src="{% static 'home/scripts/datatables.min.js' %}"></script>
+<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
 <script>
 $(document).ready(function(){
   $('#all_attrs').DataTable({
     "lengthChange": false,
     "dom": '<"pull-left"f>rt<"pull-left"p><"pull-right"i><"clear">',
   });
+
+  var shape = {{ shape|safe }};
+
+  // initialize the map
+  var map = L.map('map', {
+    center: [41.8338, -87.7334],
+    zoom: 10,
+    zoomControl: false
+  });
+
+  L.control.zoom({
+    position: 'topright'
+  }).addTo(map);
+
+  L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>- <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a> | Imagery &copy; <a href="http://mapbox.com">Mapbox</a>',
+      maxZoom: 18,
+      minZoom: 6,
+      id: 'mapbox.light',
+      accessToken: 'pk.eyJ1IjoiamdpdWZmcmlkYSIsImEiOiJjaW1pZnF3cXMwMDl5dXRrZ2FwbDAxOGx3In0.u5objUUR9x0mfHYy1PtYCQ'
+  }).addTo(map);
+
+  var layer = new L.GeoJSON().addData(shape);
+
+  // zoom to feature on mouse click
+  function zoomToFeature(e) {
+      map.fitBounds(e.target.getBounds());
+  }
+
+  function enterLayer(){  
+    this.setStyle({
+      fillOpacity: 0.45,
+      opacity: 1
+    });
+  }
+
+  function leaveLayer(){  
+    this.setStyle({
+      weight: 3,
+      fillOpacity: 0.3,
+      opacity: 0.75
+    });
+  }
+
+  layer.eachLayer(function(i){
+    i.setStyle({
+      fillColor: '#3498db',
+      color: '#3498db',
+      weight: 3,     // line
+      opacity: 0.75,   // line
+      fillOpacity: 0.3,
+      smoothFactor: 0.95
+    });
+
+    i.on({
+      mouseover: enterLayer,
+      mouseout: leaveLayer,
+      dblclick: zoomToFeature
+    });
+  });
+
+  map.addLayer(layer).fitBounds(layer.getBounds());
 });
 </script>
 {% endblock %}
