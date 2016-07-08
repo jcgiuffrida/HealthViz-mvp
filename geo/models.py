@@ -47,16 +47,26 @@ class Shape(models.Model):
 	geoid = models.OneToOneField(Geography, on_delete=models.CASCADE, related_name="shape")
 	shape = jsonfield.JSONField()
 
-# class Overlap(models.Model):
-# 	"""Store the overlap of different geographies, e.g. ZIP code and census tract. This table is de-normalized for simplicity because all information will be loaded at once. The table can help do the following things:
 
-# 		- Convert a variable from one geography to another: for each ZIP code, calculate the weighted average of a variable currently existing at the census tract level
-# 		- Help identify geographies: for a given census tract, what ZIP code is it primarily in?
-# 		"""
-# 	from_type = models.ForeignKey(Type, on_delete=models.CASCADE)
-# 	from_geo = models.ForeignKey(Geography, on_delete=models.CASCADE)
-# 	to_type = models.ForeignKey(Type, on_delete=models.CASCADE)
-# 	to_geo = models.ForeignKey(Geography, on_delete=models.CASCADE)
+class Overlap(models.Model):
+	"""
+	Store the overlap of different geographies, e.g. ZIP code and census tract. This table is de-normalized for simplicity, so each piece of information appears twice.
+
+	This table will primarily be used to:
+		- Convert a variable from one geography to another, using the average weighted by the overlap population/housing units/area
+		- Help identify and filter geographies: for a given census tract, what ZIP codes is it in?
+
+	"""
+	from_type = models.ForeignKey(Type, on_delete=models.CASCADE)
+	from_geo = models.ForeignKey(Geography, on_delete=models.CASCADE)
+	to_type = models.ForeignKey(Type, on_delete=models.CASCADE)
+	to_geo = models.ForeignKey(Geography, on_delete=models.CASCADE)
+	pop_overlap = models.IntegerField(help_text="Total population in both the `from_geo` and the `to_geo`")
+	hu_overlap = models.IntegerField(help_text="Number of housing units in both the `from_geo` and the `to_geo`")
+	area_overlap = models.IntegerField(help_text="Total land area in both the `from_geo` and the `to_geo`")
+	pop_overlap_pct = models.FloatField(help_text="Percent of the `from_geo` population that is in the `to_geo`")
+	hu_overlap_pct = models.FloatField(help_text="Percent of the `from_geo` housing units that is in the `to_geo`")
+	area_overlap_pct = models.FloatField(help_text="Percent of the `from_geo` land area that is in the `to_geo`")
 
 
 class Region(models.Model):
