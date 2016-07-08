@@ -1,0 +1,17 @@
+{% extends "rest_framework/base.html" %}
+{% load staticfiles %}
+
+{% block bootstrap_theme %}
+    <link rel="stylesheet" type="text/css" href="{% static 'home/content/bootstrap-flatly.min.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'home/content/home.css' %}" />
+{% endblock %}
+
+{% block navbar %}
+{% include "navbar.html" %}
+{% endblock %}
+
+{% block title %}
+{{ name }} - Health Viz API
+{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}

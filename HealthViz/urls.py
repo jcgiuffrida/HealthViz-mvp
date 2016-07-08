@@ -19,7 +19,7 @@ urlpatterns = [
     # attributes
     url(r'^attr/', include('attributes.urls', namespace='attributes')),
     url(r'^geo/', include('geo.urls', namespace='geo')),
-    url(r'^data/', include('eav.urls', namespace='eav')),
+    url(r'^api/', include('eav.urls')),
     url(r'^$', home, name='home'),
     url(r'^terms$', terms, name='terms'),
     url(r'^about', about, name='about'),

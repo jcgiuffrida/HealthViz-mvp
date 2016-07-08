@@ -44,7 +44,7 @@ class Geography(models.Model):
 
 class Shape(models.Model):
 	""" GeoJSON and/or TopoJSON for the geographies. We store this data separately because it can be large and slow down the main table. """
-	geoid = models.ForeignKey(Geography, on_delete=models.CASCADE)
+	geoid = models.OneToOneField(Geography, on_delete=models.CASCADE, related_name="shape")
 	shape = jsonfield.JSONField()
 
 # class Overlap(models.Model):

@@ -28,10 +28,10 @@ class Parent_Attribute(models.Model):
     base_key = models.CharField(max_length=12, unique=True, help_text="A unique three-letter key which can be used to search for this attribute and any of its stratifications.")
     name = models.CharField(max_length=127, unique=True)
     units = models.CharField(max_length=127, blank=True, null=True, default="% of residents", help_text="E.g. percent of residents, count, $.")
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True, related_name='attributes')
     period = models.CharField(max_length=127, help_text="The time period over which this data was collected or to which it refers.")
     description = models.TextField(blank=True, null=True, help_text="A short description of this attribute which will be displayed to the user.")
-    source = models.ForeignKey(Source)
+    source = models.ForeignKey(Source, related_name='attributes')
     source_exact = models.CharField("Exact source of the data", max_length=255, blank=True, null=True, help_text="E.g. table number, product name. This should be specific enough that a user can use it to find the original data.")
     technical_notes = models.TextField(blank=True, null=True, help_text="Detailed notes on how this attribute was collected or calculated.")
 
@@ -52,7 +52,7 @@ class Parent_Attribute(models.Model):
 
 class Attribute(models.Model):
     """ An instance of the Parent_Attribute model which may have stratifications on age, sex, and/or race-ethnicity. Attribute is the model which other apps connect to and inherits most of its information from its parent. """
-    parent = models.ForeignKey(Parent_Attribute, on_delete=models.CASCADE)
+    parent = models.ForeignKey(Parent_Attribute, on_delete=models.CASCADE, related_name='stratifications')
     key = models.CharField(max_length=12, help_text="A unique key consisting of the parent's base key and any stratifications. For instance, \"POP\" is the full population of this geography, while \"POP-M\" is the male population, and \"POP-MHY\" is the population of male Hispanic youth.")
 
     AGES = (

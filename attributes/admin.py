@@ -23,53 +23,6 @@ admin.site.register(Source, SourceAdmin)
 admin.site.register(Category)
 
 
-class ParentAttributeAdmin(ImportExportModelAdmin):
-    fieldsets = [
-        (None, {'fields': [
-            'name', 
-            'base_key', 
-            'units', 
-            'period',
-            'source', 
-            'source_exact',
-            'description',
-        ]}),
-        ('Advanced', {'fields': [
-            'denominator', 
-            'technical_notes',
-            'headline',
-        ], 'classes': ['collapse']}),
-    ]
-    exclude = [
-        'category',
-    ]
-    list_display = [
-        'base_key',
-        'name',
-        'period',
-        'source',
-    ]
-    list_filter = [
-        'category',
-        'period',
-        'source',
-        'denominator',
-    ]
-    ordering = [
-        'base_key',
-    ]
-
-    def save_model(self, request, obj, form, change):
-        """ Adds an un-stratified attribute with this as its parent."""
-        obj.save()
-        if not change:
-            a = Attribute(parent=obj, key=obj.base_key)
-            a.save()
-
-
-
-admin.site.register(Parent_Attribute, ParentAttributeAdmin)
-
 
 class AttributeAdmin(ImportExportModelAdmin):
     fieldsets = [
@@ -121,4 +74,59 @@ class AttributeAdmin(ImportExportModelAdmin):
 admin.site.register(Attribute, AttributeAdmin)
 
 
+class AttributeInline(admin.TabularInline):
+    model = Attribute
+    extra = 0
+    verbose_name = 'stratification'
+    verbose_name_plural = 'stratifications'
+    can_delete = False
+
+
+class ParentAttributeAdmin(ImportExportModelAdmin):
+    fieldsets = [
+        (None, {'fields': [
+            'name', 
+            'base_key', 
+            'category',
+            'units', 
+            'period',
+            'source', 
+            'source_exact',
+            'description',
+        ]}),
+        ('Advanced', {'fields': [
+            'denominator', 
+            'technical_notes',
+            'headline',
+        ], 'classes': ['collapse']}),
+    ]
+    inlines = [AttributeInline]
+    exclude = [
+    ]
+    list_display = [
+        'base_key',
+        'name',
+        'period',
+        'source',
+    ]
+    list_filter = [
+        'category',
+        'period',
+        'source',
+        'denominator',
+    ]
+    ordering = [
+        'base_key',
+    ]
+
+    def save_model(self, request, obj, form, change):
+        """ Adds an un-stratified attribute with this as its parent."""
+        obj.save()
+        if not change:
+            a = Attribute(parent=obj, key=obj.base_key)
+            a.save()
+
+
+
+admin.site.register(Parent_Attribute, ParentAttributeAdmin)
 

@@ -32,7 +32,7 @@ class EAV(models.Model):
 
 class Coverage(models.Model):
     """ This model shows which attributes are available at which geographic levels. """
-    attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE)
+    attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE, related_name="coverage")
     type = models.ForeignKey(Type, on_delete=models.CASCADE)
     original = models.BooleanField(default=True, help_text="Data available from the original source at this geographic level and has not been altered.")
     interpolated = models.BooleanField(default=False, help_text="Data was not available from the original source at this geographic level, so it has been calculated from another geographic level using overlap tables.")
@@ -46,6 +46,6 @@ class Coverage(models.Model):
     def __str__(self):
         """ Use try/except to address https://github.com/django-import-export/django-import-export/issues/439 during import/export. Once the data is in the database, it seems to pull self.attribute and self.type just fine """
         try:
-            return '%s, %s' % (self.attribute, self.type)
+            return self.type.name
         except:
             return 'Coverage %s' % self.id
