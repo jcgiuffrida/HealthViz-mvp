@@ -15,7 +15,7 @@
         <ul class="stats-tabs">
           <li><a href="{% url 'attributes:index' %}">{{ attr_count|intcomma }} <span>attributes</span></a></li>
           <li><a href="{% url 'geo:index' %}">{{ geo_count|intcomma }} <span>locations</span></a></li>
-          <li><a href="#">{{ eav_count|intcomma }} <span>data points</span></a></li>
+          <li><a href="{% url 'api-root' %}">{{ eav_count|intcomma }} <span>data points</span></a></li>
         </ul>
       </div>
     </div>
