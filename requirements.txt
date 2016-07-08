@@ -4,3 +4,4 @@ pillow
 docutils
 djangorestframework
 markdown
+jsonfield
