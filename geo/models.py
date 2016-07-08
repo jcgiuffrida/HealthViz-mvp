@@ -57,10 +57,10 @@ class Overlap(models.Model):
 		- Help identify and filter geographies: for a given census tract, what ZIP codes is it in?
 
 	"""
-	from_type = models.ForeignKey(Type, on_delete=models.CASCADE)
-	from_geo = models.ForeignKey(Geography, on_delete=models.CASCADE)
-	to_type = models.ForeignKey(Type, on_delete=models.CASCADE)
-	to_geo = models.ForeignKey(Geography, on_delete=models.CASCADE)
+	from_type = models.ForeignKey(Type, on_delete=models.CASCADE, related_name="overlaps_from")
+	from_geo = models.ForeignKey(Geography, on_delete=models.CASCADE, related_name="overlaps")
+	to_type = models.ForeignKey(Type, on_delete=models.CASCADE, related_name="overlaps_to")
+	to_geo = models.ForeignKey(Geography, on_delete=models.CASCADE, related_name="overlaps_to")
 	pop_overlap = models.IntegerField(help_text="Total population in both the `from_geo` and the `to_geo`")
 	hu_overlap = models.IntegerField(help_text="Number of housing units in both the `from_geo` and the `to_geo`")
 	area_overlap = models.IntegerField(help_text="Total land area in both the `from_geo` and the `to_geo`")
