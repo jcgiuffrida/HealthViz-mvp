@@ -1,18 +1,18 @@
 from rest_framework import serializers
-from attributes.models import Source, Parent_Attribute, Attribute, Category
+from attributes.models import Source, Population, Attribute, Category
 from geo.models import Type, Geography, Region, Shape
-from eav.models import EAV
+from eav.models import Value
 
 
 
-class NestedParentAttributeSerializer(serializers.ModelSerializer):
+class NestedAttributeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Parent_Attribute
-        fields = ('id', 'base_key', 'name', 'period', )
+        model = Attribute
+        fields = ('id', 'key', 'name', 'period', )
 
 
 class SourceSerializer(serializers.ModelSerializer):
-    attributes = NestedParentAttributeSerializer(many=True, read_only=True)
+    attributes = NestedAttributeSerializer(many=True, read_only=True)
 
     class Meta:
         model = Source
@@ -20,46 +20,33 @@ class SourceSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    attributes = NestedParentAttributeSerializer(many=True, read_only=True)
+    attributes = serializers.StringRelatedField(many=True, read_only=True)
 
     class Meta:
         model = Category
-        fields = ('id', 'name', 'attributes',)
+        fields = ('id', 'name', 'description', 'is_health_outcome', 'attributes',)
 
 
 class AttributeSerializer(serializers.ModelSerializer):
-    coverage = serializers.StringRelatedField(many=True, read_only=True)
-
-    class Meta: 
-        model = Attribute
-        fields = ('key', 'age_strat', 'race_strat', 'sex_strat', 'coverage', )
-
-
-class ParentAttributeSerializer(serializers.ModelSerializer):
     source = serializers.ReadOnlyField(source='source.name')
-    category = serializers.StringRelatedField(read_only=True)
-    stratifications = AttributeSerializer(many=True, read_only=True)
+    categories = serializers.StringRelatedField(many=True, read_only=True)
+    coverage = serializers.StringRelatedField(many=True, read_only=True)
+    populations = serializers.StringRelatedField(many=True, read_only=True)
 
     class Meta:
-        model = Parent_Attribute
-        fields = ('id', 'base_key', 'name', 'units', 'category', 
+        model = Attribute
+        fields = ('id', 'key', 'name', 'units', 'categories', 
             'period', 'source', 'description', 'source_exact', 
-            'denominator', 'stratifications', )
+            'weight_by', 'populations', 'coverage', )
 
 
 class NestedRegionSerializer(serializers.ModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='region-detail')
     added_by = serializers.ReadOnlyField(source='added_by.username')
 
     class Meta:
         model = Region
         fields = ('id', 'name', 'added_by', )
 
-
-class NestedShapeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Shape
-        fields = ('shape', )
 
 
 class GeographySerializer(serializers.ModelSerializer):
@@ -74,7 +61,7 @@ class GeographySerializer(serializers.ModelSerializer):
 class GeographyShapeSerializer(serializers.ModelSerializer):
     type = serializers.StringRelatedField(read_only=True)
     regions = NestedRegionSerializer(many=True, read_only=True)
-    shape = NestedShapeSerializer(read_only=True)
+    shape = serializers.ReadOnlyField(source='shape.shape')
 
     class Meta:
         model = Geography
@@ -93,9 +80,11 @@ class RegionSerializer(serializers.ModelSerializer):
 class DataSerializer(serializers.ModelSerializer):
     attribute = serializers.ReadOnlyField(source='attribute.key')
     geography = serializers.ReadOnlyField(source='geography.geoid')
+    population = serializers.StringRelatedField(read_only=True)
+
     class Meta:
-        model = EAV
-        fields = ('geography', 'attribute', 'value', 'suppression', )
+        model = Value
+        fields = ('geography', 'attribute', 'population', 'value', 'se', 'suppression', )
 
 
 

@@ -20,7 +20,7 @@
     <ul class="stats-tabs">
       <li>{{ attr_count|intcomma }} <span>attributes</span></li>
       <li><a href="{% url 'attributes:sources' %}">{{ source_count|intcomma }} <span>sources of data</span></a></li>
-      <li>{{ eav_count|intcomma }} <span>data points</span></li>
+      <li>{{ value_count|intcomma }} <span>data points</span></li>
     </ul>
   </div>
 </div>
@@ -41,9 +41,9 @@
   {% for attr in attribute_list %}
     <tr>
       <td>{{ attr.key }}</td>
-      <td><a href="{% url 'attributes:attribute_detail' attr.id %}">{{ attr.parent.name }}{% if attr.parent.units %} ({{ attr.parent.units }}){% endif %}</a></td>
-      <td>{{ attr.parent.period }}</td>
-      <td><a href="{% url 'attributes:source_detail' attr.parent.source.id %}">{{ attr.parent.source }}</a></td>
+      <td><a href="{% url 'attributes:attribute_detail' attr.id %}">{{ attr.name }}{% if attr.units %} ({{ attr.units }}){% endif %}</a></td>
+      <td>{{ attr.period }}</td>
+      <td><a href="{% url 'attributes:source_detail' attr.source.id %}">{{ attr.source }}</a></td>
     </tr>
   {% endfor %}
 </tbody>

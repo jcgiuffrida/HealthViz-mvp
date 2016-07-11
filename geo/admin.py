@@ -2,10 +2,16 @@ from django.contrib import admin
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 
-from .models import Type, Geography, Region, Shape
+from .models import Type, Geography, Region, Shape, Overlap
 
 class TypeAdmin(ImportExportModelAdmin):
-    pass
+    list_display = [
+        'id',
+        'name',
+    ]
+    ordering = (
+        'id',
+    )
 
 admin.site.register(Type, TypeAdmin)
 
@@ -31,7 +37,14 @@ class RegionAdmin(ImportExportModelAdmin):
     search_fields = ['name', 'description']
 
     def save_model(self, request, obj, form, change):
-      obj.added_by = request.user
-      obj.save()
+        if not change:
+            obj.added_by = request.user
+        obj.save()
 
 admin.site.register(Region, RegionAdmin)
+
+
+class OverlapAdmin(ImportExportModelAdmin):
+    pass
+
+admin.site.register(Overlap, OverlapAdmin)

@@ -8,14 +8,14 @@
 <ol class="breadcrumb">
   <li><a href="{% url 'home' %}">Home</a></li>
   <li><a href="{% url 'attributes:index' %}">Attributes</a></li>
-  <li class="active">{{ attribute.parent.name }}</li>
+  <li class="active">{{ attribute.name }}</li>
 </ol>
 
 <div class="row">
   <div class="col-md-6">
-    <h1>{{ attribute.parent.name }} <span class="badge">{{ attribute.key }}</span></h1>
-    <p class="lead">{{ attribute.parent.units }}</p>
-    <p>{{ attribute.parent.description }}</p>
+    <h1>{{ attribute.name }} <span class="badge">{{ attribute.key }}</span></h1>
+    <p class="lead">{{ attribute.units }}</p>
+    <p>{{ attribute.description }}</p>
     <br/>
     {% if coverage %}
     The following Illinois geographies have information about this attribute:
@@ -25,22 +25,23 @@
       {% endfor %}
     </ul>
     {% endif %}
-    {% if attribute.parent.technical_notes %}
+    {% if attribute.technical_notes %}
     <h4>Technical notes</h4>
-    <p class="small">{{ attribute.parent.technical_notes }}</p>
+    <p class="small">{{ attribute.technical_notes }}</p>
     {% endif %}
   </div> 
   <div class="col-md-6">
     <div class="pull-right">
       <br/>
-      <h4>Source: <a href="{% url 'attributes:source_detail' attribute.parent.source.id %}">{{ attribute.parent.source }}</a>{% if attribute.parent.source_exact %} ({{ attribute.parent.source_exact }}){% endif %}</h4>
-      <h4>Time period: {{ attribute.parent.period }}</h4>
+      <h4>Source: <a href="{% url 'attributes:source_detail' attribute.source.id %}">{{ attribute.source }}</a>{% if attribute.source_exact %} ({{ attribute.source_exact }}){% endif %}</h4>
+      <h4>Time period: {{ attribute.period }}</h4>
+      <h4><small>{{ statistics.population }}</small></h4>
       {% if coverage %}
       <h3>Statistics <small>Illinois {{ stats_coverage.plural_name }}, n={{ statistics.count|intcomma }}</small></h3>
       <table id="statistics" class="table table-striped">
         <thead>
           <tr>
-            <th></th><th>{{ attribute.parent.units }}</th>
+            <th></th><th>{{ attribute.units }}</th>
           </tr>
         </thead>
         <tbody>
@@ -68,7 +69,7 @@
     <h3>Related attributes</h3>
     <ul class="list-group">
     {% for attr in related_attrs %}
-      <a class="list-group-item" href="{% url 'attributes:attribute_detail' attr.id %}">{{ attr.parent.name }}{% if attr.parent.units %} ({{ attr.parent.units }}){% endif %}<span class="badge">{{ attr.key }}</span></a>
+      <a class="list-group-item" href="{% url 'attributes:attribute_detail' attr.id %}">{{ attr.name }}{% if attr.units %} ({{ attr.units }}){% endif %}<span class="badge">{{ attr.key }}</span></a>
     {% endfor %}
     </ul>
   </div>

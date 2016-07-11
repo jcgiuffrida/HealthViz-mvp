@@ -1,8 +1,8 @@
 from rest_framework import viewsets, generics, permissions
-from attributes.models import Source, Category, Parent_Attribute
+from attributes.models import Source, Category, Population, Attribute
 from geo.models import Geography, Region
-from eav.models import EAV
-from eav.serializers import SourceSerializer, CategorySerializer, ParentAttributeSerializer, GeographySerializer, GeographyShapeSerializer, RegionSerializer, DataSerializer
+from eav.models import Value
+from eav.serializers import SourceSerializer, CategorySerializer, AttributeSerializer, GeographySerializer, GeographyShapeSerializer, RegionSerializer, DataSerializer
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -15,7 +15,7 @@ def Health_Viz_API(request, format=None):
     """
     ### This is the API root for Health Viz.
 
-    The endpoints are detailed below. All accept `GET` requests only, and you can see individual objects by adding the object ID after the trailing slash, e.g. [`/api/attributes/2`](/api/attributes/2).
+    The endpoints are detailed below. All currently accept `GET` requests only, and you can see individual objects by adding the object ID after the trailing slash, e.g. [`/api/attributes/2`](/api/attributes/2).
 
     To retrieve JSON alone, add `?format=json` to the URL.
     """
@@ -69,7 +69,7 @@ class SourceViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = SourceSerializer
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     """
     This endpoint shows the categories of data in Health Viz through `list` and `detail` views. 
 
@@ -83,14 +83,14 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 class AttributeViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    This endpoint shows the attributes in Health Viz through `list` and `detail` views. Each attribute may have a number of stratifications (on age, sex, and/or race and ethnicity), and each stratification has a defined coverage over geography types.
+    This endpoint shows the attributes in Health Viz through `list` and `detail` views. Each attribute may cover a number of populations (defined by age, sex, and/or race and ethnicity), and each attribute has a defined coverage over geography types.
 
     You can add the `id` field after the trailing slash to request that attribute alone, e.g. [`/api/attributes/2/`](/api/attributes/2).
 
     **This endpoint is experimental and could change without warning.**
     """
-    queryset = Parent_Attribute.objects.all()
-    serializer_class = ParentAttributeSerializer
+    queryset = Attribute.objects.all()
+    serializer_class = AttributeSerializer
 
 
 class GeographyViewSet(viewsets.ReadOnlyModelViewSet):
@@ -138,27 +138,30 @@ class DataViewSet(viewsets.ReadOnlyModelViewSet):
     """
     This endpoint shows the data in Health Viz.
 
-    Due to the quantity of data, you should filter by attribute, individual geography, type of geography, or any combination of these by adding `attribute`, `geography`, or `type` as query parameters. Use the attribute's `key` field, the geography's `geoid` field, and the type's `slug` field.
+    Due to the quantity of data, you should filter by attribute, individual geography, type of geography, population, or any combination of these by adding `attribute`, `geography`, `type`, or `population` as query parameters. Use the attribute's `key` field, the geography's `geoid` field, the type's `slug` field, and the population's `key` field.
 
-    For instance, the following would retrieve all population information about ZIP codes:
+    For instance, the following would retrieve all unemployment information about ZIP codes for Hispanics:
 
-    [`/api/data/?attribute=POP&type=zip`](/api/data/?attribute=POP&type=zip&format=json)
+    [`/api/data/?attribute=UEM&type=zip&population=H`](/api/data/?attribute=UEM&type=zip&population=H&format=json)
 
     **This endpoint is experimental and could change without warning.**
     """
     serializer_class = DataSerializer
 
     def get_queryset(self):
-        queryset = EAV.objects.all()
+        queryset = Value.objects.all()
         geography = self.request.query_params.get('geography', None)
         attribute = self.request.query_params.get('attribute', None)
         type = self.request.query_params.get('type', None)
+        population = self.request.query_params.get('population', None)
         if type is not None:
             queryset = queryset.filter(geography__type__slug=type)
         if geography is not None:
             queryset = queryset.filter(geography__geoid=geography)
         if attribute is not None:
             queryset = queryset.filter(attribute__key=attribute)
+        if population is not None:
+            queryset = queryset.filter(population__key=population)
         return queryset
 
 

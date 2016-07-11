@@ -3,8 +3,8 @@ from django.views import generic
 from datetime import datetime
 from django.db.models import Avg, Max, Min, Count
 
-from .models import Parent_Attribute, Attribute, Source
-from eav.models import Coverage, EAV
+from .models import Population, Attribute, Source
+from eav.models import Coverage, Value
 
 
 class AttrList(generic.ListView):
@@ -27,7 +27,7 @@ class AttrList(generic.ListView):
         context = super(AttrList, self).get_context_data(**kwargs)
         context['attr_count'] = super(AttrList, self).get_queryset().count()
         context['source_count'] = Source.objects.all().count()
-        context['eav_count'] = EAV.objects.all().count()
+        context['value_count'] = Value.objects.all().count()
         context['title'] = "Attributes"
         context['year'] = datetime.now().year
         return context
@@ -57,19 +57,24 @@ class AttrDetail(generic.DetailView):
             for c in cov:
                 cov_list.append({
                     'name': c.type,
-                    'count': EAV.objects.filter(attribute=object).filter(geography__type=c.type).count(),
-                    # TD this will be expensive as the EAV table grows
+                    'count': Value.objects.filter(attribute=object).filter(geography__type=c.type).count(),
+                    # TD this will be expensive as the Value table grows
+                    # TD specify which population
                 })
             best_cov = cov.filter(original=True)[0].type
+            # the best sub-population is the one with the lowest ID
+            best_pop = object.populations.all().order_by('id')[0]
+            # each attribute must have at least one population
             context['stats_coverage'] = best_cov
-            data = EAV.objects.filter(attribute=object).filter(geography__type=best_cov)
+            data = Value.objects.filter(attribute=object).filter(geography__type=best_cov).filter(population=best_pop.id)
             # TD this may include null values
-            # TD this will be expensive as the EAV table grows
+            # TD this will be expensive as the Value table grows
             context['statistics'] = {
                 'count': data.count(),
                 'mean': data.aggregate(Avg('value'))['value__avg'],
                 'max': data.aggregate(Max('value'))['value__max'],
                 'min': data.aggregate(Min('value'))['value__min'],
+                'population': best_pop,
             }
             values = data.values_list('value', flat=True).order_by('value')
             try:
@@ -83,10 +88,10 @@ class AttrDetail(generic.DetailView):
 
         else:
             pass
-        related_attrs = Attribute.objects.filter(parent__category=object.parent.category).exclude(pk=object.id)[:5]
+        related_attrs = Attribute.objects.filter(categories__in=object.categories.all()).exclude(pk=object.id)[:5]
         context['related_attrs'] = related_attrs
         context['coverage'] = cov_list
-        context['title'] = object.parent.name
+        context['title'] = object.name
         context['year'] = datetime.now().year
         return context
 
@@ -102,7 +107,7 @@ class SourcesList(generic.ListView):
 
     def get_queryset(self):
         """Return the first 10 sources."""
-        return Source.objects.annotate(num_attrs=Count('parent_attribute__attribute'))
+        return Source.objects.annotate(num_attrs=Count('attributes'))
 
     def get_context_data(self, **kwargs):
         context = super(SourcesList, self).get_context_data(**kwargs)
@@ -124,7 +129,7 @@ class SourceDetail(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super(SourceDetail, self).get_context_data(**kwargs)
         object = super(SourceDetail, self).get_object()
-        attributes = Attribute.objects.filter(parent__source=object)
+        attributes = Attribute.objects.filter(source=object)
         context['attributes'] = attributes
         context['title'] = object
         context['year'] = datetime.now().year

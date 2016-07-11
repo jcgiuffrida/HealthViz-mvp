@@ -6,11 +6,11 @@ from django.contrib.auth.models import User
 
 class Type(models.Model):
 	""" The type of geography. """
-	name = models.CharField(max_length=127, unique=True)
+	name = models.CharField(max_length=100, unique=True)
 	slug = models.CharField(max_length=15, unique=True)
 	description = models.TextField(blank=True, null=True, help_text="A basic description of this geography to be shown to the user.")
 	technical_description = models.TextField(blank=True, null=True, help_text="Advanced details about this geography, such as how it is created or caveats.")
-	plural_name = models.CharField(max_length=127, null=True, blank=True, help_text="The plural form of the name.")
+	plural_name = models.CharField(max_length=100, null=True, blank=True, help_text="The plural form of the name.")
 	image = models.ImageField(upload_to='images', blank=True, null=True, help_text="A sample image of this geography, such as from a map or drawing.")
 	shapes = models.FileField(upload_to='shapes', blank=True, null=True, help_text="A TopoJSON file of all the shapes which are part of this Type.")
 
@@ -20,13 +20,13 @@ class Type(models.Model):
 
 class Geography(models.Model):
 	""" Model for the geographies. """
-	geoid = models.CharField(max_length=15, verbose_name='GEOID', help_text='The <a href="https://www.census.gov/geo/reference/geoidentifiers.html" target="_blank">GEOID</a> for this geography, e.g. 60601 for a ZIP code, 17031 for a county, or 17031110100 for a census tract. The code should be numeric (with leading zeros) and uniquely identify each geography of this type. This will be used as the URL slug.')
-	name = models.CharField(max_length=63, help_text="How this geography should be referred to throughout the site. This could be the same as the GEOID.")
-	type = models.ForeignKey(Type, on_delete=models.CASCADE)
-	latitude = models.DecimalField("Latitude of the centroid", max_digits=12, decimal_places=10, blank=True, null=True)
-	longitude = models.DecimalField("Longitude of the centroid", max_digits=12, decimal_places=10, blank=True, null=True)
+	geoid = models.CharField(max_length=15, verbose_name='GEOID', help_text='The <a href="https://www.census.gov/geo/reference/geoidentifiers.html" target="_blank">GEOID</a> for this geography, e.g. 60601 for a ZIP code, 17031 for a county, 17031110100 for a census tract, or IL04 for a legislative district. The code should uniquely identify each geography of this type. This will be used as the URL slug.')
+	name = models.CharField(max_length=50, help_text="How this geography should be referred to throughout the site. This could be the same as the GEOID.")
+	type = models.ForeignKey(Type, on_delete=models.CASCADE, related_name="geographies")
+	latitude = models.DecimalField("Latitude of the centroid or internal point", max_digits=10, decimal_places=8, blank=True, null=True)
+	longitude = models.DecimalField("Longitude of the centroid or internal point", max_digits=10, decimal_places=8, blank=True, null=True)
 	special_area = models.BooleanField(default=False, help_text="Does this geography contain a special area, like a university, jail, or central business district?")
-	special_area_name = models.CharField(max_length=127, blank=True, null=True, help_text="Name of the special area, if there is one.")
+	special_area_name = models.CharField(max_length=100, blank=True, null=True, help_text="Name of the special area, if there is one.")
 
 	class Meta:
 		unique_together = (
@@ -50,7 +50,7 @@ class Shape(models.Model):
 
 class Overlap(models.Model):
 	"""
-	Store the overlap of different geographies, e.g. ZIP code and census tract. This table is de-normalized for simplicity, so each piece of information appears twice.
+	Store the overlap of different geographies, e.g. ZIP code and census tract. This table is de-normalized for simplicity, so each row is essentially duplicated in reverse.
 
 	This table will primarily be used to:
 		- Convert a variable from one geography to another, using the average weighted by the overlap population/housing units/area
@@ -69,9 +69,10 @@ class Overlap(models.Model):
 	area_overlap_pct = models.FloatField(help_text="Percent of the `from_geo` land area that is in the `to_geo`")
 
 
+
 class Region(models.Model):
 	""" A Region is composed of one or more geographies. """
-	name = models.CharField(max_length=63, unique=True, help_text="Name of the region")
+	name = models.CharField(max_length=100, unique=True, help_text="Name of the region")
 	geographies = models.ManyToManyField(Geography, related_name="regions")
 	description = models.TextField(help_text="Describe what this region represents and how it was created")
 	date_added = models.DateField(auto_now_add=True)
@@ -80,5 +81,3 @@ class Region(models.Model):
 	def __str__(self):
    		return self.name
 
-# test that if a geography is deleted, the region still remains
-# TD: let us store data on regions
