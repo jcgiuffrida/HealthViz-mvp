@@ -4,7 +4,7 @@ from django.db.models import Count
 from datetime import datetime
 
 from .models import Type, Geography, Region, Shape
-from eav.models import EAV
+from eav.models import Value
 
 
 class IndexView(generic.ListView):
@@ -78,7 +78,7 @@ class GeoDetailView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(GeoDetailView, self).get_context_data(**kwargs)
-        context['data'] = EAV.objects.select_related('attribute').filter(geography=self.geography)
+        context['data'] = Value.objects.select_related('attribute').filter(geography=self.geography)
         context['regions'] = self.geography.regions.all()
         context['shape'] = self.shape
         context['type'] = self.type

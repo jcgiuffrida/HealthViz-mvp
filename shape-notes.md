@@ -45,3 +45,13 @@ mapshaper -i tracts-temp.geo.json -simplify 25% keep-shapes stats -o tracts.geo.
 
 mapshaper -i tracts-temp.geo.json -simplify 13% keep-shapes stats -o tracts.topo.json format=topojson force precision=0.0001
 ```
+
+#### Counties
+
+Snap vertices, rename some of the properties, keep only 15% of the points, and reduce precision to ~10 meters (from ~1 angstrom)
+
+```bash
+mapshaper -i counties-original.geo.json snap -each 'id=String(17000+co_fips), delete cartodb_id, delete created_at, delete updated_at, name=name + " County, IL", delete co_fips' -simplify 15% keep-shapes stats -o counties.geo.json force format=geojson precision=0.0001 id-field=id
+
+mapshaper -i counties-original.geo.json snap -each 'id=String(17000+co_fips), delete cartodb_id, delete created_at, delete updated_at, name=name + " County, IL", delete co_fips' -simplify 11% keep-shapes stats -o counties.topo.json force format=topojson precision=0.001 id-field=id
+```
