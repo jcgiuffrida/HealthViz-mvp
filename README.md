@@ -31,6 +31,14 @@ To run a copy of Health Viz on your own computer, you will need Python and Djang
 11. The Health Viz repo includes default settings which you will need to adjust for your implementation. Find the file `HealthViz/settings/dev.py` and update the local development variables and settings, such as your database settings. 
 12. In the root of the Health Viz repo, run `python manage.py migrate` to initialize your database. SQLite is probably fine for your local implementation.
 13. Run `python manage.py createsuperuser` to create a local account you can use to log into the admin service.
-14. Run `python manage.py makemigrations` to load all the models for Health Viz. Then run `python manage.py migrate` to update your database.
+14. Run the following to load all the models for Health Viz:
+
+```bash
+python manage.py makemigrations attributes
+python manage.py makemigrations geo
+python manage.py makemigrations eav
+```
+
+Then run `python manage.py migrate` to update your database.
 15. Load some initial data from the JSON file in the `HealthViz/fixtures/` folder by running `python manage.py loaddata initial-data.json --ignorenonexistent`. *You must create a superuser in step #13 first.*
 16. Run `python manage.py runserver` to launch Health Viz at <http://localhost:8000>. Go to <http://localhost:8000/admin> to log in using the superuser account you just created. 
