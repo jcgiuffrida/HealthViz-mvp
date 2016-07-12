@@ -1,7 +1,6 @@
 from django.shortcuts import render, get_list_or_404, get_object_or_404
 from django.views import generic
 from django.db.models import Count
-from datetime import datetime
 
 from .models import Type, Geography, Region, Shape
 from eav.models import Value
@@ -21,8 +20,6 @@ class IndexView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
-        context['title'] = "Geographies"
-        context['year'] = datetime.now().year
         return context
 
 
@@ -51,8 +48,6 @@ class GeoListView(generic.ListView):
         context['type'] = self.type
         context['shapelist'] = self.shapes.name
         context['shapes'] = self.shapes.read()
-        context['title'] = self.type.name
-        context['year'] = datetime.now().year
         return context
 
 
@@ -82,7 +77,6 @@ class GeoDetailView(generic.DetailView):
         context['regions'] = self.geography.regions.all()
         context['shape'] = self.shape
         context['type'] = self.type
-        context['year'] = datetime.now().year
         return context
 
 
@@ -97,8 +91,6 @@ class RegionListView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(RegionListView, self).get_context_data(**kwargs)
-        context['title'] = "Regions"
-        context['year'] = datetime.now().year
         return context
 
 
@@ -118,6 +110,4 @@ class RegionView(generic.DetailView):
             shape_list.append(s.shape)
         context['geographies'] = geographies
         context['shapes'] = shape_list
-        context['title'] = object
-        context['year'] = datetime.now().year
         return context
