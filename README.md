@@ -28,7 +28,7 @@ To run a copy of Health Viz on your own computer, you will need Python and Djang
 8. Go through the [Django tutorial](https://docs.djangoproject.com/en/1.9/intro/tutorial01/) to learn the basics of the Django framework. 
 9. When you're ready to work on Health Viz, clone the GitHub repo to a folder within your Django virtual environment. 
 10. Install the dependencies: `pip install -r requirements.txt`
-11. The Health Viz repo includes default settings which you will need to adjust for your implementation. Find the file `HealthViz/settings/dev.py` and update the local development variables and settings, such as your database settings. 
+11. The Health Viz repo includes default settings which you will need to adjust for your implementation. Find the file `HealthViz/settings/dev.example.py`, copy its contents into `HealthViz/settings/dev.py` (do not just rename the file), and update the local development variables and settings, such as your database settings. 
 12. In the root of the Health Viz repo, run `python manage.py migrate` to initialize your database. SQLite is probably fine for your local implementation.
 13. Run `python manage.py createsuperuser` to create a local account you can use to log into the admin service.
 14. Run the following to load all the models for Health Viz:
