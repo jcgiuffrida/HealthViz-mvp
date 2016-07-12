@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }} - Health Viz</title>
+    <title>{% block title %}Health Viz{% endblock %}</title>
     {% load staticfiles %}
     <link rel="stylesheet" type="text/css" href="{% static 'home/content/bootstrap-flatly.min.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'home/content/home.css' %}" />
@@ -17,7 +17,7 @@
 {% block content %}{% endblock %}
         <hr/>
         <footer>
-            <p>&copy; {{ year }} Presence Health&nbsp;&nbsp;/&nbsp;&nbsp;<a href="{% url 'terms' %}">Terms of Use</a></p>
+            <p>&copy; {% now "Y" %} Presence Health&nbsp;&nbsp;/&nbsp;&nbsp;<a href="{% url 'terms' %}">Terms of Use</a></p>
         </footer>
     </div>
 

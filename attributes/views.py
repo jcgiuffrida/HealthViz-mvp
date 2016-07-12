@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from django.views import generic
-from datetime import datetime
 from django.db.models import Avg, Max, Min, Count
 
 from .models import Population, Attribute, Source
@@ -28,8 +27,6 @@ class AttrList(generic.ListView):
         context['attr_count'] = super(AttrList, self).get_queryset().count()
         context['source_count'] = Source.objects.all().count()
         context['value_count'] = Value.objects.all().count()
-        context['title'] = "Attributes"
-        context['year'] = datetime.now().year
         return context
 
 
@@ -91,8 +88,6 @@ class AttrDetail(generic.DetailView):
         related_attrs = Attribute.objects.filter(categories__in=object.categories.all()).exclude(pk=object.id)[:5]
         context['related_attrs'] = related_attrs
         context['coverage'] = cov_list
-        context['title'] = object.name
-        context['year'] = datetime.now().year
         return context
 
 
@@ -111,8 +106,6 @@ class SourcesList(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(SourcesList, self).get_context_data(**kwargs)
-        context['title'] = "Sources"
-        context['year'] = datetime.now().year
         return context
 
 
@@ -131,6 +124,4 @@ class SourceDetail(generic.DetailView):
         object = super(SourceDetail, self).get_object()
         attributes = Attribute.objects.filter(source=object)
         context['attributes'] = attributes
-        context['title'] = object
-        context['year'] = datetime.now().year
         return context

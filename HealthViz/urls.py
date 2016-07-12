@@ -1,7 +1,3 @@
-"""
-Definition of urls for HealthViz.
-"""
-
 from datetime import datetime
 from django.conf.urls import patterns, url
 from home.forms import BootstrapAuthenticationForm
@@ -9,8 +5,6 @@ from home.views import home, terms, about
 from django.contrib.auth.views import login, logout
 from django.conf import settings
 from django.conf.urls.static import static
-
-# Uncomment the next lines to enable the admin:
 from django.conf.urls import include
 from django.contrib import admin
 admin.autodiscover()
@@ -27,11 +21,6 @@ urlpatterns = [
         {
             'template_name': 'home/login.html',
             'authentication_form': BootstrapAuthenticationForm,
-            'extra_context':
-            {
-                'title':'Admin Login',
-                'year':datetime.now().year,
-            }
         },
         name='login'),
     url(r'^logout$', logout, 
@@ -39,13 +28,6 @@ urlpatterns = [
             'next_page': '/',
         },
         name='logout'),
-
-    # port of original Health Viz
-    # url(r'^SDH$', 'home.views.SDH', name='SDH'),
-
-    # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-    # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
