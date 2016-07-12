@@ -13,7 +13,7 @@ If you have ideas about how this site might be improved, notice a bug, or would 
 ### Deployment checklist
 To run a copy of Health Viz on your own computer, you will need Python and Django.
 
-**If you don't already have Django**
+####If you don't already have Django**
 
 1. Install python 3.5
 2. Install [pip](https://pip.pypa.io/)
@@ -23,7 +23,7 @@ To run a copy of Health Viz on your own computer, you will need Python and Djang
 6. Install django: from within the virtual environment, type `pip install django`
 7. Verify that django was installed: type `python` to load Python, then type `import django; print(django.get_version())`. You should have version 1.9.x.
 
-**After installing Django**
+  ####After installing Django
 
 8. Go through the [Django tutorial](https://docs.djangoproject.com/en/1.9/intro/tutorial01/) to learn the basics of the Django framework. 
 9. When you're ready to work on Health Viz, clone the GitHub repo to a folder within your Django virtual environment. 
@@ -33,13 +33,13 @@ To run a copy of Health Viz on your own computer, you will need Python and Djang
 13. Run `python manage.py createsuperuser` to create a local account you can use to log into the admin service.
 14. Run the following to load all the models for Health Viz:
 
-```bash
-python manage.py makemigrations attributes
-python manage.py makemigrations geo
-python manage.py makemigrations eav
-```
+  ```bash
+  python manage.py makemigrations attributes
+  python manage.py makemigrations geo
+  python manage.py makemigrations eav
+  ```
 
-Then run `python manage.py migrate` to update your database.
+  Then run `python manage.py migrate` to update your database.
 
 15. Load some initial data from the JSON file in the `HealthViz/fixtures/` folder by running `python manage.py loaddata initial-data.json --ignorenonexistent`. *You must create a superuser in step #13 first.*
 16. Run `python manage.py runserver` to launch Health Viz at <http://localhost:8000>. Go to <http://localhost:8000/admin> to log in using the superuser account you just created. 
