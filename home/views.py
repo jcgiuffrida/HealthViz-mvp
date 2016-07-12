@@ -9,7 +9,7 @@ from datetime import datetime
 
 from attributes.models import Attribute
 from geo.models import Geography
-from eav.models import EAV
+from eav.models import Value
 
 def home(request):
     """Renders the home page."""
@@ -45,7 +45,7 @@ def about(request):
         'year': datetime.now().year,
         'attr_count': Attribute.objects.count(),
         'geo_count': Geography.objects.count(),
-        'eav_count': EAV.objects.count(),
+        'value_count': Value.objects.count(),
     }
     return render(request, 'home/about.html',
         context_instance = RequestContext(request, context)

@@ -36,8 +36,8 @@
       {% for d in data %}
         <tr>
           <td>{{ d.attribute.key }}</td>
-          <td><a href="{% url 'attributes:attribute_detail' d.attribute.id %}">{{ d.attribute.parent.name }}{% if d.attribute.parent.units %} ({{ d.attribute.parent.units }}){% endif %}</a></td>
-          <td>{{ d.attribute.parent.period }}</td>
+          <td><a href="{% url 'attributes:attribute_detail' d.attribute.id %}">{{ d.attribute.name }}{% if d.attribute.units %} ({{ d.attribute.units }}){% endif %}</a></td>
+          <td>{{ d.attribute.period }}</td>
           <td>{{ d.value|floatformat:2 }}</td>
         </tr>
       {% endfor %}

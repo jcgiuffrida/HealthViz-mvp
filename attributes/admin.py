@@ -2,123 +2,104 @@ from django.contrib import admin
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 
-from .models import Source, Category, Parent_Attribute, Attribute
-
-
-# class SourceResource(resources.ModelResource):
-
-#     class Meta:
-#         model = Source
-#         skip_unchanged = True
-#         report_skipped = True
-#         export_order = ('id', 'description', 'name', 'url',)
+from .models import Source, Category, Population, Attribute
 
 
 class SourceAdmin(ImportExportModelAdmin):
-    pass
+    list_display = [
+        'id',
+        'name',
+    ]
+    ordering = (
+        'id',
+    )
 
 
 admin.site.register(Source, SourceAdmin)
 
-admin.site.register(Category)
-
-
-class ParentAttributeAdmin(ImportExportModelAdmin):
-    fieldsets = [
-        (None, {'fields': [
-            'name', 
-            'base_key', 
-            'units', 
-            'period',
-            'source', 
-            'source_exact',
-            'description',
-        ]}),
-        ('Advanced', {'fields': [
-            'denominator', 
-            'technical_notes',
-            'headline',
-        ], 'classes': ['collapse']}),
-    ]
-    exclude = [
-        'category',
-    ]
+class CategoryAdmin(ImportExportModelAdmin):
     list_display = [
-        'base_key',
+        'id',
         'name',
-        'period',
-        'source',
+        'is_health_outcome',
     ]
     list_filter = [
-        'category',
-        'period',
-        'source',
-        'denominator',
+        'is_health_outcome',
     ]
-    ordering = [
-        'base_key',
-    ]
+    ordering = (
+        'id',
+    )
 
-    def save_model(self, request, obj, form, change):
-        """ Adds an un-stratified attribute with this as its parent."""
-        obj.save()
-        if not change:
-            a = Attribute(parent=obj, key=obj.base_key)
-            a.save()
+admin.site.register(Category, CategoryAdmin)
 
 
-
-admin.site.register(Parent_Attribute, ParentAttributeAdmin)
-
-
-class AttributeAdmin(ImportExportModelAdmin):
-    fieldsets = [
-        (None, {'fields': [
-            'parent',
-        ]}),
-        ('Stratifications', {'fields': [
-            'sex_strat', 
-            'race_strat', 
-            'age_strat',
-        ], 'classes': ['collapse']}),
-    ]
+class PopulationAdmin(ImportExportModelAdmin):
     exclude = [
         'key',
     ]
     list_display = [
         'key', 
-        'parent', 
+        'race_or_ethnicity',
+        'sex', 
+        'age', 
     ]
     list_filter = [
-        'sex_strat', 
-        'race_strat', 
-        'age_strat',
+        'race_or_ethnicity', 
+        'sex', 
+        'age',
     ]
     ordering = (
-        'key',
+        'id',
     )
-
-    def create_key(self, obj):
-        v = obj.parent.base_key
-        if obj.age_strat or obj.sex_strat or obj.race_strat:
-            v += '-'
-        if obj.age_strat:
-            v += obj.age_strat
-        if obj.sex_strat:
-            v += obj.sex_strat
-        if obj.race_strat:
-            v += obj.race_strat
-        return v
 
     def save_model(self, request, obj, form, change):
         """ Adds the current user in the added_by field."""
-        obj.added_by = request.user
         if not change:
-            obj.key = self.create_key(obj)
-            obj.save()
+            obj.added_by = request.user
+        obj.save()
 
+
+admin.site.register(Population, PopulationAdmin)
+
+
+class AttributeAdmin(ImportExportModelAdmin):
+    fieldsets = [
+        (None, {'fields': [
+            'name', 
+            'key', 
+            'categories',
+            'units', 
+            'period',
+            'description',
+            'source', 
+            'source_exact',
+        ]}),
+        ('Advanced', {'fields': [
+            'populations', 
+            'weight_by', 
+            'technical_notes',
+        ]}),
+    ]
+    exclude = [
+    ]
+    list_display = [
+        'key',
+        'name',
+        'period',
+        'source',
+    ]
+    list_filter = [
+        'categories',
+        'period',
+        'source',
+        'populations__race_or_ethnicity',
+        'populations__sex', 
+        'populations__age',
+        'weight_by',
+    ]
+    ordering = [
+        'key',
+    ]
 
 admin.site.register(Attribute, AttributeAdmin)
-
-
 

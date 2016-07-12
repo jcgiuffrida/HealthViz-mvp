@@ -2,10 +2,9 @@ from django.shortcuts import render, get_list_or_404, get_object_or_404
 from django.views import generic
 from django.db.models import Count
 from datetime import datetime
-import json
 
 from .models import Type, Geography, Region, Shape
-from eav.models import EAV
+from eav.models import Value
 
 
 class IndexView(generic.ListView):
@@ -72,14 +71,14 @@ class GeoDetailView(generic.DetailView):
         self.type = get_object_or_404(Type, slug=self.kwargs['slug'])
         self.geography = get_object_or_404(Geography, type=self.type, geoid=self.kwargs['geoid'])
         try:
-            self.shape = self.geography.shape_set.all().get().shape
+            self.shape = self.geography.shape.shape
         except:
             self.shape = {'geography': 'does not exist'}
         return self.geography
 
     def get_context_data(self, **kwargs):
         context = super(GeoDetailView, self).get_context_data(**kwargs)
-        context['data'] = EAV.objects.select_related('attribute').filter(geography=self.geography)
+        context['data'] = Value.objects.select_related('attribute').filter(geography=self.geography)
         context['regions'] = self.geography.regions.all()
         context['shape'] = self.shape
         context['type'] = self.type

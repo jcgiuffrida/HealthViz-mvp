@@ -2,4 +2,6 @@ django<2
 django-import-export
 pillow
 docutils
+djangorestframework
+markdown
 jsonfield

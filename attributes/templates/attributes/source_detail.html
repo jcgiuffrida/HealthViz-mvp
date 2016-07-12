@@ -38,8 +38,8 @@
       {% for attr in attributes %}
         <tr>
           <td><a href="{% url 'attributes:attribute_detail' attr.id %}">{{ attr }}</a></td>
-          <td>{{ attr.parent.source_exact }}</td>
-          <td>{{ attr.parent.period }}</td>
+          <td>{{ attr.source_exact }}</td>
+          <td>{{ attr.period }}</td>
         </tr>
       {% endfor %}
     </tbody>

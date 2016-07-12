@@ -13,7 +13,7 @@ mapinfo.onAdd = function (map) {
 mapinfo.update = function (props) {
   var html = '';
   if (props){
-    html = '<h4>' + type + ' ' + props.name + 
+    html = '<h4>' + props.name + 
     '</h4><b>Click</b> to zoom to this ' + type + '<br><b>Right click</b> to learn more about this ' + type;
   } else {
     html = 'Hover over an area';

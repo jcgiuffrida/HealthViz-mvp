@@ -11,9 +11,8 @@ tests/coverage_html/
 tests/.coverage
 build/
 tests/report/
-HealthViz/settings/
+HealthViz/settings/dev.py
 HealthViz/static
-settings.py
 *.sqlite3
 .gitattributes
 migrations/
