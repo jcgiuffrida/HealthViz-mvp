@@ -19,7 +19,7 @@ To run a copy of Health Viz on your own computer, you will need Python and Djang
 2. Install [pip](https://pip.pypa.io/)
 3. Create a folder to hold all your virtual environments, e.g. `mkdir ~/.virtualenvs`
 4. Create a virtual environment where you want everything Django to live: `python -m venv ~/.virtualenvs/Django` (or whatever name you want)
-5. Run the virtual environment: `source ~/.virtualenvs/Django/bin/activate`. You may want to put this in a bash/BATCH script that lives in your root directory so it's easy to load quickly.
+5. Run the virtual environment: `source ~/.virtualenvs/Django/bin/activate`. On Windows, just type `Scripts\activate`. You may want to put this in a bash/BATCH script that lives in your root directory so it's easy to load quickly.
 6. Install django: from within the virtual environment, type `pip install django`
 7. Verify that django was installed: type `python` to load Python, then type `import django; print(django.get_version())`. You should have version 1.9.x.
 
@@ -40,5 +40,6 @@ python manage.py makemigrations eav
 ```
 
 Then run `python manage.py migrate` to update your database.
+
 15. Load some initial data from the JSON file in the `HealthViz/fixtures/` folder by running `python manage.py loaddata initial-data.json --ignorenonexistent`. *You must create a superuser in step #13 first.*
 16. Run `python manage.py runserver` to launch Health Viz at <http://localhost:8000>. Go to <http://localhost:8000/admin> to log in using the superuser account you just created. 
