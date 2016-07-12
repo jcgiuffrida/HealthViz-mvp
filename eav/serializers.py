@@ -81,11 +81,26 @@ class DataSerializer(serializers.ModelSerializer):
     attribute = serializers.ReadOnlyField(source='attribute.key')
     geography = serializers.ReadOnlyField(source='geography.geoid')
     population = serializers.StringRelatedField(read_only=True)
+    suppression = serializers.StringRelatedField(read_only=True)
+    value = serializers.SerializerMethodField()
+    se = serializers.SerializerMethodField()
 
     class Meta:
         model = Value
         fields = ('geography', 'attribute', 'population', 'value', 'se', 'suppression', )
 
+    # cannot reveal case count when value is suppressed
+    def get_value(self, obj):
+        # TD we may want to allow some suppression values, e.g. warnings
+        if obj.suppression:
+            return None
+        return obj.value
+
+    # showing the standard error can also reveal the case count
+    def get_se(self, obj):
+        if obj.suppression:
+            return None
+        return obj.se
 
 
 

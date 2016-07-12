@@ -39,7 +39,7 @@
           <td>{{ d.attribute.key }}</td>
           <td><a href="{% url 'attributes:attribute_detail' d.attribute.id %}">{{ d.attribute.name }}{% if d.attribute.units %} ({{ d.attribute.units }}){% endif %}</a></td>
           <td>{{ d.attribute.period }}</td>
-          <td>{{ d.value|floatformat:2 }}</td>
+          <td>{% if not d.suppression %}{{ d.value|floatformat:2 }}{% else %}SUPPRESSED: {{ d.suppression.name }}{% endif %}</td>
         </tr>
       {% endfor %}
     </tbody>
